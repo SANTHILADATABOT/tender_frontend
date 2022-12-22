@@ -1,35 +1,52 @@
 import { usePageTitle } from "../../hooks/usePageTitle";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 // import Select from "react-select";
 // import { useEffect } from "react";
 // import Swal from "sweetalert2";
 // import axios from "axios";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
-import { useNavigate, useParams, NavLink } from "react-router-dom";
+import { useNavigate, useParams, NavLink, useOutletContext } from "react-router-dom";
 import CompetitorBranch from "./Competitor_Details/CompetitorBranch";
+
 
 const comppath="tender/master/competitorcreation/competitor/details";
 
 const CompetitorDetails = () => {
   usePageTitle("Competitor Creation");
-  const { id } = useParams();
+  const { compid } = useParams();
   const { server1: baseUrl } = useBaseUrl();
+  const setCompetitorId = useOutletContext();
   // const navigate = useNavigate();
-  
+  // useEffect(() => {
+  //   if(compid)
+    
+  // }, []);
+
   return (
-    <Fragment>
+    <div className="formContent">
+      {!compid && (
+        <div className="loading">
+          <img
+            id="loading-image"
+            src="/assets/img/lock.png"
+            alt="Loading..."
+            width="150"
+            height="150"
+          />
+        </div>
+      )}
           
-      <div className="card mb-2 ml-n4  mr-n4 ">
+      <div className="card mb-2  ">
         <a   
           href="#competitorBranch"
-          className="d-block card-header py-3 bg-white"
+          className="d-block card-header py-3 bg-white "
           data-toggle="collapse"
           role="button"
           aria-expanded="true"
           aria-controls="competitorBranch"
         >
-          <h6 className="m-0 font-weight-bold text-black">
-            BRANCHES OF THE COMPANY 1
+          <h6 className="m-0 font-weight-bold text-dark">
+            BRANCHES OF THE COMPANY
           </h6>
         </a>
         {/* Card Content - Collapse */}
@@ -40,33 +57,8 @@ const CompetitorDetails = () => {
         </div>
     </div>
 
-    <div className="card mb-2 ml-n4 mr-n4">
-        <a
-          href={`/${comppath}/branches/${id}`}
-          className="d-block card-header py-3 bg-white"
-          data-toggle="collapse"
-          role="button"
-          aria-expanded="true"
-          aria-controls="competitorTurnOver"
 
-        >
-          <h6 className="m-0 font-weight-bold text-primary">
-            TURN OVER OF THE COMPANY
-          </h6>
-        </a>
-        {/* Card Content - Collapse */}
-        <div className="collapse" id="competitorTurnOver">
-          <div className="card-header">
-            This is a collapsable card example using Bootstrap's built in
-            collapse functionality. <strong>Click on the card header</strong> to
-            see the card body collapse and expand!
-          </div>
-        </div>
-      </div>
-
-      
-
-    <div className="card mb-2 ml-n4 mr-n4">
+    <div className="card mb-2  ">
         <a
           href="#competitorNetWorth"
           className="d-block card-header py-3 bg-white"
@@ -76,7 +68,7 @@ const CompetitorDetails = () => {
           aria-controls="competitorNetWorth"
 
         >
-          <h6 className="m-0 font-weight-bold text-primary">
+          <h6 className="m-0 font-weight-bold text-primary text-dark">
             NETWORTH OF THE COMPANY
           </h6>
         </a>
@@ -90,7 +82,7 @@ const CompetitorDetails = () => {
         </div>
         </div>
 
-        <div className="card mb-2 ml-n4 mr-n4">
+        <div className="card mb-2  ">
     <a
       href="#qualityCertificates"
       className="d-block card-header py-3 bg-white"
@@ -100,7 +92,7 @@ const CompetitorDetails = () => {
       aria-controls="qualityCertificates"
 
     >
-      <h6 className="m-0 font-weight-bold text-primary">
+      <h6 className="m-0 font-weight-bold text-primary text-dark">
         QUALITY CERTIFICATES
       </h6>
     </a>
@@ -115,7 +107,7 @@ const CompetitorDetails = () => {
 </div>
 
 
-    </Fragment>
+</div>
   );
 };
 

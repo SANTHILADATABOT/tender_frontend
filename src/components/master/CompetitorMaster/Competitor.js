@@ -1,18 +1,26 @@
 import { usePageTitle } from "../../hooks/usePageTitle";
-import "./CompetitorMaster.css";
-import { Fragment, useState } from "react";
-import { Link } from "react-router-dom";
-import {  Outlet } from "react-router-dom";
-import {useParams } from "react-router-dom";
+import { Fragment, useState,useEffect } from "react";
+import {useParams,  Outlet, NavLink, useLocation} from "react-router-dom";
 import "./CompetitorMaster.css";
 
 const Competitor = () => {
   usePageTitle("Competitor Creation");
   const { id } = useParams();
-  const [activeTab,setActiveTab]=useState("profile-tab");
-  const tabToggle=(event)=>{
-    setActiveTab(event.target.name)
-  }
+const [competitorId,setCompetitorId]=useState(0);
+ //assigning location variable
+ const location = useLocation();
+
+ //destructuring pathname from location
+ const { pathname } = location;
+
+ //Javascript split method to get the name of the path in array
+ const activeTab = pathname.split("/");
+ 
+useEffect(() => {
+  {id ? setCompetitorId(id): setCompetitorId(0) }
+}, []);
+
+
 
   return (
       
@@ -25,48 +33,44 @@ const Competitor = () => {
                 <div>
                   <ul className="nav nav-tabs nav-justified" id="myTab" role="tablist">
                     <li className="nav-item">
-                      <Link
-                        className={activeTab==="profile-tab" ? "nav-link active" :"nav-link"}
+                      <NavLink
+                        className="nav-link"
                         id="profile-tab"
-                        name="profile-tab"
                         data-toggle="tab"
-                        to={!id ? "profile" : `profile/${id}`}
+                        to={!competitorId ? "profile" : `profile/${competitorId}`}
                         role="tab"
                         aria-controls="profile"
                         aria-selected="true"
-                        onClick={tabToggle}
                       >
                         <i className='far fa-user mr-3'></i>
                         Competitor Profile
-                      </Link>
+                      </NavLink>
                     </li>
                     <li className="nav-item">
-                      <Link
-                        className={activeTab==="contactPerson-tab" ? "nav-link active" :"nav-link"}
-                        id="contactPerson-tab"
-                        name="contactPerson-tab"
+                      <NavLink
+                        className="nav-link" 
+                        id="details-tab"
                         data-toggle="tab"
-                        to={id ? "details/"+id : "details"}
+                        to={!competitorId ? "details": `details/${competitorId}`}
                         role="tab"
-                        aria-controls="contactPerson"
+                        aria-controls="details"
                         aria-selected="false"
-                        onClick={tabToggle}
                       >
-                        
                         <i className='far fa-id-card mr-3'></i>
                         Competitor Details
-                      </Link>
+                      </NavLink>
                     </li>
                   </ul>
+                  
                   <div className="tab-content" id="myTabContent">
                     <div
                     
-                      className={activeTab==="contactPerson-tab" ? "tab-pane fade show active card-body bg-white" :"tab-pane fade show active card-body bg-light"} 
+                      className={activeTab[5]==='profile'? `tab-pane fade show active card-body bg-light`:`tab-pane fade show active card-body bg-white`}
                       id="home"
                       role="tabpanel"
                       aria-labelledby="home-tab"
                     >
-                      <Outlet/>
+                      <Outlet  competitorId/>
                     </div>
                     
                   </div>

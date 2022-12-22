@@ -42,6 +42,7 @@ import CustSubCategView from "./components/master/CustomerSubCategory/CustSubCat
 import CustSubCategMaster from "./components/master/CustomerSubCategory/CustSubCategMaster";
 import ProjectstatusMaster from "./components/master/Projectstatus/ProjectstatusMaster";
 
+
 function App() {
   const authCtx = useContext(AuthContext);
   return (
@@ -111,15 +112,15 @@ function App() {
                 <Route path="competitorcreation/competitor" element={<Competitor />} >
                   <Route path="profile" element={<CompetitorProfile />}/>
                   <Route path="profile/:id" element={<CompetitorProfile />}/>
-
                   <Route path="details" element={<CompetitorDetails />}>
                       <Route path="branches" element={<CompetitorBranch />}/>
+                      
                   </Route>
                 
                 {/*route for to edit with id*/} 
                   <Route path="details/:compid" element={<CompetitorDetails />}>
                     <Route path="branches/:compid" element={<CompetitorBranch />}/>
-                  </Route> 
+                  </Route>
                 </Route>
              
               <Route path="statemaster" >
