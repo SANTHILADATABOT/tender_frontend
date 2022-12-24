@@ -32,14 +32,15 @@ let table;
 const CompetitorBranch = () => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
-  const [competitorBranchInput, setCompetitorBranchInput] = useState({
+  const initialValue={
     branchId: null,
     compNo: null,
     country: null,
     state: null,
     district: null,
     city: null,
-  });
+  }
+  const [competitorBranchInput, setCompetitorBranchInput] = useState(initialValue);
 
   const [countryList, setCountryList] = useState([]);
   const [stateList, setStateList] = useState([]);
@@ -71,58 +72,41 @@ const CompetitorBranch = () => {
     city: null,
   });
 
-  
+  var dataSet = []
   const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
-  let updateId = null;
 
   useEffect(() => {
-    // if (id) {editCompetitor();};
+    
     getBranchList();
     getCountryList();
     getCompNo();
   }, []);
 
-  const getBranchList = async () => {
-    var dataset;
-    const db_branchlist = await axios.get(`${baseUrl}/api/competitorbranch/branchlist/${compid}`);
-    if (db_branchlist.data.status === 200) {
-      let list = [...db_branchlist.data.branch];
 
-      console.log("list :",list );
-      let listarr = list.map((item, index) => ({
-        ...item,
-        action: `<i class="fas fa-edit text-info mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fas fa-trash-alt text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
-        sl_no: index + 1,
-      }));
-      dataset = listarr;
-    } else {
-      dataset = [];
-    }
-    let i = 0;
-    table = $("#dataTable").DataTable({
-      data: dataset,
-      columns: [
-        {
-          render: function (data, type, row) {
-            return ++i;
+  useEffect(() => {
+    var i=0;
+    table =  $('#dataTable').DataTable({
+         data: dataSet,
+         columns: [
+          {render: function (data, type, row) {
+                    return ++i;
+                  },
           },
-        },
-        { data: "country_name" },
-        { data: "state_name" },
-        { data: "district_name" },
-        { data: "city_name" },
-        { data: "action" },
-      ],
-    });
-    setIsMounted(false);
-
-    $("#dataTable tbody").on("click", "tr .fa-edit", function () {
+          { data: "country_name" },
+          { data: "state_name" },
+          { data: "district_name" },
+          { data: "city_name" },
+          { data: "action" },
+         ],
+     })
+     setIsMounted(false);
+     $("#dataTable tbody").on("click", "tr .fa-edit", function () {
       let rowdata = table.row($(this).closest("tr")).data();
       getBranchDetails(rowdata.id);
     });
-
-    // to delete a row
+ 
+       // to delete a row
     $("#dataTable tbody").on("click", "tr .fa-trash-alt", async function () {
       let rowdata = table.row($(this).closest("tr")).data();
 
@@ -174,7 +158,109 @@ const CompetitorBranch = () => {
         }
       });
     });
+  }, [])
+ 
+  useEffect(() => {
+     if(branchList){
+         table.clear().rows.add(branchList).draw();
+     }
+  }, [branchList])
+  
+
+  
+  const getBranchList = async () => {
+    const db_branchlist = await axios.get(`${baseUrl}/api/competitorbranch/branchlist/${compid}`);
+    if (db_branchlist.data.status === 200) {
+      let list = [...db_branchlist.data.branch];
+
+      let listarr = list.map((item, index) => ({
+        ...item,
+        action: `<i class="fas fa-edit text-info mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fas fa-trash-alt text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
+        sl_no: index + 1,
+      }));
+      setBranchList(listarr);
+    } else {
+      setBranchList([]);
+    }
+    // let i = 0;
+    // table = $("#dataTable").DataTable({
+    //   data: dataset,
+    //   columns: [
+    //     {
+    //       render: function (data, type, row) {
+    //         return ++i;
+    //       },
+    //     },
+    //     { data: "country_name" },
+    //     { data: "state_name" },
+    //     { data: "district_name" },
+    //     { data: "city_name" },
+    //     { data: "action" },
+    //   ],
+    // });
+    // setIsMounted(false);
+
+    // $("#dataTable tbody").on("click", "tr .fa-edit", function () {
+    //   let rowdata = table.row($(this).closest("tr")).data();
+    //   getBranchDetails(rowdata.id);
+    // });
+
+    // // to delete a row
+    // $("#dataTable tbody").on("click", "tr .fa-trash-alt", async function () {
+    //   let rowdata = table.row($(this).closest("tr")).data();
+
+    //   Swal.fire({
+    //     text: `Are You sure, to delete ${rowdata.city}?`,
+    //     icon: "warning",
+    //     showCancelButton: true,
+    //     confirmButtonText: "Yes, delete it!",
+    //     cancelButtonText: "No, cancel!",
+    //     confirmButtonColor: "#2fba5f",
+    //     cancelButtonColor: "#fc5157",
+    //   }).then(async (willDelete) => {
+    //     if (willDelete.isConfirmed) {
+    //       let response = await deleteBranch(rowdata.id);
+
+    //       if (response.data.status === 200) {
+    //         Swal.fire({
+    //           //success msg
+    //           icon: "success",
+    //           text: `${rowdata.projectstatus} has been removed!`,
+    //           timer: 1500,
+    //           showConfirmButton: false,
+    //         });
+
+    //         //delete in datatable
+    //         table
+    //           .row($(this).parents("tr"))
+    //           .remove()
+    //           .column(0)
+    //           .nodes()
+    //           .each(function (cell, i) {
+    //             cell.innerHTML = i + 1;
+    //           })
+    //           .draw();
+    //       } else if (response.data.status === 404) {
+    //         Swal.fire({
+    //           // error msg
+    //           icon: "error",
+    //           text: response.data.message,
+    //           showConfirmButton: true,
+    //         });
+    //       } else {
+    //         Swal.fire({
+    //           title: "Cancelled",
+    //           icon: "error",
+    //           timer: 1500,
+    //         });
+    //       }
+    //     }
+    //   });
+    // });
   };
+
+
+
   const getBranchDetails = async (rowid) => {
     let fetchedData = await axios.get(
       `${baseUrl}/api/competitorbranch/${rowid}`
@@ -190,15 +276,7 @@ const CompetitorBranch = () => {
         city: fetchedData.data.branch.city,
       };
     });
-    setCompetitorBranchInput((prev) => {
-      return {
-        ...prev,
-        branchId: editableRow.branchId,
-        compNo: editableRow.compNo,
-      };
-    });
   };
-
   useEffect(() => {
     if (
       editableRow.branchId &&
@@ -233,14 +311,18 @@ const CompetitorBranch = () => {
   };
 
   const getStateList = async () => {
+    if(competitorBranchInput.country!==null){
     await axios
       .get(`${baseUrl}/api/state/list/${competitorBranchInput.country.value}`)
       .then((resp) => {
         setStateList(resp.data.stateList);
         setDistrictList([]);
       });
+    }
   };
   const getDistrictList = async () => {
+    if(competitorBranchInput.country!==null && competitorBranchInput.state!==null)
+    {
     await axios
       .get(
         `${baseUrl}/api/district/list/${competitorBranchInput.country.value}/${competitorBranchInput.state.value}`
@@ -249,8 +331,11 @@ const CompetitorBranch = () => {
         setDistrictList(resp.data.districtList);
         setCityList([]);
       });
+    }
   };
   const getCityList = async () => {
+    if(competitorBranchInput.country!==null && competitorBranchInput.state!==null && competitorBranchInput.district!==null )
+    {
     await axios
       .get(
         `${baseUrl}/api/city/list/${competitorBranchInput.country.value}/${competitorBranchInput.state.value}/${competitorBranchInput.district.value}/null`
@@ -258,63 +343,122 @@ const CompetitorBranch = () => {
       .then((resp) => {
         setCityList(resp.data.cityList);
       });
+    }
   };
 
   useEffect(() => {
-    console.log();
-    if (
-      !competitorBranchInput.branchId > 0 &&
-      competitorBranchInput.country !== null &&
-      countryList.length > 0
-    ) {
+    if(competitorBranchInput.country!==null){
       getStateList();
       setDistrictList([]);
       setCityList([]);
-    } else if (
-      competitorBranchInput.branchId > 0 &&
-      competitorBranchInput.country !== null &&
-      countryList.length > 0
-    ) {
-      getStateList();
-      setCompetitorBranchInput((prev) => {
-        return {
-          ...prev,
-          state: stateList.find((x) => x.value === editableRow.state),
-          district: null,
-          city: null,
-        };
-      });
-      setCityList([]);
-    } else {
-      setCompetitorBranchInput((prev) => {
-        return { ...prev, state: null, district: null, city: null };
-      });
+    }
+    else{
       setStateList([]);
       setDistrictList([]);
       setCityList([]);
     }
+    
   }, [competitorBranchInput.country]);
 
+//set state and get districtList
+  useEffect(()=>{
+    if(editableRow.branchId > 0 &&
+      competitorBranchInput.country !== null &&
+      stateList.length > 0)
+      {
+        setCompetitorBranchInput((prev)=>{return{...prev, state: stateList.find((x) => x.value === editableRow.state)
+        }});
+        setCompetitorBranchInput((prev) => {
+              return { ...prev, district: null, city: null };
+            });
+            getDistrictList();
+      }
+      else{
+        setCompetitorBranchInput((prev) => {
+              return { ...prev, state: null, district: null, city: null };
+            });
+          setDistrictList([]);
+          setCityList([]);
+      }
+  },[stateList])
+  
+//get districtList
   useEffect(() => {
-    if (competitorBranchInput.state !== null && stateList.length > 0) {
+    if(editableRow.branchId > 0 &&
+      competitorBranchInput.state !== null &&
+      districtList.length > 0)
+      { 
+        getDistrictList();
+        setCompetitorBranchInput((prev) => {
+              return { ...prev, district:null, city: null };
+            });
+      }
+    else if (competitorBranchInput.state !== null && stateList.length > 0) {
       getDistrictList();
     }
     setCompetitorBranchInput((prev) => {
       return { ...prev, district: null, city: null };
     });
-    setDistrictList([]);
     setCityList([]);
   }, [competitorBranchInput.state]);
 
+
+  //set district and get citytList
+  useEffect(()=>{
+    if(editableRow.branchId > 0 &&
+      competitorBranchInput.state !== null &&
+      districtList.length > 0 && editableRow.district!== null)
+      {
+        setCompetitorBranchInput((prev)=>{return{...prev, district: districtList.find((x) => x.value === editableRow.district)
+        }});
+        setCompetitorBranchInput((prev) => {
+              return { ...prev, city: null };
+            });
+            getCityList();
+      }
+      else{
+        setCompetitorBranchInput((prev) => {
+              return { ...prev, district: null, city: null };
+            });
+          setCityList([]);
+      }
+  },[districtList]);
+
+  //set city
   useEffect(() => {
     if (competitorBranchInput.district !== null && districtList.length > 0) {
       getCityList();
-    }
-    setCompetitorBranchInput((prev) => {
+      setCompetitorBranchInput((prev) => {
       return { ...prev, city: null };
     });
-    setCityList([]);
+  }
+  else{setCityList([]);}
   }, [competitorBranchInput.district]);
+
+    //set city
+    useEffect(()=>{
+      if(editableRow.branchId > 0 &&
+        competitorBranchInput.district !== null &&
+        cityList.length > 0 && editableRow.city!== null)
+        {
+          setCompetitorBranchInput((prev)=>{return{...prev, city: cityList.find((x) => x.value === editableRow.city)
+          }});
+          setCompetitorBranchInput((prev) => {
+            return {
+              ...prev,
+              branchId: editableRow.branchId,
+              compNo: editableRow.compNo,
+            };
+          });
+          setHasError({country:false, state:false, district:false, city:false});
+        }
+        else{
+          setCompetitorBranchInput((prev) => {
+                return { ...prev, city: null };
+              });
+        }
+    },[cityList]);
+
 
   useEffect(() => {
     if (
@@ -324,6 +468,9 @@ const CompetitorBranch = () => {
       hasError.city === false
     ) {
       setFormIsValid(true);
+    }
+    else{
+      setFormIsValid(false);
     }
   }, [hasError]);
   //Set select Input Values
@@ -405,7 +552,10 @@ const CompetitorBranch = () => {
           timer: 2000,
         }).then(function () {
           setLoading(false);
-          //   navigate(`/tender/master/competitorcreation/competitor/details`);
+          setCompetitorBranchInput(initialValue)
+          getBranchList();
+          // setBranchList(updatedBranchList);
+          // navigate(`/tender/master/competitorcreation/competitor/details`);
         });
       } else if (resp.data.status === 404) {
         Swal.fire({
@@ -424,13 +574,14 @@ const CompetitorBranch = () => {
     return response;
   };
 
-  const updateHandler = (e) => {
+  const updateHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
+    
     let tokenId = localStorage.getItem("token");
     const data = {
       compId: compid,
-      brnachId: inserted_id,
+      brnachId: competitorBranchInput.branchId,
       compNo: competitorBranchInput.compNo,
       country: competitorBranchInput.country.value,
       state: competitorBranchInput.state.value,
@@ -438,12 +589,46 @@ const CompetitorBranch = () => {
       city: competitorBranchInput.city.value,
       tokenId: tokenId,
     };
+    if (
+      data.compId !== null &&
+      data.compNo !== null &&
+      data.country !== null &&
+      data.state !== null &&
+      data.district !== null &&
+      data.city !== null && formIsValid
+    )
+      console.log("data Update:", data);
+    await axios.put(`${baseUrl}/api/competitorbranch/${competitorBranchInput.branchId}`, data).then((resp) => {
+      if (resp.data.status === 200) {
+        console.log("resp.data :", resp.data);
+        Swal.fire({
+          icon: "success",
+          title: "Competitor Branch",
+          text: resp.data.message,
+          timer: 2000,
+        }).then(function () {
+          setLoading(false);
+          setCompetitorBranchInput(initialValue);
+          getBranchList();
+          // navigate(`/tender/master/competitorcreation/competitor/details`);
+        });
+      } else if (resp.data.status === 404) {
+        Swal.fire({
+          icon: "error",
+          title: "Competitor Branch",
+          text: resp.data.errors,
+          confirmButtonColor: "#5156ed",
+        }).then(function () {
+          setLoading(false);
+        });
+      }
+    });
   };
 
   return (
     
       <div className="card-body ">
-        <form onSubmit={submitHandler}>
+        <form>
           <div className="row align-items-center">
             <div className="inputgroup col-lg-5 mb-4">
               <div className="row align-items-center">
@@ -569,9 +754,9 @@ const CompetitorBranch = () => {
                 <button
                   className="btn btn-primary"
                   disabled={!formIsValid}
-                  onClick={!updateId ? submitHandler : updateHandler}
+                  onClick={!editableRow.branchId ? submitHandler : updateHandler}
                 >
-                  {!updateId
+                  {!editableRow.branchId
                     ? loading === true
                       ? "Adding...."
                       : "Add"
@@ -579,7 +764,6 @@ const CompetitorBranch = () => {
                     ? "Updating...."
                     : "Update"}
                 </button>
-                {!formIsValid}
               </div>
             </div>
             <div className="inputgroup col-lg-5 mb-4"></div>
