@@ -168,7 +168,6 @@ const CompetitorProfile = () => {
     else{
       setDistrictList([]);
       setCityList([]);
-      // getDistrictList(); 
     }
   },[stateList])
 

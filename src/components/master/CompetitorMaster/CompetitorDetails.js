@@ -1,12 +1,12 @@
 import { usePageTitle } from "../../hooks/usePageTitle";
-import { Fragment, useState, useEffect } from "react";
+import {  useState, useEffect } from "react";
 // import Select from "react-select";
 // import { useEffect } from "react";
 // import Swal from "sweetalert2";
 // import axios from "axios";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
 import { useNavigate, useParams, NavLink, useOutletContext } from "react-router-dom";
-import CompetitorBranch from "./Competitor_Details/CompetitorBranch";
+import CompetitorBranchForm from "./Competitor_Details/CompetitorBranchForm";
 
 
 const comppath="tender/master/competitorcreation/competitor/details";
@@ -16,11 +16,6 @@ const CompetitorDetails = () => {
   const { compid } = useParams();
   const { server1: baseUrl } = useBaseUrl();
   const setCompetitorId = useOutletContext();
-  // const navigate = useNavigate();
-  // useEffect(() => {
-  //   if(compid)
-    
-  // }, []);
 
   return (
     <div className="formContent">
@@ -52,7 +47,7 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorBranch">
           <div className="card-header">
-            <CompetitorBranch />
+            <CompetitorBranchForm />
           </div>
         </div>
     </div>

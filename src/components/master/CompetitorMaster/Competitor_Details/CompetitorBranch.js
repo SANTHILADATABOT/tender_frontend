@@ -60,10 +60,10 @@ const CompetitorBranch = () => {
   const [isMounted, setIsMounted] = useState(true);
   let inserted_id = 0;
   const [isChanged, setIsChanged] = useState({
-    country: null,
-    state: null,
-    district: null,
-    city: null,
+    country: false,
+    state: false,
+    district: false,
+    city: false,
   });
   const [hasError, setHasError] = useState({
     country: null,
@@ -281,12 +281,22 @@ const CompetitorBranch = () => {
     if (
       editableRow.branchId &&
       editableRow.country !== "" &&
-      countryList.length > 0
+      countryList.length > 0 && isChanged.country===false
     ) {
+      
       setCompetitorBranchInput({
         ...competitorBranchInput,
         country: countryList.find((x) => x.value === editableRow.country),
       });
+    }
+    else{
+      
+      setStateList([]);
+      setDistrictList([]);
+      setCityList([]);
+      setCompetitorBranchInput((prev) => {
+        return { ...prev, country: null, state:null, district: null, city: null };
+          });
     }
   }, [editableRow, countryList]);
 
@@ -347,12 +357,25 @@ const CompetitorBranch = () => {
   };
 
   useEffect(() => {
-    if(competitorBranchInput.country!==null){
+    
+    if(editableRow.branchId && competitorBranchInput.country!==null && isChanged.country===false){
+      console.log("In if");
+      setStateList([]);
+      setDistrictList([]);
+      setCityList([]);
+      getStateList();
+    }
+    else if(editableRow.branchId && competitorBranchInput.country===null){
+      console.log("In Elif");
+      setCompetitorBranchInput((prev) => {
+        return { ...prev,state:null, district: null, city: null };
+          });
       getStateList();
       setDistrictList([]);
       setCityList([]);
     }
     else{
+      console.log("In else");
       setStateList([]);
       setDistrictList([]);
       setCityList([]);
@@ -364,7 +387,7 @@ const CompetitorBranch = () => {
   useEffect(()=>{
     if(editableRow.branchId > 0 &&
       competitorBranchInput.country !== null &&
-      stateList.length > 0)
+      stateList.length > 0 && isChanged.state===false)
       {
         setCompetitorBranchInput((prev)=>{return{...prev, state: stateList.find((x) => x.value === editableRow.state)
         }});
@@ -373,7 +396,7 @@ const CompetitorBranch = () => {
             });
             getDistrictList();
       }
-      else{
+      else {
         setCompetitorBranchInput((prev) => {
               return { ...prev, state: null, district: null, city: null };
             });
@@ -386,20 +409,30 @@ const CompetitorBranch = () => {
   useEffect(() => {
     if(editableRow.branchId > 0 &&
       competitorBranchInput.state !== null &&
-      districtList.length > 0)
-      { 
+      districtList.length > 0 && isChanged.state===false)
+      { setDistrictList([]);
         getDistrictList();
         setCompetitorBranchInput((prev) => {
-              return { ...prev, district:null, city: null };
-            });
+          return { ...prev, district: null, city: null };
+        });
+        setCityList([]);
       }
     else if (competitorBranchInput.state !== null && stateList.length > 0) {
+      setDistrictList([]);
       getDistrictList();
+      setCompetitorBranchInput((prev) => {
+        return { ...prev, district: null, city: null };
+      });
+      setCityList([]);
     }
-    setCompetitorBranchInput((prev) => {
+    else{
+      setDistrictList([]);
+      setCityList([]);
+      setCompetitorBranchInput((prev) => {
       return { ...prev, district: null, city: null };
     });
-    setCityList([]);
+    
+  }
   }, [competitorBranchInput.state]);
 
 
@@ -407,14 +440,20 @@ const CompetitorBranch = () => {
   useEffect(()=>{
     if(editableRow.branchId > 0 &&
       competitorBranchInput.state !== null &&
-      districtList.length > 0 && editableRow.district!== null)
+      districtList.length > 0 && editableRow.district!== null && isChanged.district===false)
       {
-        setCompetitorBranchInput((prev)=>{return{...prev, district: districtList.find((x) => x.value === editableRow.district)
+        setCompetitorBranchInput((prev)=>{return{...prev, district: districtList.find((x) => x.value === editableRow.district), city : null
         }});
-        setCompetitorBranchInput((prev) => {
-              return { ...prev, city: null };
-            });
-            getCityList();
+          setCityList([]);  
+      }
+      else if(editableRow.branchId > 0 &&
+        competitorBranchInput.state !== null &&
+        districtList.length > 0 && isChanged.state===true){
+          setCompetitorBranchInput((prev) => {
+            return { ...prev, district:null, city: null };
+          });
+
+        setCityList([]);
       }
       else{
         setCompetitorBranchInput((prev) => {
@@ -426,6 +465,7 @@ const CompetitorBranch = () => {
 
   //set city
   useEffect(() => {
+   
     if (competitorBranchInput.district !== null && districtList.length > 0) {
       getCityList();
       setCompetitorBranchInput((prev) => {
@@ -439,7 +479,7 @@ const CompetitorBranch = () => {
     useEffect(()=>{
       if(editableRow.branchId > 0 &&
         competitorBranchInput.district !== null &&
-        cityList.length > 0 && editableRow.city!== null)
+        cityList.length > 0 && editableRow.city!== null &&  isChanged.city===false)
         {
           setCompetitorBranchInput((prev)=>{return{...prev, city: cityList.find((x) => x.value === editableRow.city)
           }});
@@ -519,6 +559,7 @@ const CompetitorBranch = () => {
       setHasError({ ...hasError, [action.name]: false });
     }
   };
+  
   const submitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);

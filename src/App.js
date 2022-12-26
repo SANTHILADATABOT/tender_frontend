@@ -7,7 +7,6 @@ import Tendertracker from "./components/tender/Tendertracker/Tendertracker";
 import Tendercreation from "./components/tender/Tendercreation/Tendercreation";
 import Legacystatement from "./components/tender/Legacystatement/Legacystatement";
 import Bidmanagement from "./components/tender/Bidmanagement/Bidmanagement";
-import Test from "./components/tender/test/test";
 import { AuthContextProvider } from "./storeAuth/auth-context";
 import AuthContext from "./storeAuth/auth-context";
 // import Master from "./components/master/Master";
@@ -19,7 +18,8 @@ import CompetitorCreation from "./components/master/CompetitorMaster/CompetitorC
 import Competitor from "./components/master/CompetitorMaster/Competitor";
 import CompetitorProfile from "./components/master/CompetitorMaster/CompetitorProfile";
 import CompetitorDetails from "./components/master/CompetitorMaster/CompetitorDetails";
-import CompetitorBranch from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranch";
+//import CompetitorBranch from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranch";
+import CompetitorBranchForm from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranchForm";
 import CustomerCreationProfile from "./components/master/CustomerCreation/CustomerCreationProfile/CustomerCreationProfile";
 import CustomerCreationMain from "./components/master/CustomerCreation/CustomerCreationMain";
 import CustomerCreationContactPerson from "./components/master/CustomerCreation/CustomerCreationContactPerson/CustomerCreationContactperson";
@@ -113,13 +113,13 @@ function App() {
                   <Route path="profile" element={<CompetitorProfile />}/>
                   <Route path="profile/:id" element={<CompetitorProfile />}/>
                   <Route path="details" element={<CompetitorDetails />}>
-                      <Route path="branches" element={<CompetitorBranch />}/>
+                      <Route path="branches" element={<CompetitorBranchForm />}/>
                       
                   </Route>
                 
                 {/*route for to edit with id*/} 
                   <Route path="details/:compid" element={<CompetitorDetails />}>
-                    <Route path="branches/:compid" element={<CompetitorBranch />}/>
+                    <Route path="branches/:compid" element={<CompetitorBranchForm />}/>
                   </Route>
                 </Route>
              
