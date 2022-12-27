@@ -19,7 +19,7 @@ import Competitor from "./components/master/CompetitorMaster/Competitor";
 import CompetitorProfile from "./components/master/CompetitorMaster/CompetitorProfile";
 import CompetitorDetails from "./components/master/CompetitorMaster/CompetitorDetails";
 //import CompetitorBranch from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranch";
-import CompetitorBranchForm from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranchForm";
+import CompetitorBranchForm from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranch/CompetitorBranchForm";
 import CustomerCreationProfile from "./components/master/CustomerCreation/CustomerCreationProfile/CustomerCreationProfile";
 import CustomerCreationMain from "./components/master/CustomerCreation/CustomerCreationMain";
 import CustomerCreationContactPerson from "./components/master/CustomerCreation/CustomerCreationContactPerson/CustomerCreationContactperson";

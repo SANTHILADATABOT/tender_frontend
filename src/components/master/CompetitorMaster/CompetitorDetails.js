@@ -6,8 +6,8 @@ import {  useState, useEffect } from "react";
 // import axios from "axios";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
 import { useNavigate, useParams, NavLink, useOutletContext } from "react-router-dom";
-import CompetitorBranchForm from "./Competitor_Details/CompetitorBranchForm";
-
+import CompetitorBranchForm from "./Competitor_Details/CompetitorBranch/CompetitorBranchForm";
+import CompetitorDetailsTurnOverForm from "./Competitor_Details/CompetitorTurnOver/CompetitorDetailsTurnOverForm"; 
 
 const comppath="tender/master/competitorcreation/competitor/details";
 
@@ -48,6 +48,27 @@ const CompetitorDetails = () => {
         <div className="collapse" id="competitorBranch">
           <div className="card-header">
             <CompetitorBranchForm />
+          </div>
+        </div>
+    </div>
+
+    <div className="card mb-2  ">
+        <a   
+          href="#competitorTurnOver"
+          className="d-block card-header py-3 bg-white "
+          data-toggle="collapse"
+          role="button"
+          aria-expanded="true"
+          aria-controls="competitorTurnOver"
+        >
+          <h6 className="m-0 font-weight-bold text-dark">
+            TURN OVER OF THE COMPANY
+          </h6>
+        </a>
+        {/* Card Content - Collapse */}
+        <div className="collapse" id="competitorTurnOver">
+          <div className="card-header">
+            <CompetitorDetailsTurnOverForm />
           </div>
         </div>
     </div>

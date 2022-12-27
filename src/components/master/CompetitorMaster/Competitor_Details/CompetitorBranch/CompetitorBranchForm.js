@@ -1,8 +1,8 @@
-import { usePageTitle } from "../../../hooks/usePageTitle";
+import { usePageTitle } from "../../../../hooks/usePageTitle";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useBaseUrl } from "../../../hooks/useBaseUrl";
+import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Select from "react-select";
 import Swal from "sweetalert2";
 // import { Loader } from "rsuite";
@@ -60,7 +60,10 @@ const CompetitorBranchForm = () => {
 
   useEffect(() => {
     getCompNo();
-    getCountryList();
+    if(editableRow.branchId===null)
+    {
+      getCountryList();
+    }
     getBranchList();
   }, []);
 
@@ -81,7 +84,6 @@ const CompetitorBranchForm = () => {
       setCountryList(resp.data.countryList);
     });
   };
-console.log(competitorBranchInput)
   const getStateList = async () => {
 
     if (competitorBranchInput.country !== null) {
@@ -130,7 +132,7 @@ console.log(competitorBranchInput)
         let list = [...resp.data.branch];
         let listarr = list.map((item, index) => ({
           ...item,
-          action: `<i class="fas fa-edit text-info mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fas fa-trash-alt text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
+          buttons:`<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
         setBranchList(listarr);
@@ -140,6 +142,7 @@ console.log(competitorBranchInput)
 
   const onEdit = (data) => {    
       getCountryList();
+      setFormIsValid(true);
       setEditableRow({branchId: data.id,
         compNo: data.compNo,
         country: data.country,
@@ -153,7 +156,6 @@ console.log(competitorBranchInput)
   useEffect(()=>{    
     if(editableRow.branchId >0 && editableRow.country!==null && isChanged.country===false && countryList.length >0)
     {
-
     setCompetitorBranchInput({
       ...competitorBranchInput,
       country: countryList.find((x) => x.value === editableRow.country),
@@ -163,13 +165,19 @@ console.log(competitorBranchInput)
 
   //set Country for New or modification Branch
   useEffect(()=>{
-    if(competitorBranchInput.country!==null){
-      setStateList([]);
+    if(competitorBranchInput.country!==null && isChanged.country === true){
+      
       setCompetitorBranchInput((prev) => {
         return { ...prev, state:null, district: null, city: null };
           });  
       getStateList();
     }
+    else if(competitorBranchInput.country!==null && isChanged.country === false){
+        // setCompetitorBranchInput((prev) => {
+        //   return { ...prev, state:null, district: null, city: null };
+        //     });  
+        getStateList();
+      }
     else if(competitorBranchInput.country===null){
       setStateList([]);
       setCompetitorBranchInput((prev) => {
@@ -185,8 +193,8 @@ useEffect(()=>{
     setCompetitorBranchInput((prev) => {
       return { ...prev,state: stateList.find((x) => x.value === editableRow.state), district: null, city: null };
         }); 
-        setDistrictList([]); 
-        getDistrictList();
+        // setDistrictList([]); 
+        // getDistrictList();
   }
   else{
     setCompetitorBranchInput((prev) => {
@@ -199,7 +207,13 @@ useEffect(()=>{
 
  //set District for New or modification Branch
  useEffect(()=>{
-  if(competitorBranchInput.state!==null)  
+  if(competitorBranchInput.state!==null && isChanged.state===false)  
+  {  getDistrictList();
+    // setCompetitorBranchInput((prev) => {
+    //   return { ...prev, district: null, city: null };
+    //   });  
+  }
+  else if(competitorBranchInput.state!==null && isChanged.state===true)  
   {  getDistrictList();
     setCompetitorBranchInput((prev) => {
       return { ...prev, district: null, city: null };
@@ -220,8 +234,8 @@ useEffect(()=>{
     setCompetitorBranchInput((prev) => {
       return { ...prev,district: districtList.find((x) => x.value === editableRow.district), city: null };
         }); 
-        setCityList([]); 
-        getCityList();
+        // setCityList([]); 
+        // getCityList();
   }
   else{
     setCompetitorBranchInput((prev) => {
@@ -233,12 +247,18 @@ useEffect(()=>{
 
  //set City for New or modification Branch
  useEffect(()=>{  
-  if(competitorBranchInput.district!==null){
-  getCityList();
-  setCompetitorBranchInput((prev) => {
-    return { ...prev, city: null };
-      });  
+  if(competitorBranchInput.district!==null && isChanged.district===false){
+    getCityList();
+  // setCompetitorBranchInput((prev) => {
+  //   return { ...prev, city: null };
+  //     });  
   }
+  else if(competitorBranchInput.district!==null && isChanged.district===true){
+    getCityList();
+    setCompetitorBranchInput((prev) => {
+      return { ...prev, city: null };
+        });  
+    }
   else if(competitorBranchInput.district===null){
     setCityList([]);
     setCompetitorBranchInput((prev) => {
@@ -266,10 +286,10 @@ useEffect(()=>{
 //check Form is Valid or not
 useEffect(() => {
   if (
-    hasError.country === false &&
-    hasError.state === false &&
-    hasError.district === false &&
-    hasError.city === false 
+    hasError.country !== true &&
+    hasError.state !== true &&
+    hasError.district !== true &&
+    hasError.city !== true 
   ) {
     setFormIsValid(true);
   }
@@ -280,6 +300,8 @@ useEffect(() => {
 
 
   const onDelete = (data) => {
+    console.log(data);
+    
     Swal.fire({
       text: `Are You sure, to delete ?`,
       icon: "warning",
@@ -291,14 +313,15 @@ useEffect(() => {
     }).then((willDelete) => {
       if (willDelete.isConfirmed) {
         axios
-          .delete(`${baseUrl}/api/customercreationcontact/${data.id}`)
+          .delete(`${baseUrl}/api/competitorbranch/${data.id}`)
           .then((resp) => {
             if (resp.data.status === 200) {
               Swal.fire({
                 //success msg
                 icon: "success",
+                title: "Competitor Branch for "+data.compNo,
                 text: `removed!`,
-                timer: 1500,
+                timer: 2000,
                 showConfirmButton: false,
               });
               getBranchList();
@@ -385,7 +408,6 @@ useEffect(() => {
       city: competitorBranchInput.city.value,
       tokenId: tokenId,
     };
-    console.log("datatosend",datatosend);
     if (
       datatosend.compId !== null &&
       datatosend.compNo !== null &&
@@ -395,7 +417,6 @@ useEffect(() => {
       datatosend.city !== null 
     )
     {
-      console.log("In Axio");
     axios.post(`${baseUrl}/api/competitorbranch`, datatosend).then((resp) => {
       if (resp.data.status === 200) {
         Swal.fire({
@@ -407,8 +428,6 @@ useEffect(() => {
           setLoading(false);
           setCompetitorBranchInput(initialValue);
           getBranchList();
-          // setBranchList(updatedBranchList);
-          // navigate(`/tender/master/competitorcreation/competitor/details`);
         });
       } else if (resp.data.status === 404) {
         Swal.fire({
@@ -439,19 +458,17 @@ useEffect(() => {
       city: competitorBranchInput.city.value,
       tokenId: tokenId,
     };
-    console.log('datatosend',datatosend);
     if (
       datatosend.compId !== null &&
       datatosend.compNo !== null &&
       datatosend.country !== null &&
       datatosend.state !== null &&
       datatosend.district !== null &&
-      datatosend.city !== null && formIsValid
+      datatosend.city !== null 
     )
     {
-    axios.put(`${baseUrl}/api/competitorbranch/${competitorBranchInput.branchId}`, data).then((resp) => {
+    axios.put(`${baseUrl}/api/competitorbranch/${competitorBranchInput.branchId}`, datatosend).then((resp) => {
       if (resp.data.status === 200) {
-        console.log("resp.data :", resp.data);
         Swal.fire({
           icon: "success",
           title: "Competitor Branch",
@@ -460,7 +477,14 @@ useEffect(() => {
         }).then(function () {
           setLoading(false);
           setCompetitorBranchInput(initialValue);
+          setEditableRow({branchId: null,
+            compNo: null,
+            country: null,
+            state: null,
+            district: null,
+            city: null});
           getBranchList();
+
           // navigate(`/tender/master/competitorcreation/competitor/details`);
         });
       } else if (resp.data.status === 404) {
@@ -468,6 +492,16 @@ useEffect(() => {
           icon: "error",
           title: "Competitor Branch",
           text: resp.data.errors,
+          confirmButtonColor: "#5156ed",
+        }).then(function () {
+          setLoading(false);
+        });
+      }
+      else{
+        Swal.fire({
+          icon: "error",
+          title: "Competitor Branch",
+          text: "Something went wrong!",
           confirmButtonColor: "#5156ed",
         }).then(function () {
           setLoading(false);
@@ -616,11 +650,7 @@ useEffect(() => {
           <div className="inputgroup col-lg-5 mb-4"></div>
         </div>
       </form>
-      <CompetitorDetailsBranchList
-        branchList={branchList}
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
+      <CompetitorDetailsBranchList branchList={branchList} onEdit={onEdit} onDelete={onDelete}/>
     </div>
   );
 };

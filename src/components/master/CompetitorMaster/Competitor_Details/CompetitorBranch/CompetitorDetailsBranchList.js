@@ -30,19 +30,21 @@ const CompetitorDetailsBranchList = (props) => {
             { data: 'state_name' },
             { data: 'district_name' },
             { data: 'city_name' },
-            { data: 'action' },
+            { data: 'buttons' },
         ],
     })
 
       $('#dataTable tbody').on('click', 'tr .fa-edit', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onEdit(rowdata)
+        
       });
 
       $('#dataTable tbody').on('click', 'tr .fa-trash', function () {
-        let rowdata = table.row($(this).closest('tr')).data();
+        let rowdata =table.row($(this).closest('tr')).data();
         props.onDelete(rowdata)
       });
+
  }, [])
 
  useEffect(() => {
@@ -73,7 +75,7 @@ const CompetitorDetailsBranchList = (props) => {
               <th scope="col">Action</th>
             </tr>
           </thead>
-          <tbody >
+          <tbody className="bg-white">
                 
           </tbody>
         </table>
