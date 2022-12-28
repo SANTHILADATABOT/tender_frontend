@@ -1,16 +1,132 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useBaseUrl } from "../../../hooks/useBaseUrl";
 
 const initialState = {
-  area: "",
-  population2011: "",
-  presentpopulation:"",
-  wards:"",
-  households:"",
+  area : "", 
+  population2011 : "",
+  presentpopulation : "",
+  wards : "",
+  households : "",
+  commercial : "",
+  ABbusstand : "",
+  CDbusstand : "",
+  market_morethan_oneacre : "",
+  market_lessthan_oneacre : "",
+  lengthofroad : "",
+  lengthofrouteroad : "",
+  lengthofotherroad : "",
+  lengthoflanes : "",
+  lengthofpucca : "",
+  lengthofcutcha : "",
+  parks : "",
+  parksforpublicuse : "",
+  tricycle : "",
+  bov : "",
+  bovrepair : "",
+  lcv : "",
+  lcvrepair : "",
+  compactor : "",
+  hookloaderwithcapacity : "",
+  compactorbin : "",
+  hookloader : "",
+  tractortipper : "",
+  lorries : "",
+  jcb : "",
+  bobcat : "",
+  sanitaryworkers_sanctioned : "",
+  sanitaryworkers_inservice : "",
+  sanitarysupervisor_sanctioned : "",
+  sanitarysupervisor_inservice : "",
+  permanentdrivers : "",
+  regulardrivers : "",
+  publicgathering : "",
+  secondarystorage : "",
+  transferstation : "",
+  households_animatorsurvey : "",
+  assessments_residential : "",
+  assessments_commercial : "",
 };
 
+let formvalid = false;
 const CustomerCreationUlbDetails = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [datasending, setdatasending] = useState(false);
+  const [isDisabled, setDisabled] = useState(true);
   const [input, setInput] = useState(initialState);
+  const [ulbid, setuldid] =  useState(null);
+  const { id } = useParams();
+  const { server1: baseUrl } = useBaseUrl();
+  const navigate = useNavigate();
+  const [toastSuccess, toastError, setCustomerCreationMainID] = useOutletContext();
+
+
+  const getulbdetails = () => {
+    axios.get(`${baseUrl}/api/customercreationulbdetails/${id}`).then((resp) => {
+      if (resp.data.status === 200) {
+
+       let  ulbdetails =   resp.data.ulbdetails ;
+        setInput({
+          ...input,
+          area : (ulbdetails.area) ? (ulbdetails.area) : "",
+          population2011 : (ulbdetails.population2011) ? (ulbdetails.population2011) : "",
+          presentpopulation : (ulbdetails.presentpopulation) ? (ulbdetails.presentpopulation) : "",
+          wards : (ulbdetails.wards) ? (ulbdetails.wards) : "",
+          households : (ulbdetails.households) ? (ulbdetails.households) : "",
+          commercial : (ulbdetails.commercial) ? (ulbdetails.commercial) : "",
+          ABbusstand : (ulbdetails.ABbusstand) ? (ulbdetails.ABbusstand) : "",
+          CDbusstand : (ulbdetails.CDbusstand) ? (ulbdetails.CDbusstand) : "",
+          market_morethan_oneacre : (ulbdetails.market_morethan_oneacre) ? (ulbdetails.market_morethan_oneacre) : "",
+          market_lessthan_oneacre : (ulbdetails.market_lessthan_oneacre) ? (ulbdetails.market_lessthan_oneacre) : "",
+          lengthofroad : (ulbdetails.lengthofroad) ? (ulbdetails.lengthofroad) : "",
+          lengthofrouteroad : (ulbdetails.lengthofrouteroad) ? (ulbdetails.lengthofrouteroad) : "",
+          lengthofotherroad : (ulbdetails.lengthofotherroad) ? (ulbdetails.lengthofotherroad) : "",
+          lengthoflanes : (ulbdetails.lengthoflanes) ? (ulbdetails.lengthoflanes) : "",
+          lengthofpucca : (ulbdetails.lengthofpucca) ? (ulbdetails.lengthofpucca) : "",
+          lengthofcutcha : (ulbdetails.lengthofcutcha) ? (ulbdetails.lengthofcutcha) : "",
+          parks : (ulbdetails.parks) ? (ulbdetails.parks) : "",
+          parksforpublicuse : (ulbdetails.parksforpublicuse) ? (ulbdetails.parksforpublicuse) : "",
+          tricycle : (ulbdetails.tricycle) ? (ulbdetails.tricycle) : "",
+          bov : (ulbdetails.bov) ? (ulbdetails.bov) : "",
+          bovrepair : (ulbdetails.bovrepair) ? (ulbdetails.bovrepair) : "",
+          lcv : (ulbdetails.lcv) ? (ulbdetails.lcv) : "",
+          lcvrepair : (ulbdetails.lcvrepair) ? (ulbdetails.lcvrepair) : "",
+          compactor : (ulbdetails.compactor) ? (ulbdetails.compactor) : "",
+          hookloaderwithcapacity : (ulbdetails.hookloaderwithcapacity) ? (ulbdetails.hookloaderwithcapacity) : "",
+          compactorbin : (ulbdetails.compactorbin) ? (ulbdetails.compactorbin) : "",
+          hookloader : (ulbdetails.hookloader) ? (ulbdetails.hookloader) : "",
+          tractortipper : (ulbdetails.tractortipper) ? (ulbdetails.tractortipper) : "",
+          lorries : (ulbdetails.lorries) ? (ulbdetails.lorries) : "",
+          jcb : (ulbdetails.jcb) ? (ulbdetails.jcb) : "",
+          bobcat : (ulbdetails.bobcat) ? (ulbdetails.bobcat) : "",
+          sanitaryworkers_sanctioned : (ulbdetails.sanitaryworkers_sanctioned) ? (ulbdetails.sanitaryworkers_sanctioned) : "",
+          sanitaryworkers_inservice : (ulbdetails.sanitaryworkers_inservice) ? (ulbdetails.sanitaryworkers_inservice) : "",
+          sanitarysupervisor_sanctioned : (ulbdetails.sanitarysupervisor_sanctioned) ? (ulbdetails.sanitarysupervisor_sanctioned) : "",
+          sanitarysupervisor_inservice : (ulbdetails.sanitarysupervisor_inservice) ? (ulbdetails.sanitarysupervisor_inservice) : "",
+          permanentdrivers : (ulbdetails.permanentdrivers) ? (ulbdetails.permanentdrivers) : "",
+          regulardrivers : (ulbdetails.regulardrivers) ? (ulbdetails.regulardrivers) : "",
+          publicgathering : (ulbdetails.publicgathering) ? (ulbdetails.publicgathering) : "",
+          secondarystorage : (ulbdetails.secondarystorage) ? (ulbdetails.secondarystorage) : "",
+          transferstation : (ulbdetails.transferstation) ? (ulbdetails.transferstation) : "",
+          households_animatorsurvey : (ulbdetails.households_animatorsurvey) ? (ulbdetails.households_animatorsurvey) : "",
+          assessments_residential : (ulbdetails.assessments_residential) ? (ulbdetails.assessments_residential) : "",
+          assessments_commercial : (ulbdetails.assessments_commercial) ? (ulbdetails.assessments_commercial) : "",
+        });
+        setuldid(ulbdetails.id)
+
+        // navigate("/tender/master/customercreation/list/main/contactPerson/"+id);
+      }
+      setLoading(false)      
+    });
+  }
+
+  useEffect(() => {
+    if(id){
+      setCustomerCreationMainID(id)
+      getulbdetails()
+    }
+  },[])
 
   const inputHandler = (e) => {
     setInput({
@@ -19,11 +135,117 @@ const CustomerCreationUlbDetails = () => {
     });
   };
 
-  const submitHandler = () => {};
+  for (const key in input) {
+    if(input[key].trim() !== ""){
+      formvalid = true;
+      break;
+    }else{
+      formvalid = false;
+    }
+  }
+
+ 
+  const submitHandler = (e) => {
+    e.preventDefault();
+    setdatasending(true);
+    let ulbdetails = {
+      area : input.area,
+      population2011 : input.population2011,
+      presentpopulation : input.presentpopulation,
+      wards : input.wards,
+      households : input.households,
+      commercial : input.commercial,
+      ABbusstand : input.ABbusstand,
+      CDbusstand : input.CDbusstand,
+      market_morethan_oneacre : input.market_morethan_oneacre,
+      market_lessthan_oneacre : input.market_lessthan_oneacre,
+      lengthofroad : input.lengthofroad,
+      lengthofrouteroad : input.lengthofrouteroad,
+      lengthofotherroad : input.lengthofotherroad,
+      lengthoflanes : input.lengthoflanes,
+      lengthofpucca : input.lengthofpucca,
+      lengthofcutcha : input.lengthofcutcha,
+      parks : input.parks,
+      parksforpublicuse : input.parksforpublicuse,
+      tricycle : input.tricycle,
+      bov : input.bov,
+      bovrepair : input.bovrepair,
+      lcv : input.lcv,
+      lcvrepair : input.lcvrepair,
+      compactor : input.compactor,
+      hookloaderwithcapacity : input.hookloaderwithcapacity,
+      compactorbin : input.compactorbin,
+      hookloader : input.hookloader,
+      tractortipper : input.tractortipper,
+      lorries : input.lorries,
+      jcb : input.jcb,
+      bobcat : input.bobcat,
+      sanitaryworkers_sanctioned : input.sanitaryworkers_sanctioned,
+      sanitaryworkers_inservice : input.sanitaryworkers_inservice,
+      sanitarysupervisor_sanctioned : input.sanitarysupervisor_sanctioned,
+      sanitarysupervisor_inservice : input.sanitarysupervisor_inservice,
+      permanentdrivers : input.permanentdrivers,
+      regulardrivers : input.regulardrivers,
+      publicgathering : input.publicgathering,
+      secondarystorage : input.secondarystorage,
+      transferstation : input.transferstation,
+      households_animatorsurvey : input.households_animatorsurvey,
+      assessments_residential : input.assessments_residential,
+      assessments_commercial : input.assessments_commercial,
+      cust_creation_mainid : id,
+    }
+
+    let data = {
+      ulbdetails : ulbdetails,
+      tokenid : localStorage.getItem("token"),
+    };
+
+    if(ulbid){
+      putData(data)
+    }else{
+      postData(data)
+    }
+
+  };
+
+  const postData = (data) => {
+    axios.post(`${baseUrl}/api/customercreationulbdetails`, data).then((resp) => {
+      if (resp.data.status === 200) {
+        toastSuccess(resp.data.message)
+        resetall()
+        navigate("/tender/master/customercreation/list/main/bankdetails/"+id);
+      } else if (resp.data.status === 400) {
+        toastError(resp.data.message)
+      }
+      setdatasending(false)
+    });
+  }
+
+  const putData = (data) => {
+    axios.put(`${baseUrl}/api/customercreationulbdetails/${ulbid}`, data).then((resp) => {
+      if (resp.data.status === 200) {
+        toastSuccess(resp.data.message)
+        resetall()
+        navigate("/tender/master/customercreation/list/main/bankdetails/"+id);
+      } else if (resp.data.status === 400) {
+        toastError(resp.data.message)
+      }
+      setdatasending(false)
+    });
+  }
+
+  const cancelHandler = () =>{
+    resetall()
+   
+  }
+
+  const resetall = () => {
+    setInput(initialState)
+  }
   return (
     <Fragment>
       <div className="formContent">
-        {loading && (
+        {id && loading && (
           <div className="loading">
             <img
               id="loading-image"
@@ -32,6 +254,9 @@ const CustomerCreationUlbDetails = () => {
             />
           </div>
         )}
+        {!id && <div className="loading">
+          <img id="loading-image" src="/assets/img/lock.png" alt="Loading..." width ="150" height="150"/>
+        </div>}
         <form onSubmit={submitHandler}>
           <div className="row align-items-center">
             <div className="inputgroup col-lg-6 mb-4">
@@ -765,6 +990,24 @@ const CustomerCreationUlbDetails = () => {
                 </div>
               </div>
             </div>
+            <div className = "col-lg-12 mt-3 d-flex justify-content-end">
+         
+            <button
+                className={(!formvalid) ?  "btn btn-outline-primary mr-3 rounded-pill" :  "btn btn-primary mr-3 rounded-pill"} 
+                onClick={submitHandler}
+                disabled={!formvalid || datasending}
+              >
+             {datasending && <span className="spinner-border spinner-border-sm mr-2"></span> }
+             {datasending && ((ulbid) ? "Updating..." : "Saving...")}
+             {!datasending && ((ulbid) ? "Update & Continue" : "Save & Continue")}
+            </button>
+            <button className="btn  btn-outline-dark rounded-pill"
+              onClick = {() => navigate("/tender/master/customercreation/list")}
+              disabled = {datasending}
+              >
+                Cancel
+            </button>
+          </div>    
           </div>
         </form>
       </div>

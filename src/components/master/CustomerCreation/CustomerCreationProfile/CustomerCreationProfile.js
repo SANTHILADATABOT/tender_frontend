@@ -52,7 +52,7 @@ const CustomerCreationProfile = () => {
   const [CityOptions, setCityoptions] = useState(initialOptions);
   const [GstNoDisable, setGstNoDisable] = useState(false);
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [addresslen, setaddresslength] =  useState(255);
   const [savedData, setSavedData] =useState({})
   const [isRendered, setIsrendered] = useState(false)
@@ -336,6 +336,7 @@ const CustomerCreationProfile = () => {
     }else{
       getCountryListOptions();
       getCustomerSubCategoryList();
+      setLoading(false)
     }
     // getCustCreationMainId()
     // getProfileFormData();
@@ -633,11 +634,12 @@ const CustomerCreationProfile = () => {
 
   const postData = (data) => {
     axios.post(`${baseUrl}/api/customercreationprofile`, data).then((resp) => {
-      console.log(resp);
+      console.log(resp);  
       if (resp.data.status === 200) {
         setCustomerCreationMainID(resp.data.id)
         toastSuccess(resp.data.message)
         resetall()
+        window.history.replaceState({},"Customer Creation", "/tender/master/customercreation/list/main/profile/"+resp.data.id);
         navigate("/tender/master/customercreation/list/main/contactPerson/"+resp.data.id);
       } else if (resp.data.status === 400) {
         toastError(resp.data.message)
@@ -666,6 +668,7 @@ const CustomerCreationProfile = () => {
     setdatasending(true)
 
     if (!formIsValid) {
+      setdatasending(false)
       return;
     }
 
@@ -1333,22 +1336,25 @@ const CustomerCreationProfile = () => {
           
           <div className="col-lg-12">
             {!id && <button
-              className="btn btn-outline-primary float-right"
+             className={(!formIsValid) ?  "btn btn-outline-primary float-right rounded-pill" :  "btn btn-primary float-right rounded-pill"} 
               disabled={!formIsValid || isdatasending}
             >
+              {isdatasending && <span className="spinner-border spinner-border-sm mr-2"></span> }
               {isdatasending && "Saving..."}
               {!isdatasending && "Save & Continue"}
             </button>}
             {id && 
               <button
-              className="btn btn-outline-primary float-right"
-              disabled={!formIsValid || isdatasending}
+              className={(!formIsValid) ?  "btn btn-outline-primary float-right rounded-pill" :  "btn btn-primary float-right rounded-pill"} 
+              disabled = {!formIsValid || isdatasending}
             >
+              {isdatasending && <span className="spinner-border spinner-border-sm mr-2"></span> }
               {isdatasending && "Updating..."}
               {!isdatasending && "Edit & Continue"}
               </button>}
-            <button className="btn  btn-outline-dark mr-3 float-right"
+            <button className="btn  btn-outline-dark mr-3 float-right rounded-pill"
             onClick = {() => navigate("/tender/master/customercreation/list")}
+            disabled ={isdatasending}
             >
               Cancel
             </button>

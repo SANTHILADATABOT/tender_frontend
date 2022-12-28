@@ -5,12 +5,12 @@ import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Select from "react-select";
 import Swal from "sweetalert2";
-import CompetitorDetailsTurnOverList from "./CompetitorDetailsTurnOverList";
+import CompetitorDetailsCompanyNetWorthList from "./CompetitorDetailsCompanyNetWorthList";
 // import { data, map } from "jquery";
 
 
 
-const CompetitorDetailsTurnOverForm = () => {
+const CompetitorDetailsCompanyNetWorthForm = () => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
   const initialValue = {
@@ -19,13 +19,13 @@ const CompetitorDetailsTurnOverForm = () => {
     accountYear: null,
     accValue: "",
   };
-  const [competitorTurnOverInput, setCompetitorTurnOverInput] =
+  const [competitorNetWorthInput, setCompetitorNetWorthInput] =
     useState(initialValue);
 
   const [accountYearList, setAccountYearList] = useState([]);
   const [formIsValid, setFormIsValid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [turnOverList, setTurnOverList] = useState([]);
+  const [netWorthList, setNetWorthList] = useState([]);
   const [editYearData,setEditYearData]=useState();
   const [isBtnClicked,setIsBtnClicked]=useState(false);
   const [hasError, setHasError] = useState({
@@ -41,7 +41,7 @@ const CompetitorDetailsTurnOverForm = () => {
   useEffect(() => {
     getCompNo();
     getAccountYearList();
-    getTurnOverList();
+    getNetWorthList();
   }, []);
   
   const getAccountYearList = async() =>{
@@ -62,8 +62,8 @@ const CompetitorDetailsTurnOverForm = () => {
       .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
       .then((resp) => {
         if (resp.data.status === 200) {
-          setCompetitorTurnOverInput({
-            ...competitorTurnOverInput,
+          setCompetitorNetWorthInput({
+            ...competitorNetWorthInput,
             compNo: resp.data.compNo,
           });
         }
@@ -83,28 +83,28 @@ useEffect(() => {
   }
 }, [hasError]);
 
-  const getTurnOverList = () => {
+  const getNetWorthList = () => {
     axios
-      .get(`${baseUrl}/api/competitordetails/turnoverlist/${compid}`)
+      .get(`${baseUrl}/api/competitordetails/networthlist/${compid}`)
       .then((resp) => {
-        let list = [...resp.data.turn_over];
+        let list = [...resp.data.networth];
         let listarr = list.map((item, index) => ({
           ...item,
           buttons:`<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
-        setTurnOverList(listarr);
+        setNetWorthList(listarr);
       });
   };
 
 useEffect(()=>{
   getAccountYearList();
-},[competitorTurnOverInput.accYearId]);
+},[competitorNetWorthInput.accYearId]);
 
 useEffect(()=>{
-  if(competitorTurnOverInput.accYearId!==null && editYearData!==null && accountYearList.length>0)
+  if(competitorNetWorthInput.accYearId!==null && editYearData!==null && accountYearList.length>0)
   {
-  setCompetitorTurnOverInput((prev)=>{return {...prev,accountYear: accountYearList.find(x => x.value === editYearData)
+  setCompetitorNetWorthInput((prev)=>{return {...prev,accountYear: accountYearList.find(x => x.value === editYearData)
   }});
 }
 },[accountYearList]);
@@ -114,7 +114,7 @@ useEffect(()=>{
       setFormIsValid(true);
       getAccountYearList();      
         setEditYearData(data.accountYear);
-        setCompetitorTurnOverInput({
+        setCompetitorNetWorthInput({
           accYearId: data.id,
           compNo: data.compNo,
           accValue: data.accValue,
@@ -133,7 +133,7 @@ useEffect(()=>{
     }).then((willDelete) => {
       if (willDelete.isConfirmed) {
         axios
-          .delete(`${baseUrl}/api/competitorturnover/${data.id}`)
+          .delete(`${baseUrl}/api/competitornetworth/${data.id}`)
           .then((resp) => {
             if (resp.data.status === 200) {
               Swal.fire({
@@ -144,7 +144,7 @@ useEffect(()=>{
                 timer: 2000,
                 showConfirmButton: false,
               });
-              getTurnOverList();
+              getNetWorthList();
             } else if (resp.data.status === 404) {
               Swal.fire({
                 // error msg
@@ -171,8 +171,8 @@ useEffect(()=>{
   };
  
   const selectInputHandler = (value, action) => {
-       setCompetitorTurnOverInput({
-      ...competitorTurnOverInput,
+       setCompetitorNetWorthInput({
+      ...competitorNetWorthInput,
       [action.name]: value,
     });
     if (value === "" || value === null) {
@@ -183,7 +183,7 @@ useEffect(()=>{
   };
 
   const textInputHandler = (e) =>{
-    setCompetitorTurnOverInput({...competitorTurnOverInput, accValue: e.target.value});
+    setCompetitorNetWorthInput({...competitorNetWorthInput, accValue: e.target.value});
     
     if (!e.target.value === "" || !e.target.value === null || !(/^[1-9]{1}[0-9]{0,10}[\.][0-9]{2}$/).test(e.target.value))  {
       
@@ -201,9 +201,9 @@ useEffect(()=>{
     let tokenId = localStorage.getItem("token");
     const datatosend = {
       compId: compid,
-      compNo: competitorTurnOverInput.compNo,
-      accValue: competitorTurnOverInput.accValue,
-      accountYear: competitorTurnOverInput.accountYear.value,
+      compNo: competitorNetWorthInput.compNo,
+      accValue: competitorNetWorthInput.accValue,
+      accountYear: competitorNetWorthInput.accountYear.value,
       tokenId: tokenId,
     };
     if (
@@ -213,23 +213,23 @@ useEffect(()=>{
       datatosend.accountYear !== null
     )
     {
-    axios.post(`${baseUrl}/api/competitorturnover`, datatosend).then((resp) => {
+    axios.post(`${baseUrl}/api/competitornetworth`, datatosend).then((resp) => {
       if (resp.data.status === 200) {
         Swal.fire({
           icon: "success",
-          title: "Competitor Turn Over",
+          title: "Competitor Networth",
           text: resp.data.message,
           timer: 2000,
         }).then(function () {
           setLoading(false);
           setIsBtnClicked(false);
-          setCompetitorTurnOverInput({...competitorTurnOverInput, accValue: "", accountYear: null});
-          getTurnOverList();
+          setCompetitorNetWorthInput({...competitorNetWorthInput, accValue: "", accountYear: null});
+          getNetWorthList();
         });
       } else if (resp.data.status === 404) {
         Swal.fire({
           icon: "error",
-          title: "Competitor Turn Over",
+          title: "Competitor Networth",
           text: resp.data.message,
           confirmButtonColor: "#5156ed",
         }).then(function () {
@@ -249,9 +249,9 @@ useEffect(()=>{
     let tokenId = localStorage.getItem("token");
     const datatosend = {
       compId: compid,
-      compNo: competitorTurnOverInput.compNo,
-      accValue: competitorTurnOverInput.accValue,
-      accountYear: competitorTurnOverInput.accountYear.value,
+      compNo: competitorNetWorthInput.compNo,
+      accValue: competitorNetWorthInput.accValue,
+      accountYear: competitorNetWorthInput.accountYear.value,
       tokenId: tokenId,
     };
     if (
@@ -259,26 +259,26 @@ useEffect(()=>{
       datatosend.compNo !== null &&
       datatosend.accValue !== null &&
       datatosend.accountYear !== null &&
-      competitorTurnOverInput.accYearId
+      competitorNetWorthInput.accYearId
     )
     {
-    axios.put(`${baseUrl}/api/competitorturnover/${competitorTurnOverInput.accYearId}`, datatosend).then((resp) => {
+    axios.put(`${baseUrl}/api/competitornetworth/${competitorNetWorthInput.accYearId}`, datatosend).then((resp) => {
       if (resp.data.status === 200) {
         Swal.fire({
           icon: "success",
-          title: "Competitor Turn Over",
+          title: "Competitor Networth",
           text: resp.data.message,
           timer: 2000,
         }).then(function () {
-          setCompetitorTurnOverInput({...competitorTurnOverInput,accYearId:null, accValue: "", accountYear: null});
-          getTurnOverList();
+          setCompetitorNetWorthInput({...competitorNetWorthInput,accYearId:null, accValue: "", accountYear: null});
+          getNetWorthList();
           setIsBtnClicked(false);
           setLoading(false);
         });
       } else if (resp.data.status === 404) {
         Swal.fire({
           icon: "error",
-          title: "Competitor Turn Over",
+          title: "Competitor Networth",
           text: resp.data.errors,
           confirmButtonColor: "#5156ed",
         }).then(function () {
@@ -289,7 +289,7 @@ useEffect(()=>{
       else{
         Swal.fire({
           icon: "error",
-          title: "Competitor Turn Over",
+          title: "Competitor Networth",
           text: "Something went wrong!",
           confirmButtonColor: "#5156ed",
         }).then(function () {
@@ -324,7 +324,7 @@ useEffect(()=>{
                   isClearable="true"
                   options={accountYearList}
                   onChange={selectInputHandler}
-                  value={competitorTurnOverInput.accountYear}
+                  value={competitorNetWorthInput.accountYear}
                 ></Select>
                 
                 {hasError.accountYear && (
@@ -354,7 +354,7 @@ useEffect(()=>{
                   id="accValue"
                   placeholder="Enter Value...."
                   name="accValue"
-                  value={competitorTurnOverInput.accValue}
+                  value={competitorNetWorthInput.accValue}
                   onChange={textInputHandler}                  
                 />
                 
@@ -373,8 +373,8 @@ useEffect(()=>{
           <div className="inputgroup col-lg-5 mb-4"></div>
           <div className="inputgroup col-lg-2 mb-4 align-items-center">
             <div className="row">
-              <button className="btn btn-primary"  disabled={!formIsValid || isBtnClicked === true} onClick={!competitorTurnOverInput.accYearId ? submitHandler : updateHandler}>
-                {!competitorTurnOverInput.accYearId
+              <button className="btn btn-primary"  disabled={!formIsValid || isBtnClicked === true} onClick={!competitorNetWorthInput.accYearId ? submitHandler : updateHandler}>
+                {!competitorNetWorthInput.accYearId
                   ? loading === true
                     ? "Adding...."
                     : "Add"
@@ -388,8 +388,8 @@ useEffect(()=>{
           <div className="inputgroup col-lg-5 mb-4"></div>
         </div>
       </form>
-      <CompetitorDetailsTurnOverList turnOverList={turnOverList} onEdit={onEdit} onDelete={onDelete}/>
+      <CompetitorDetailsCompanyNetWorthList netWorthList={netWorthList} onEdit={onEdit} onDelete={onDelete}/>
     </div>
   );
 };
-export default CompetitorDetailsTurnOverForm;
+export default CompetitorDetailsCompanyNetWorthForm;

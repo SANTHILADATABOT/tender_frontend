@@ -7,6 +7,7 @@ import Tendertracker from "./components/tender/Tendertracker/Tendertracker";
 import Tendercreation from "./components/tender/Tendercreation/Tendercreation";
 import Legacystatement from "./components/tender/Legacystatement/Legacystatement";
 import Bidmanagement from "./components/tender/Bidmanagement/Bidmanagement";
+import Test from "./components/tender/test/test";
 import { AuthContextProvider } from "./storeAuth/auth-context";
 import AuthContext from "./storeAuth/auth-context";
 // import Master from "./components/master/Master";
@@ -18,12 +19,10 @@ import CompetitorCreation from "./components/master/CompetitorMaster/CompetitorC
 import Competitor from "./components/master/CompetitorMaster/Competitor";
 import CompetitorProfile from "./components/master/CompetitorMaster/CompetitorProfile";
 import CompetitorDetails from "./components/master/CompetitorMaster/CompetitorDetails";
-//import CompetitorBranch from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranch";
-import CompetitorBranchForm from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranch/CompetitorBranchForm";
+import CompetitorBranch from "./components/master/CompetitorMaster/Competitor_Details/CompetitorBranch";
 import CustomerCreationProfile from "./components/master/CustomerCreation/CustomerCreationProfile/CustomerCreationProfile";
 import CustomerCreationMain from "./components/master/CustomerCreation/CustomerCreationMain";
 import CustomerCreationContactPerson from "./components/master/CustomerCreation/CustomerCreationContactPerson/CustomerCreationContactperson";
-// import CustomerCreationBankDetails from "./components/master/CustomerCreation/CustomerCreationBankdetails";
 import CustomerCreationSWMProjectStatus from "./components/master/CustomerCreation/SWMProjectStatus/CustomerCreationSWMProjectStatus";
 import StateMasterView from "./components/master/StateMaster/StateMasterView";
 import CountryMasterView from "./components/master/CountryMaster/CountryMasterView";
@@ -48,7 +47,6 @@ import BidSubmission from "./components/tender/Bidmanagement/Bidsubmission/BidSu
 import TenderStatus from "./components/tender/Bidmanagement/TenderStatus/TenderStatus";
 import Workorder from "./components/tender/Bidmanagement/Workorder/Workorder";
 
-
 function App() {
   const authCtx = useContext(AuthContext);
   return (
@@ -62,6 +60,7 @@ function App() {
             <Route path="tendertracker" element={<Tendertracker />} />
             <Route path="tendercreation" element={<Tendercreation />} />
             <Route path="legacystatement" element={<Legacystatement />} />
+            {/* <Route path="bidmanagement" element={<Bidmanagement />} /> */}
             <Route path="bidmanagement">
               <Route path="list" element={<Bidmanagement />}/>
               <Route path="list/main" element={<BidmanagementMain />}>
@@ -73,7 +72,7 @@ function App() {
               </Route>
             </Route>
             <Route path="master">
-            <Route
+              <Route
                 path="customercreation/list"
                 element={<CustomerCreation />}
               />
@@ -105,7 +104,7 @@ function App() {
                 />
                 <Route
                   path="bankdetails/:id"
-                  element={<CustomerCreationBankDetails />}
+                  element={<CustomerCreationBankDetails  />}
                 />
                 <Route
                   path="swmprojectstatus"
@@ -126,16 +125,15 @@ function App() {
                 
                 <Route path="competitorcreation/competitor" element={<Competitor />} >
                   <Route path="profile" element={<CompetitorProfile />}/>
-                  <Route path="profile/:id" element={<CompetitorProfile />}/>
                   <Route path="details" element={<CompetitorDetails />}>
-                      <Route path="branches" element={<CompetitorBranchForm />}/>
-                      
+                    <Route path="branches" element={<CompetitorBranch />}/>
                   </Route>
                 
                 {/*route for to edit with id*/} 
-                  <Route path="details/:compid" element={<CompetitorDetails />}>
-                    <Route path="branches/:compid" element={<CompetitorBranchForm />}/>
-                  </Route>
+                  <Route path="profile/:id" element={<CompetitorProfile />}/>
+                  <Route path="details/:id" element={<CompetitorDetails />}>
+                    <Route path="branches" element={<CompetitorBranch />}/>
+                  </Route> 
                 </Route>
              
               <Route path="statemaster" >

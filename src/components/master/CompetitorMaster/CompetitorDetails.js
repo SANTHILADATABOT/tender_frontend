@@ -8,7 +8,9 @@ import { useBaseUrl } from "../../hooks/useBaseUrl";
 import { useNavigate, useParams, NavLink, useOutletContext } from "react-router-dom";
 import CompetitorBranchForm from "./Competitor_Details/CompetitorBranch/CompetitorBranchForm";
 import CompetitorDetailsTurnOverForm from "./Competitor_Details/CompetitorTurnOver/CompetitorDetailsTurnOverForm"; 
-
+import CompetitorDetailsCompanyNetWorthForm from "./Competitor_Details/CompetitorCompanyNetWorth/CompetitorDetailsCompanyNetWorthForm";
+import CompetitorDetailsLineOfBusinessForm from "./Competitor_Details/CompetitorCompanyLineOfBusiness/CompetitorDetailsLineOfBusinessForm"; 
+import CompetitorCompanyStrengthWeaknessForm from "./Competitor_Details/CompetitorCompanyStrengthWeakness/CompetitorCompanyStrengthWeaknessForm";
 const comppath="tender/master/competitorcreation/competitor/details";
 
 const CompetitorDetails = () => {
@@ -73,54 +75,68 @@ const CompetitorDetails = () => {
         </div>
     </div>
 
-
     <div className="card mb-2  ">
-        <a
+        <a   
           href="#competitorNetWorth"
-          className="d-block card-header py-3 bg-white"
+          className="d-block card-header py-3 bg-white "
           data-toggle="collapse"
           role="button"
           aria-expanded="true"
           aria-controls="competitorNetWorth"
-
         >
-          <h6 className="m-0 font-weight-bold text-primary text-dark">
+          <h6 className="m-0 font-weight-bold text-dark">
             NETWORTH OF THE COMPANY
           </h6>
         </a>
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorNetWorth">
           <div className="card-header">
-            This is a collapsable card example using Bootstrap's built in
-            collapse functionality. <strong>Click on the card header</strong> to
-            see the card body collapse and expand!
+            <CompetitorDetailsCompanyNetWorthForm/>
           </div>
         </div>
-        </div>
-
-        <div className="card mb-2  ">
-    <a
-      href="#qualityCertificates"
-      className="d-block card-header py-3 bg-white"
-      data-toggle="collapse"
-      role="button"
-      aria-expanded="true"
-      aria-controls="qualityCertificates"
-
-    >
-      <h6 className="m-0 font-weight-bold text-primary text-dark">
-        QUALITY CERTIFICATES
-      </h6>
-    </a>
-        {/* Card Content - Collapse */}
-      <div className="collapse" id="qualityCertificates">
-      <div className="card-header">
-        This is a collapsable card example using Bootstrap's built in
-        collapse functionality. <strong>Click on the card header</strong> to
-        see the card body collapse and expand!
-      </div>
     </div>
-</div>
+
+    <div className="card mb-2  ">
+        <a   
+          href="#competitorlineofbusiness"
+          className="d-block card-header py-3 bg-white "
+          data-toggle="collapse"
+          role="button"
+          aria-expanded="true"
+          aria-controls="competitorlineofbusiness"
+        >
+          <h6 className="m-0 font-weight-bold text-dark">
+            LINE OF BUSINESS
+          </h6>
+        </a>
+        {/* Card Content - Collapse */}
+        <div className="collapse" id="competitorlineofbusiness">
+          <div className="card-header">
+            <CompetitorDetailsLineOfBusinessForm/>
+          </div>
+        </div>
+    </div>
+
+    <div className="card mb-2  ">
+        <a   
+          href="#competitorplusminus"
+          className="d-block card-header py-3 bg-white "
+          data-toggle="collapse"
+          role="button"
+          aria-expanded="true"
+          aria-controls="competitorplusminus"
+        >
+          <h6 className="m-0 font-weight-bold text-dark">
+            STRENGTH / WEAKNESS
+          </h6>
+        </a>
+        {/* Card Content - Collapse */}
+        <div className="collapse" id="competitorplusminus">
+          <div className="card-header">
+            <CompetitorCompanyStrengthWeaknessForm/>
+          </div>
+        </div>
+    </div>
 
 
 </div>

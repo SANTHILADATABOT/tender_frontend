@@ -172,7 +172,7 @@ const CompetitorCreation = () => {
                     width="100%"
                     cellSpacing={0}
                   >
-                    <thead className="text-center">
+                    <thead className="text-center bg-primary text-white">
                       <tr>
                         <th className="w-5">Sl.No</th>
                         <th className="w-15">Competitor No</th>

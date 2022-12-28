@@ -78,38 +78,34 @@ function Sidebar() {
           data-parent="#accordionSidebar"
         >
           <div className="bg-white py-2 collapse-inner rounded">
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-              isActive ? "active" : undefined}`}
+            <Link
+              className={`collapse-item ${active === "tab1" ? "active" : ""}`}
               to={`/${pathName}/tendercreation`}
-              onClick={() => hideSidebarElement("tenderMenu")}
+              onClick={() => hideSidebarElement("tenderMenu", "tab1")}
             >
               Tender Creation
-            </NavLink>
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-              isActive ? "active" : undefined}`}
+            </Link>
+            <Link
+              className={`collapse-item ${active === "tab2" ? "active" : ""}`}
               to={`/${pathName}/tendertracker`}
-              onClick={() => hideSidebarElement("tenderMenu")}
+              onClick={() => hideSidebarElement("tenderMenu", "tab2")}
             >
               Tender Tracker
-            </NavLink>
-            <NavLink
-               className={`collapse-item ${({ isActive }) =>
-               isActive ? "active" : undefined}`}
+            </Link>
+            <Link
+              className={`collapse-item ${active === "tab3" ? "active" : ""}`}
               to={`/${pathName}/legacystatement`}
-              onClick={() => hideSidebarElement("tenderMenu")}
+              onClick={() => hideSidebarElement("tenderMenu", "tab3")}
             >
               Legacy Statement
-            </NavLink>
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-                isActive ? "active" : undefined}`}
-              to={`/${pathName}/bidmanagement/list`}
-              onClick={() => hideSidebarElement("tenderMenu")}
+            </Link>
+            <Link
+              className={`collapse-item ${active === "tab4" ? "active" : ""}`}
+              to={`/${pathName}/test/2`}
+              onClick={() => hideSidebarElement("tenderMenu", "tab4")}
             >
               Bid's Management
-            </NavLink> 
+            </Link>
           </div>
         </div>
       </li>

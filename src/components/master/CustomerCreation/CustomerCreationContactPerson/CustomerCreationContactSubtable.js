@@ -16,7 +16,7 @@ import "datatables.net-buttons/js/buttons.print.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
-var table
+var table;
 const CustomerCreationContactSubtable = (props) => {
   
  var dataSet = []

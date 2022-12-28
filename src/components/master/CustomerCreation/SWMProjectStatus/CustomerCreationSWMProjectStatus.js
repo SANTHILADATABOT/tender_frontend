@@ -25,7 +25,8 @@ const initialOptions = {
 
 
 const isNotEmpty = (value) => value.trim() !== "";
-
+let projectstatusList ; 
+let projectTypeList;
 const CustomerCreationSWMProjectStatus = () => {
 
     const navigate = useNavigate();
@@ -37,7 +38,7 @@ const CustomerCreationSWMProjectStatus = () => {
     const [toastSuccess, toastError, setCustomerCreationMainID] = useOutletContext()
     const { server1: baseUrl } = useBaseUrl();
     const [projecttypeoptions, setprojecttypeOptions] = useState(initialOptions);
-
+    const [projectstatusoptions,  setprojectstatusoptions] = useState(initialOptions)
     const {
         value: vendorValue,
         isValid: vendorIsValid,
@@ -52,11 +53,11 @@ const CustomerCreationSWMProjectStatus = () => {
         value: projectstatusValue,
         isValid: projectstatusIsValid,
         hasError: projectstatusHasError,
-        valueChangeHandler: projectstatusChangeHandler,
+        valueChangeHandlerForReactSelect: projectstatusChangeHandler,
         inputBlurHandler: projectstatusBlurHandler,
         setInputValue: setprojectstatusValue,
         reset: resetprojectstatus,
-      } = useInputValidation(isNotEmpty);
+      } = useInputValidation(isNotNull);
 
       const {
         value: projectvalueValue,
@@ -143,7 +144,6 @@ const CustomerCreationSWMProjectStatus = () => {
             ...item,
             duration: monthDiff(item.duration1, item.duration2),
             status_label: statusOptions.find(o => o.value === item.status.toString()).label, 
-            projecttype_label: projectTypeOptions.find(o => o.value === item.projecttype.toString()).label,
             vendortype_label: vendorTypeOptions.find(o => o.value === item.vendortype.toString()).label,
             buttons:`<i class="fa fa-edit text-success mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
             sl_no : index + 1
@@ -157,18 +157,29 @@ const CustomerCreationSWMProjectStatus = () => {
           return { ...c, isLoading: true };
         });
         let response = await axios.get(`${baseUrl}/api/projecttype/list/${id}`)  
-        let projectTypeList = { options: response.data.projectTypeList, isLoading: false }
+        projectTypeList = { options: response.data.projectTypeList, isLoading: false }
         setprojecttypeOptions(projectTypeList)
       }
+
+      const getProjectStatus = async () => {
+        setprojectstatusoptions((c) => {
+          return { ...c, isLoading: true };
+        });
+        let response = await axios.get(`${baseUrl}/api/projectstatus/list/${id}`)  
+         projectstatusList = { options: response.data.projectstatusList, isLoading: false }
+        setprojectstatusoptions(projectstatusList)
+      }
+
   
       
       useEffect(() => {
           if(id){
            setCustomerCreationMainID(id)
            getsublist()
+           getProjectType()
+           getProjectStatus()
           }
 
-          getProjectType()
       }, [])
 
       const postData = (data) => {
@@ -201,19 +212,71 @@ const CustomerCreationSWMProjectStatus = () => {
         })
       }
 
+      
       const onEdit =(data) => {
         setisEditbtn(true)
         setProjectId(data.id)
         setvendorValue(data.vendor)
-        setprojectstatusValue(data.projectstatus)
+        setprojectstatusValueFunction(data)
         setprojectvalueValue(data.projectvalue)
         setdurationdate1Value(data.duration1)
         setdurationdate2Value(data.duration2)
+        setprojectTypeValueFunction(data)
+      
         // setprojectTypeValue(projectTypeOptions.find(o => o.value === data.projecttype.toString()))
         setstatusValue(statusOptions.find(o => o.value === data.status.toString()))
         setvendorTypeValue(vendorTypeOptions.find(o => o.value === data.vendortype.toString()))
       }
-    
+   
+      const setprojectTypeValueFunction = (data) => {
+        if(projectTypeList.options.find(o => o.value === data.projecttype)){
+          setprojectTypeValue(projectTypeList.options.find(o => o.value === data.projecttype))
+        }else{
+          // setprojecttypeOptions((prev)=> {
+          //   console.log(prev)
+          //   return {
+          //     ...prev,
+          //     options : [...prev.options, 
+          //       {
+          //           'value' : data.projecttype,
+          //           'label' : data.projecttype_label
+          //       }
+          //     ]
+          //   }
+          // })
+
+          setprojectTypeValue( {
+            'value' : data.projecttype,
+            'label' : data.projecttype_label
+          })
+        }
+      }
+
+      const setprojectstatusValueFunction = (data) => {
+        console.log(data)
+        if(projectstatusList.options.find(o => o.value === data.projectstatus)){
+          setprojectstatusValue(projectstatusList.options.find(o => o.value === data.projectstatus))
+        }else{
+          // setprojectstatusoptions((prev)=> {
+          //   return {
+          //     ...prev,
+          //     options : [...prev.options, 
+          //       {
+          //           'value' : data.projectstatus,
+          //           'label' : data.projectstatus_label
+          //       }
+          //     ]
+          //   }
+          // })
+
+          setprojectstatusValue( {
+            'value' : data.projectstatus,
+            'label' : data.projectstatus_label
+          })
+        }
+      }
+      
+
       const onDelete = (data) => {
 
         Swal.fire({
@@ -264,6 +327,8 @@ const CustomerCreationSWMProjectStatus = () => {
         resetdurationdate1()
         resetdurationdate2()
         resetvendorType()
+        setisEditbtn(false)
+        setProjectId(null)
     }
 
     const submitHandler = (event) => {
@@ -272,7 +337,7 @@ const CustomerCreationSWMProjectStatus = () => {
     
         if (!formIsValid) {
           console.log("Inavlid Form!");
-          setdatasending(true)
+          setdatasending(false)
           return;
         }
 
@@ -427,23 +492,24 @@ const CustomerCreationSWMProjectStatus = () => {
             </div>
 
             <div className="inputgroup col-lg-6 mb-4">
-              <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+              <div className="row align-items-center ">
+                <div className="col-lg-4 text-dark font-weight-bold" >
                   <label htmlFor="projectstatus">
                     Project Status :
                   </label>
                 </div>
                 <div className="col-lg-8">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="projectstatus"
-                    placeholder="Enter Project Status"
+                   <Select
                     name="projectstatus"
-                    value={projectstatusValue}
+                    id="projectstatus"
+                    isSearchable="true"
+                    options={projectstatusoptions.options}
+                    isClearable="true"
                     onChange={projectstatusChangeHandler}
                     onBlur={projectstatusBlurHandler}
-                  />
+                    value={projectstatusValue}
+                    isLoading={projectstatusoptions.isLoading}
+                    ></Select>
                   {projectstatusHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
@@ -529,20 +595,29 @@ const CustomerCreationSWMProjectStatus = () => {
             <div className="col-lg-12 d-flex justify-content-center">
               {!isEditbtn && 
               <button
-                className="btn btn-outline-primary rounded-pill px-4"
-                disabled={!formIsValid || isDatasending}
+              className={(!formIsValid) ?  "btn btn-outline-primary rounded-pill px-4" :  "btn btn-primary rounded-pill px-4"} 
+              disabled={!formIsValid || isDatasending}
               >
+                {isDatasending && <span className="spinner-border spinner-border-sm mr-2"></span> }
                 {isDatasending && 'Saving...'}
                 {!isDatasending && 'Add'}
               </button>}
               {isEditbtn && 
                <button
-                className="btn btn-outline-primary rounded-pill px-4"
-                disabled={!formIsValid || isDatasending}
+               className={(!formIsValid) ?  "btn btn-outline-primary rounded-pill px-4" :  "btn btn-primary rounded-pill px-4"} 
+               disabled={!formIsValid || isDatasending}
               >
+                {isDatasending && <span className="spinner-border spinner-border-sm mr-2"></span> }
                 {isDatasending && 'Updating...'}
                 {!isDatasending && 'Update'}
               </button>  }  
+              <button
+                className="btn  btn-outline-dark rounded-pill mx-3"
+                onClick={resetform}
+                disabled={isDatasending}
+              >
+                Clear
+              </button>
             </div>
           </div>
         </form>
@@ -554,6 +629,7 @@ const CustomerCreationSWMProjectStatus = () => {
         <div className = "col-lg-12 mt-3 d-flex justify-content-end">
           <button
               className="btn btn-outline-primary mr-3 rounded-pill"
+              onClick = {() => navigate("/tender/master/customercreation/list/main/ulbdetails/"+id)}
             >
             Next
           </button>
