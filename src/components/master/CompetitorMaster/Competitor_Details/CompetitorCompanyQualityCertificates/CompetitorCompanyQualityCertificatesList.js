@@ -17,12 +17,12 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
 var table;
-const CompetitorCompanyStrengthWeaknessList = (props) => {
+const CompetitorCompanyQualityCertificatesList = (props) => {
   
  var dataSet = []
 
  useEffect(() => {
-   table =  $('#prosConsTable').DataTable({
+   table =  $('#qualityCertificateTable').DataTable({
         data: dataSet,
         columns: [
             { data: 'sl_no' },
@@ -32,13 +32,13 @@ const CompetitorCompanyStrengthWeaknessList = (props) => {
         ],
     })
 
-      $('#prosConsTable tbody').on('click', 'tr .fa-edit', function () {
+      $('#qualityCertificateTable tbody').on('click', 'tr .fa-edit', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onEdit(rowdata)
         
       });
 
-      $('#prosConsTable tbody').on('click', 'tr .fa-trash', function () {
+      $('#qualityCertificateTable tbody').on('click', 'tr .fa-trash', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onDelete(rowdata)
       });
@@ -59,15 +59,16 @@ const CompetitorCompanyStrengthWeaknessList = (props) => {
       <div className="table-responsive">
         <table
           className="table   text-center"
-          id="prosConsTable"
+          id="qualityCertificateTable"
           width="100%"
           cellSpacing={0}
         >
           <thead className="text-center bg-primary text-white">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Strength</th>
-              <th scope="col">Weakness</th>
+              <th scope="col">Certificate</th>
+              <th scope="col">Remarks</th>
+              <th scope="col">File Upload</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
@@ -80,4 +81,4 @@ const CompetitorCompanyStrengthWeaknessList = (props) => {
   );
 };
 
-export default CompetitorCompanyStrengthWeaknessList;
+export default CompetitorCompanyQualityCertificatesList;

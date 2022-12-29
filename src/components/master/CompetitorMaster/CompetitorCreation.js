@@ -31,6 +31,7 @@ let table;
 
 const CompetitorCreation = () => {
   useDocumentTitle("Competitor Creation");
+  usePageTitle("Competitor Creation");
   const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
   //Id is the Last submited form id

@@ -1,30 +1,37 @@
 import { usePageTitle } from "../../../../hooks/usePageTitle";
-import { useState, useEffect} from "react";
+import { useState, useEffect, useRef} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
-import CompetitorCompanyStrengthWeaknessList from "./CompetitorCompanyStrengthWeaknessList";
+import CompetitorCompanyQualityCertificatesList from "./CompetitorCompanyQualityCertificatesList";
+import './UploadDoc.css'
+// import UploadDoc from "./UploadDoc";
 
 
 
 
-const CompetitorCompanyStrengthWeaknessForm = () => {
+const CompetitorCompanyQualityCertificatesForm = () => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
   const initialValue = {
-    prosConsId: null,
+    qcId: null,
     compNo: null,
-    strength: "",
-    weakness: "",
+    cerName: "",
+    remark: "",
+    file:"",
   };
-  const [competitorProsConsInput, setCompetitorProsConsInput] =
+  const [competitorQCInput, setCompetitorQCInput] =
     useState(initialValue);
-
   const [formIsValid, setFormIsValid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [prosConsList, setProsConsList] = useState([]);
+  const [qCList, setQCList] = useState([]);
   const [isBtnClicked,setIsBtnClicked]=useState(false);
+
+  const [progress, setProgressCompleted] = useState(0)
+  const [dragover, setdragover] = useState(false);
+  const wrapperRef = useRef(null);
+  const [file, setFile] = useState(null);
   
   let tokenId = localStorage.getItem("token");
   const { server1: baseUrl } = useBaseUrl();
@@ -32,8 +39,27 @@ const CompetitorCompanyStrengthWeaknessForm = () => {
 
   useEffect(() => {
     getCompNo();
-    getProsConsList();
+    getQCList();
   }, []);
+
+  const onDragEnter = () => {
+    wrapperRef.current.classList.add('dragover')
+    setdragover(true)
+};
+
+const onDragLeave = () => {
+    wrapperRef.current.classList.remove('dragover')
+    setdragover(false)
+};
+
+const onDrop = () => wrapperRef.current.classList.remove('dragover');
+
+const onFileDrop = (e) => {
+    const newFile = e.target.files[0];
+    if (newFile) {
+        setFile(newFile);
+    }
+}
   
 
   const getCompNo = async () => {
@@ -41,8 +67,8 @@ const CompetitorCompanyStrengthWeaknessForm = () => {
       .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
       .then((resp) => {
         if (resp.data.status === 200) {
-          setCompetitorProsConsInput({
-            ...competitorProsConsInput,
+          setCompetitorQCInput({
+            ...competitorQCInput,
             compNo: resp.data.compNo,
           });
         }
@@ -52,16 +78,16 @@ const CompetitorCompanyStrengthWeaknessForm = () => {
   //check Form is Valid or not
 useEffect(() => {
   if (
-      competitorProsConsInput.strength !== "" || competitorProsConsInput.weakness !== "" 
+      competitorQCInput.cerName !== "" || competitorQCInput.remark !== "" 
   ) {
     setFormIsValid(true);
   }
   else{
     setFormIsValid(false);
   }
-}, [competitorProsConsInput]);
+}, [competitorQCInput]);
 
-  const getProsConsList = () => {
+  const getQCList = () => {
     axios
       .get(`${baseUrl}/api/competitordetails/prosconslist/${compid}`)
       .then((resp) => {
@@ -71,7 +97,7 @@ useEffect(() => {
           buttons:`<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
-        setProsConsList(listarr);
+        setQCList(listarr);
       });
   };
 
@@ -80,11 +106,11 @@ useEffect(() => {
 
   const onEdit = (data) => {    
       setFormIsValid(true);     
-        setCompetitorProsConsInput({
-          prosConsId: data.id,
+        setCompetitorQCInput({
+          qcId: data.id,
           compNo: data.compNo,
-          strength: data.strength,
-          weakness: data.weakness,
+          cerName: data.cerName,
+          remark: data.remark,
         });
   };
   
@@ -100,18 +126,18 @@ useEffect(() => {
     }).then((willDelete) => {
       if (willDelete.isConfirmed) {
         axios
-          .delete(`${baseUrl}/api/competitorproscons/${data.id}`)
+          .delete(`${baseUrl}/api/competitorqcertificate/${data.id}`)
           .then((resp) => {
             if (resp.data.status === 200) {
               Swal.fire({
                 //success msg
                 icon: "success",
-                title: "Strength/Weakness ",
+                title: "Quality Certificate "+resp.data.cerName,
                 text: `removed!`,
                 timer: 2000,
                 showConfirmButton: false,
               });
-              getProsConsList();
+              getQCList();
             } else if (resp.data.status === 404) {
               Swal.fire({
                 // error msg
@@ -139,7 +165,7 @@ useEffect(() => {
  
 
   const textInputHandler = (e) =>{
-    setCompetitorProsConsInput({...competitorProsConsInput, [e.target.name] : e.target.value});
+    setCompetitorQCInput({...competitorQCInput, [e.target.name] : e.target.value});
   }
   
 
@@ -150,35 +176,36 @@ useEffect(() => {
     let tokenId = localStorage.getItem("token");
     const datatosend = {
       compId: compid,
-      compNo: competitorProsConsInput.compNo,
-      weakness: competitorProsConsInput.weakness,
-      strength: competitorProsConsInput.strength,
+      compNo: competitorQCInput.compNo,
+      remark: competitorQCInput.remark,
+      cerName: competitorQCInput.cerName,
+      file: file,
       tokenId: tokenId,
     };
     console.log("datatosend",datatosend);
     if (
       datatosend.compId !== null &&
       datatosend.compNo !== null &&
-      (datatosend.strength !== null || datatosend.weakness !== null)
+      (datatosend.cerName !== null || datatosend.remark !== null)
     )
     {
-    axios.post(`${baseUrl}/api/competitorproscons`, datatosend).then((resp) => {
+    axios.post(`${baseUrl}/api/competitorqcertificate`, datatosend).then((resp) => {
       if (resp.data.status === 200) {
         Swal.fire({
           icon: "success",
-          title: "Competitor Strength/Weakness",
+          title: "Competitor Quality Certificate",
           text: resp.data.message,
           timer: 2000,
         }).then(function () {
           setLoading(false);
           setIsBtnClicked(false);
-          setCompetitorProsConsInput({...competitorProsConsInput, weakness: "", strength: ""});
-          getProsConsList();
+          setCompetitorQCInput({...competitorQCInput, remark: "", cerName: ""});
+          getQCList();
         });
       } else if (resp.data.status === 404) {
         Swal.fire({
           icon: "error",
-          title: "Competitor Strength/Weakness",
+          title: "Competitor Quality Certificate",
           text: resp.data.message,
           confirmButtonColor: "#5156ed",
         }).then(function () {
@@ -191,7 +218,7 @@ useEffect(() => {
   else{
     Swal.fire({
       icon: "error",
-      title: "Competitor Strength/Weakness",
+      title: "Competitor Quality Certificate",
       text: "You are tring to submit empty values",
       confirmButtonColor: "#5156ed",
     }).then(function () {
@@ -207,35 +234,35 @@ useEffect(() => {
     let tokenId = localStorage.getItem("token");
     const datatosend = {
       compId: compid,
-      compNo: competitorProsConsInput.compNo,
-      weakness: competitorProsConsInput.weakness,
-      strength: competitorProsConsInput.strength,
+      compNo: competitorQCInput.compNo,
+      remark: competitorQCInput.remark,
+      cerName: competitorQCInput.cerName,
       tokenId: tokenId,
     };
     if (
       datatosend.compId !== null &&
       datatosend.compNo !== null &&
-      datatosend.strength !== null &&
-      competitorProsConsInput.prosConsId
+      datatosend.cerName !== null &&
+      competitorQCInput.qcId
     )
     {
-    axios.put(`${baseUrl}/api/competitorproscons/${competitorProsConsInput.prosConsId}`, datatosend).then((resp) => {
+    axios.put(`${baseUrl}/api/competitorqcertificate/${competitorQCInput.qcId}`, datatosend).then((resp) => {
       if (resp.data.status === 200) {
         Swal.fire({
           icon: "success",
-          title: "Competitor Strength/Weakness",
+          title: "Competitor Quality Certificate",
           text: resp.data.message,
           timer: 2000,
         }).then(function () {
-          setCompetitorProsConsInput({...competitorProsConsInput,prosConsId:null, weakness: "", strength: ""});
-          getProsConsList();
+          setCompetitorQCInput({...competitorQCInput,qcId:null, remark: "", cerName: ""});
+          getQCList();
           setIsBtnClicked(false);
           setLoading(false);
         });
       } else if (resp.data.status === 404) {
         Swal.fire({
           icon: "error",
-          title: "Competitor Networth",
+          title: "Competitor Qualiy Certificate",
           text: resp.data.errors,
           confirmButtonColor: "#5156ed",
         }).then(function () {
@@ -246,7 +273,7 @@ useEffect(() => {
       else{
         Swal.fire({
           icon: "error",
-          title: "Competitor Networth",
+          title: "Competitor Qualiy Certificate",
           text: "Something went wrong!",
           confirmButtonColor: "#5156ed",
         }).then(function () {
@@ -259,7 +286,7 @@ useEffect(() => {
   }
   };
 
-  
+  console.log("File", file);
 
   return (
     <div className="card-body ">
@@ -268,24 +295,23 @@ useEffect(() => {
         <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold pt-1">
-                <label htmlFor="strength"> Strength/Weakness
+                <label htmlFor="cerName"> Certificate Name
 
-                    {/* Value in Rupees ( &#8377; )<span className="text-danger">&nbsp;*</span>
-                    <p className="text-info">( upto : 99,999,999,999.99 )</p> */}
+                    
                 </label>
               </div>
               <div className="col-lg-6">
               <input
                   type="text"
                   className="form-control"
-                  id="strength"
-                  placeholder="Enter Competitor Strength"
-                  name="strength"
-                  value={competitorProsConsInput.strength}
+                  id="cerName"
+                  placeholder="Enter Certificate Name"
+                  name="cerName"
+                  value={competitorQCInput.cerName}
                   onChange={textInputHandler}                  
                 />
                 
-                {/* {hasError.weakness && (
+                {/* {hasError.remark && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
@@ -300,22 +326,22 @@ useEffect(() => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold pt-1">
-                <label htmlFor="weakness">
-                  Weakness
+                <label htmlFor="remark">
+                  Remarks
                 </label>
               </div>
               <div className="col-lg-6">
               <input
                   type="text"
                   className="form-control"
-                  id="weakness"
-                  placeholder="Enter Competitor Weakness"
-                  name="weakness"
-                  value={competitorProsConsInput.weakness}
+                  id="remark"
+                  placeholder="Enter Remarks"
+                  name="remark"
+                  value={competitorQCInput.remark}
                   onChange={textInputHandler}                  
                 />
                 
-                {/* {hasError.weakness && (
+                {/* {hasError.remark && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
@@ -325,13 +351,72 @@ useEffect(() => {
               </div>
             </div>
           </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
+
+
+
+        <div className="inputgroup col-lg-6 mb-4 ">
+            <div className="row align-items-center">
+              <div className="col-lg-4 text-dark font-weight-bold pt-1">
+                <label htmlFor="cerName"> File Upload
+
+                    
+                </label>
+              </div>
+              <div className="col-lg-6">  
+                <div className="dashed border-primary height_of_dropbox boderradius__dropbox d-flex flex-column align-items-center justify-content-center  drop-file-input bg-gray-200"
+                     ref={wrapperRef}
+                     onDragEnter={onDragEnter}
+                     onDragLeave={onDragLeave}
+                     onDrop={onDrop}
+                    >
+                    <p className="display-4 mb-0"><i className='fas fa-cloud-upload-alt text-primary '></i></p>
+                    {!dragover && <p className="mt-0">Drag & Drop an document or Click</p>}
+                    {dragover && <p className="mt-0">Drop the document</p>}
+                    <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer " onChange={onFileDrop}/>
+                    </div>
+            
+              </div>
+            </div>
+          </div>
+          
+
+          <div className="inputgroup col-lg-6 mb-4 ">
+            <div className="row align-items-center">
+              <div className="col-lg-4 text-dark font-weight-bold pt-1">
+                <label htmlFor="remark">
+                  
+                </label>
+              </div>
+              <div className="col-lg-6">
+              {/* <input
+                  type="text"
+                  className="form-control"
+                  id="remark"
+                  placeholder="Enter Remarks"
+                  name="remark"
+                  value={competitorQCInput.remark}
+                  onChange={textInputHandler}                  
+                /> */}
+                
+                {/* {hasError.remark && (
+                  <div className="pt-1">
+                    <span className="text-danger font-weight-bold">
+                      Enter Valid Amount..!
+                    </span>
+                  </div>
+                )} */}
+              </div>
+            </div>
+          </div>
+          
+          
+          
 
           <div className="inputgroup col-lg-5 mb-4"></div>
           <div className="inputgroup col-lg-2 mb-4 align-items-center">
             <div className="row">
-              <button className="btn btn-primary"  disabled={!formIsValid || isBtnClicked === true} onClick={!competitorProsConsInput.prosConsId ? submitHandler : updateHandler}>
-                {!competitorProsConsInput.prosConsId
+              <button className="btn btn-primary"  disabled={!formIsValid || isBtnClicked === true} onClick={!competitorQCInput.qcId ? submitHandler : updateHandler}>
+                {!competitorQCInput.qcId
                   ? loading === true
                     ? "Adding...."
                     : "Add"
@@ -344,8 +429,8 @@ useEffect(() => {
           <div className="inputgroup col-lg-5 mb-4"></div>
         </div>
       </form>
-      <CompetitorCompanyStrengthWeaknessList prosConsList={prosConsList} onEdit={onEdit} onDelete={onDelete}/>
+      <CompetitorCompanyQualityCertificatesList qCList={qCList} onEdit={onEdit} onDelete={onDelete}/>
     </div>
   );
 };
-export default CompetitorCompanyStrengthWeaknessForm;
+export default CompetitorCompanyQualityCertificatesForm;

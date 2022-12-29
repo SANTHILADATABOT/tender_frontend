@@ -11,6 +11,8 @@ import CompetitorDetailsTurnOverForm from "./Competitor_Details/CompetitorTurnOv
 import CompetitorDetailsCompanyNetWorthForm from "./Competitor_Details/CompetitorCompanyNetWorth/CompetitorDetailsCompanyNetWorthForm";
 import CompetitorDetailsLineOfBusinessForm from "./Competitor_Details/CompetitorCompanyLineOfBusiness/CompetitorDetailsLineOfBusinessForm"; 
 import CompetitorCompanyStrengthWeaknessForm from "./Competitor_Details/CompetitorCompanyStrengthWeakness/CompetitorCompanyStrengthWeaknessForm";
+import CompetitorCompanyQualityCertificatesForm from "./Competitor_Details/CompetitorCompanyQualityCertificates/CompetitorCompanyQualityCertificatesForm";
+
 const comppath="tender/master/competitorcreation/competitor/details";
 
 const CompetitorDetails = () => {
@@ -98,6 +100,27 @@ const CompetitorDetails = () => {
 
     <div className="card mb-2  ">
         <a   
+          href="#qualitycertificates"
+          className="d-block card-header py-3 bg-white "
+          data-toggle="collapse"
+          role="button"
+          aria-expanded="true"
+          aria-controls="qualitycertificates"
+        >
+          <h6 className="m-0 font-weight-bold text-dark">
+          QUALITY CERTIFICATES
+          </h6>
+        </a>
+        {/* Card Content - Collapse */}
+        <div className="collapse" id="qualitycertificates">
+          <div className="card-header">
+            <CompetitorCompanyQualityCertificatesForm/>
+          </div>
+        </div>
+    </div>
+
+    <div className="card mb-2  ">
+        <a   
           href="#competitorlineofbusiness"
           className="d-block card-header py-3 bg-white "
           data-toggle="collapse"
@@ -133,7 +156,7 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorplusminus">
           <div className="card-header">
-            <CompetitorCompanyStrengthWeaknessForm/>
+            <CompetitorCompanyStrengthWeaknessForm/>CompetitorCompanyQualityCertificates
           </div>
         </div>
     </div>

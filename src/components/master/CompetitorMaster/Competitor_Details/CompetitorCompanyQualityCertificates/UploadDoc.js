@@ -132,8 +132,8 @@ const UploadDoc = () => {
       
     }  
  
-    // console.log(file)
-console.log(wrapperRef);
+    console.log(file)
+
     return (
         <Fragment>
         <div className="d-sm-flex align-items-center justify-content-between mb-4">
