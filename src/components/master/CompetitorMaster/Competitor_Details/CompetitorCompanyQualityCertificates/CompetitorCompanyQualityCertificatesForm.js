@@ -1,4 +1,6 @@
 import { usePageTitle } from "../../../../hooks/usePageTitle";
+import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
+import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useState, useEffect, useRef} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -6,8 +8,6 @@ import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import CompetitorCompanyQualityCertificatesList from "./CompetitorCompanyQualityCertificatesList";
 import './UploadDoc.css'
-// import UploadDoc from "./UploadDoc";
-
 
 
 
@@ -19,7 +19,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     compNo: null,
     cerName: "",
     remark: "",
-    file:"",
+    fileName:"",
   };
   const [competitorQCInput, setCompetitorQCInput] =
     useState(initialValue);
@@ -27,7 +27,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const [loading, setLoading] = useState(false);
   const [qCList, setQCList] = useState([]);
   const [isBtnClicked,setIsBtnClicked]=useState(false);
-
+  const [previewObjURL,setPreviewObjURL]=useState();
   const [progress, setProgressCompleted] = useState(0)
   const [dragover, setdragover] = useState(false);
   const wrapperRef = useRef(null);
@@ -35,6 +35,9 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   
   let tokenId = localStorage.getItem("token");
   const { server1: baseUrl } = useBaseUrl();
+  const { img: maxImageSize } = useAllowedUploadFileSize();
+  const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,13 +58,51 @@ const onDragLeave = () => {
 const onDrop = () => wrapperRef.current.classList.remove('dragover');
 
 const onFileDrop = (e) => {
-    const newFile = e.target.files[0];
+  
+  const newFile = e.target.files[0]; 
     if (newFile) {
         setFile(newFile);
+        setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
+       
     }
 }
-  
 
+var config = {
+  onUploadProgress: function(progressEvent) {
+    var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
+    setProgressCompleted(percentCompleted)
+  }
+
+}
+
+
+useEffect(()=>{
+  
+  if(file && file.size > maxImageSize)
+  {
+    Swal.fire({
+      title: "File Size",
+      text: "Maximum Allowed File size is 1MB",
+      icon: "error",
+      confirmButtonColor: "#2fba5f",
+    }).then(() => {
+      setFile(null);
+    }); 
+  }
+  else if(file && !doctype.includes(file.type))
+  {
+    console.log("doctype.includes(file.type",doctype.includes(file.type));
+    Swal.fire({
+      title: "File Type",
+      text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+      icon: "error",
+      confirmButtonColor: "#2fba5f",
+    }).then(() => {
+      setFile(null);
+    }); 
+  }
+
+},[file]);
   const getCompNo = async () => {
     await axios
       .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
@@ -173,6 +214,7 @@ useEffect(() => {
     e.preventDefault();
     setLoading(true);
     setIsBtnClicked(true);
+    
     let tokenId = localStorage.getItem("token");
     const datatosend = {
       compId: compid,
@@ -182,14 +224,21 @@ useEffect(() => {
       file: file,
       tokenId: tokenId,
     };
-    console.log("datatosend",datatosend);
+
+    const formdata = new FormData();
+
+        for ( var key in datatosend ) {
+            formdata.append(key, datatosend[key]);
+        }
+
+    console.log("formdata",formdata);
     if (
       datatosend.compId !== null &&
       datatosend.compNo !== null &&
       (datatosend.cerName !== null || datatosend.remark !== null)
     )
     {
-    axios.post(`${baseUrl}/api/competitorqcertificate`, datatosend).then((resp) => {
+    axios.post(`${baseUrl}/api/competitorqcertificate`, formdata,config).then((resp) => {
       if (resp.data.status === 200) {
         Swal.fire({
           icon: "success",
@@ -384,20 +433,37 @@ useEffect(() => {
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold pt-1">
                 <label htmlFor="remark">
-                  
+                  Preview
                 </label>
               </div>
               <div className="col-lg-6">
-              {/* <input
-                  type="text"
-                  className="form-control"
-                  id="remark"
-                  placeholder="Enter Remarks"
-                  name="remark"
-                  value={competitorQCInput.remark}
-                  onChange={textInputHandler}                  
-                /> */}
-                
+              {/* <img src={previewObjURL} /> */}
+              {file && <div className="card border-left-info shadow py-2 w-100 my-4">
+                <div className="card-body">
+                    <div className="row no-gutters align-items-center">
+                        <div className="col-md-10">
+                            <div className="font-weight-bold text-info text-uppercase mb-1">
+                                {competitorQCInput.cerName}
+                            </div>
+
+                            <div className="row no-gutters align-items-center ">
+                                <div className="col-auto">
+                                    <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
+                                        <p className="text-truncate">
+                                            {file.name}
+                                        </p>
+                                        <p>({file.size/1000} KB)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+              <div className="col-md-2 d-flex align-items-center justify-content-center">
+                            {previewObjURL &&  <img className="rounded-circle pointer" id="previewImg" src={previewObjURL} alt="No Image" width="75px" height="75px"   onClick={()=> window.open(previewObjURL, "_blank")} title="Click for Preview"/>}
+                        
+                </div>
+                </div>
+                </div>
+            </div>}
                 {/* {hasError.remark && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
