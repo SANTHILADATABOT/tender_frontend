@@ -26,8 +26,9 @@ const CompetitorCompanyQualityCertificatesList = (props) => {
         data: dataSet,
         columns: [
             { data: 'sl_no' },
-            { data: 'strength' },
-            { data: 'weakness' },
+            { data: 'cerName' },
+            { data: 'remark' },
+            { data: 'filepath' },
             { data: 'buttons' },
         ],
     })
@@ -43,13 +44,19 @@ const CompetitorCompanyQualityCertificatesList = (props) => {
         props.onDelete(rowdata)
       });
 
+      $('#qualityCertificateTable tbody').on('click', 'tr #qcImg', function () {
+        let rowdata =table.row($(this).closest('tr')).data();
+        props.onPreview(rowdata)
+        
+      });
+
  }, [])
 
  useEffect(() => {
-    if(props.prosConsList){
-        table.clear().rows.add(props.prosConsList).draw();
+    if(props.qCSubList){
+        table.clear().rows.add(props.qCSubList).draw();
     }
- }, [props.prosConsList])
+ }, [props.qCSubList])
  
 
   return (
@@ -68,7 +75,7 @@ const CompetitorCompanyQualityCertificatesList = (props) => {
               <th scope="col">#</th>
               <th scope="col">Certificate</th>
               <th scope="col">Remarks</th>
-              <th scope="col">File Upload</th>
+              <th scope="col">Image</th>
               <th scope="col">Action</th>
             </tr>
           </thead>

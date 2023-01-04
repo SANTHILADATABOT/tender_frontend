@@ -23,3 +23,7 @@
     height: 500px;
   
 }
+.closebtn
+{
+    cursor: pointer;
+}
