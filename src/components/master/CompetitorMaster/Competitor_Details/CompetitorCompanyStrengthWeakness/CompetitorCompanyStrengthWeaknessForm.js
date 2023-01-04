@@ -269,7 +269,6 @@ useEffect(() => {
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold pt-1">
                 <label htmlFor="strength"> Strength/Weakness
-
                     {/* Value in Rupees ( &#8377; )<span className="text-danger">&nbsp;*</span>
                     <p className="text-info">( upto : 99,999,999,999.99 )</p> */}
                 </label>
@@ -295,8 +294,6 @@ useEffect(() => {
               </div>
             </div>
           </div>
-          
-
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold pt-1">

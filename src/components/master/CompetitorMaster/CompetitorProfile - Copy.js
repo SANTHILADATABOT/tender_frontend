@@ -121,118 +121,94 @@ const CompetitorProfile = () => {
     if (id) {editCompetitor();};
     getCountryList();
   }, []);
-
-  const getCountryList = async () => {
-    await axios.get(`${baseUrl}/api/country/list`).then((resp) => {
+  const getCountryList = () => {
+    axios.get(`${baseUrl}/api/country/list`).then((resp) => {
       setCountryList(resp.data.countryList);
+      setStateList([]);
     });
   };
 
-//set Country on Edit
   useEffect(()=>{
-    if(id && fetchingData.country !=="" && countryList.length >0 && isChanged.country===false)
+    if(id && fetchingData.country !=="" && countryList.length >0)
     {
     setCompetitorFormInput({ ...competitorFormInput, country: countryList.find((x)=>x.value === fetchingData.country)
     })}
   },[countryList, fetchingData]);
 
-
-  //Get State  for New or modification
   useEffect(()=>{
-    
-    if(competitorFormInput.country!==null && isChanged.country === true){
-      setCompetitorFormInput((prev) => {
-        return { ...prev, state:null, district: null, city: null };
-          });  
-      getStateList();
-    }
-    else if(competitorFormInput.country!==null && isChanged.country === false){
-        getStateList();
-      }
-    else if(competitorFormInput.country===null){
+    if(id && competitorFormInput.country !==null && isChanged.country===false){
+      setCompetitorFormInput({
+        ...competitorFormInput,
+        state: null,
+        district: null,
+        city: null,
+      });
       setStateList([]);
-      setCompetitorFormInput((prev) => {
-        return { ...prev, state:null, district: null, city: null };
-          });  
+      setDistrictList([]);
+      setCityList([]);
+      getStateList(); 
+    }
+    else if(id && (competitorFormInput.country === null)){
+      setCompetitorFormInput({
+        ...competitorFormInput,
+        state: null,
+        district: null,
+        city: null,
+      });
+      setStateList([]);
+      setDistrictList([]);
+      setCityList([]);
     }
   },[competitorFormInput.country]);
 
-
-  //set State on Edit
   useEffect(()=>{
-
-    if(fetchingData.state!=="" && isChanged.country===false && competitorFormInput.country!==null && stateList.length>0)
-    {    
-      setCompetitorFormInput((prev) => {
-        return { ...prev,state: stateList.find((x) => x.value === fetchingData.state), district: null, city: null };
-          }); 
+    if(id && stateList.length>0 && isChanged.state===false){
+      setCompetitorFormInput({...competitorFormInput, state: stateList.find((x)=>x.value === fetchingData.state) });
     }
     else{
-      setCompetitorFormInput((prev) => {
-        return { ...prev, district: null, city: null };
-          }); 
-      setDistrictList([]); 
-    }
-    
-  },[stateList]);
-  
-   //set District for New or modification Branch
-   useEffect(()=>{
-    if(competitorFormInput.state!==null && isChanged.state===false)  
-    {  getDistrictList();
-     
-    }
-    else if(competitorFormInput.state!==null && isChanged.state===true)  
-    {  getDistrictList();
-      setCompetitorFormInput((prev) => {
-        return { ...prev, district: null, city: null };
-        });  
-    }
-    else if(competitorFormInput.state===null){
-      setCompetitorFormInput((prev) => {
-        return { ...prev, district: null, city: null };
-        });
-          setDistrictList([]);
-    }
-  },[competitorFormInput.state]);
-  
-  //set District on Edit
-  useEffect(()=>{
-    
-    if( fetchingData.district!=="" && isChanged.state===false && competitorFormInput.state!==null && districtList.length > 0) 
-    {
-      setCompetitorFormInput((prev) => {
-        return { ...prev,district: districtList.find((x) => x.value === fetchingData.district), city: null };
-          }); 
-    }
-    else{
-      setCompetitorFormInput((prev) => {
-        return { ...prev,  city: null };
-          }); 
-      setCityList([]); 
-    }
-  },[districtList]);
-  
-   //set City for New or modification Branch
-   useEffect(()=>{  
-    if(competitorFormInput.district!==null && isChanged.district===false){
-      getCityList(); 
-    }
-    else if(competitorFormInput.district!==null && isChanged.district===true){
-      getCityList();
-      setCompetitorFormInput((prev) => {
-        return { ...prev, city: null };
-          });  
-      }
-    else if(competitorFormInput.district===null){
+      setDistrictList([]);
       setCityList([]);
-      setCompetitorFormInput((prev) => {
-        return { ...prev, city: null };
-          });  
     }
+  },[stateList])
+
+  useEffect(()=>{
+    if(id && competitorFormInput.state!== null){
+      getDistrictList();}
+    else if(id && competitorFormInput.state === null){
+        setCompetitorFormInput({
+            ...competitorFormInput,
+            district: null,
+            city: null,
+          });
+          setDistrictList([]);
+          setCityList([]);
+          
+        }  
+  },[competitorFormInput.state]);
+
+  useEffect(()=>{
+    if(id && districtList.length>0 && isChanged.district===false)
+    {
+        setCompetitorFormInput({...competitorFormInput, district: districtList.find((x)=>x.value === fetchingData.district) })
+    }
+    else{
+      setCityList([]);
+      // getCityList(); 
+    }
+  },[districtList])
+
+  useEffect(()=>{
+    if(id && competitorFormInput.district !== null && isChanged.district===false){
+      getCityList();}
+    else if(id && competitorFormInput.district === null ){
+      setCompetitorFormInput({
+          ...competitorFormInput,
+          city: null,
+        });
+        setCityList([]);
+      }
   },[competitorFormInput.district]);
 
- 
   useEffect(()=>{
     if(id && cityList.length>0 && isChanged.city===false)
     {
@@ -241,47 +217,102 @@ const CompetitorProfile = () => {
   },[cityList]);
 
   
-  const getStateList = async () => {
-    if (competitorFormInput.country !== null) {
-      await axios
-        .get(`${baseUrl}/api/state/list/${competitorFormInput.country.value}`)
-        .then((resp) => {
-          setStateList(resp.data.stateList);     
-        });
-    }
+  const getStateList = () => {
+    axios
+      .get(`${baseUrl}/api/state/list/${competitorFormInput.country.value}`)
+      .then((resp) => {
+        setStateList(resp.data.stateList);
+        setDistrictList([]);
+      });
   };
-  const getDistrictList = async () => {
-    if (competitorFormInput.country !== null &&
-      competitorFormInput.state !== null
-      
-    ) {
-      await axios
-        .get(
-          `${baseUrl}/api/district/list/${competitorFormInput.country.value}/${competitorFormInput.state.value}`
-        )
-        .then((resp) => {
-          setDistrictList(resp.data.districtList);
-        });
-    }
+
+  const getDistrictList = () => {
+    axios
+      .get(
+        `${baseUrl}/api/district/list/${competitorFormInput.country.value}/${competitorFormInput.state.value}`
+      )
+      .then((resp) => {
+        setDistrictList(resp.data.districtList);
+        setCityList([]);
+      });
+    
   };
-  const getCityList = async () => {
-    if (
-      competitorFormInput.country !== null &&
-      competitorFormInput.state !== null &&
-      competitorFormInput.district !== null
-    ) {
-      await axios
-        .get(
-          `${baseUrl}/api/city/list/${competitorFormInput.country.value}/${competitorFormInput.state.value}/${competitorFormInput.district.value}/null`
-        )
-        .then((resp) => {
-          setCityList(resp.data.cityList);
-        });
-    }
+
+  const getCityList = () => {
+    axios
+      .get(
+        `${baseUrl}/api/city/list/${competitorFormInput.country.value}/${competitorFormInput.state.value}/${competitorFormInput.district.value}/null`
+      )
+      .then((resp) => {
+        setCityList(resp.data.cityList);
+      });
+    // }
   };
 
   
 
+ 
+  //get State List for the Country id
+  useEffect(() => {
+    if (competitorFormInput.country && isChanged.country===true) {
+      setCompetitorFormInput({
+        ...competitorFormInput,
+        state: null,
+        district: null,
+        city: null,
+      });
+      getStateList();
+    } else if(isChanged.country===true){
+      setCompetitorFormInput({
+        ...competitorFormInput,
+        state: null,
+        district: null,
+        city: null,
+      });
+      setStateList([]);
+      setDistrictList([]);
+      setCityList([]);
+    }
+  }, [competitorFormInput.country]);
+
+
+  //get district List for the state id
+  useEffect(() => {
+  
+    if (isChanged.state===true && competitorFormInput.country && competitorFormInput.state) {
+      setCompetitorFormInput({
+        ...competitorFormInput,
+        district: null,
+        city: null,
+      });
+      getDistrictList();
+    } else  if(isChanged.state===true){
+      setCompetitorFormInput({
+        ...competitorFormInput,
+        district: null,
+        city: null,
+      });
+      setDistrictList([]);
+      setCityList([]);
+    }
+  }, [competitorFormInput.state]);
+
+  //get city List for the district id
+  useEffect(() => {
+    if (
+      isChanged.district===true &&
+      competitorFormInput.country &&
+      competitorFormInput.state &&
+      competitorFormInput.district
+    ) {
+      setCompetitorFormInput({ ...competitorFormInput, city: null });
+      getCityList();
+
+    } else if(isChanged.district===true){
+      setCompetitorFormInput({ ...competitorFormInput, city: null });
+      setCityList([]);
+    }
+  }, [competitorFormInput.district]);
   
 useEffect(()=>{  
   if(id && fetchingData.registrationType!=='')
@@ -555,6 +586,7 @@ useEffect(()=>{
 
     axios.post(`${baseUrl}/api/competitorprofile`, data).then((res) => {
       if (res.data.status === 200) {
+        console.log("res.data :",res.data);
         Swal.fire({
           icon: "success",
           title: "Competitor",
