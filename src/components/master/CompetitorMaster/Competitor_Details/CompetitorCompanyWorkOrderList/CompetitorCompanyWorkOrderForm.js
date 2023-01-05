@@ -8,6 +8,7 @@ import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import CompetitorCompanyWorkOrderList from "./CompetitorCompanyWorkOrderList";
 import "./UploadDoc.css";
+import Select from "react-select";
 
 const CompetitorCompanyWorkOrderForm = () => {
   const { compid } = useParams();
@@ -48,6 +49,8 @@ const CompetitorCompanyWorkOrderForm = () => {
   const { server1: baseUrl } = useBaseUrl();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  const [stateList,setStateList]=useState([]);
+  const [unitList,setUnitList]=useState([]);
   // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
   const [hasError, setHasError] = useState({
@@ -65,6 +68,8 @@ const CompetitorCompanyWorkOrderForm = () => {
     woFile: false,
     completionFile: false,
   });
+
+  
 
   useEffect(() => {
     getCompNo();
@@ -173,12 +178,13 @@ const CompetitorCompanyWorkOrderForm = () => {
         let list = [...resp.data.qc];
         let listarr = list.map((item, index) => ({
           ...item,
-
+          
           filepath:
-            `<img src="${baseUrl}/competitorWO/` +
-            item.filepath +
-            `" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image"></img>`,
-          // filepath: `<img src="${baseUrl}/storage/app/public/uploads/image/competitor/qc/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image" ></img>`,
+            
+              `<img src="${baseUrl}/competitorWO/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="`+ item.filetype !== "pdf" ? "pdf" : "Image"+`" id="qcImg" style="cursor:pointer" title="`+item.filetype !== "pdf" ? "pdf" : "Image"+`"></img>`,
+            
+
+
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
@@ -273,6 +279,20 @@ const CompetitorCompanyWorkOrderForm = () => {
       [e.target.name]: e.target.value,
     });
   };
+  const selectInputHandler = (action ,value) => {
+    // setCompetitorWOInput({
+    //   ...competitorWOInput,
+    //   [e.target.name]: e.target.value,
+    // });
+  };
+
+  useEffect(()=>{
+
+
+
+  },[competitorWOInput]);
+
+
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -526,7 +546,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> Customer Name</label>
+                <label htmlFor="custName"> Customer Name<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -542,7 +562,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.custName && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Customer Name is Mandatory..!
                     </span>
                   </div>
                 )}
@@ -569,7 +589,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.projectName && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Project Name is Mandatory..!
                     </span>
                   </div>
                 )}
@@ -587,7 +607,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                   type="text"
                   className="form-control"
                   id="tnederId"
-                  placeholder="Enter Customer Name"
+                  placeholder="Enter Teder Id"
                   name="tnederId"
                   value={competitorWOInput.tnederId}
                   onChange={textInputHandler}
@@ -596,7 +616,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.tnederId && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Tender ID..!
+                      Tender ID is Mandatory..!
                     </span>
                   </div>
                 )}
@@ -610,23 +630,24 @@ const CompetitorCompanyWorkOrderForm = () => {
                 <label htmlFor="state">State Name</label>
               </div>
               <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="state"
-                  placeholder="Enter Project Name"
+              <Select
                   name="state"
+                  id="state"
+                  isSearchable="true"
+                  isClearable="true"
+                  options={stateList}
+                  onChange={selectInputHandler}
+                  // onBlur="{customersubcategoryBlurHandler}"
                   value={competitorWOInput.state}
-                  onChange={textInputHandler}
-                />
+                ></Select>
 
-                {/* {hasError.projectName && (
+                {hasError.state && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Select State..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -638,10 +659,9 @@ const CompetitorCompanyWorkOrderForm = () => {
               </div>
               <div className="col-lg-8">
                 <input
-                  type="text"
+                  type="date"
                   className="form-control"
                   id="woDate"
-                  placeholder="Enter Customer Name"
                   name="woDate"
                   value={competitorWOInput.woDate}
                   onChange={textInputHandler}
@@ -650,7 +670,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.woDate && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Select Work Order Date ..!
                     </span>
                   </div>
                 )}
@@ -667,17 +687,17 @@ const CompetitorCompanyWorkOrderForm = () => {
                 <input
                   type="text"
                   className="form-control"
-                  id="qantity"
-                  placeholder="Enter Project Name"
-                  name="qantity"
-                  value={competitorWOInput.qantity}
+                  id="quantity"
+                  placeholder="Enter Quantity"
+                  name="quantity"
+                  value={competitorWOInput.quantity}
                   onChange={textInputHandler}
                 />
 
-                {hasError.qantity && (
+                {hasError.quantity && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Enter Valid Quantity..!
                     </span>
                   </div>
                 )}
@@ -691,20 +711,21 @@ const CompetitorCompanyWorkOrderForm = () => {
                 <label htmlFor="unit">Unit</label>
               </div>
               <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="unit"
-                  placeholder="Enter Customer Name"
+
+              <Select
                   name="unit"
+                  id="unit"
+                  isSearchable="true"
+                  isClearable="true"
+                  options={unitList}
+                  onChange={selectInputHandler}
                   value={competitorWOInput.unit}
-                  onChange={textInputHandler}
-                />
+                ></Select>
 
                 {hasError.unit && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Select Valid Unit..!
                     </span>
                   </div>
                 )}
@@ -722,7 +743,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                   type="text"
                   className="form-control"
                   id="projectValue"
-                  placeholder="Enter Project Name"
+                  placeholder="Enter Project Value"
                   name="projectValue"
                   value={competitorWOInput.projectValue}
                   onChange={textInputHandler}
@@ -731,7 +752,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.projectValue && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Enter Valid Project Value..!
                     </span>
                   </div>
                 )}
@@ -749,19 +770,19 @@ const CompetitorCompanyWorkOrderForm = () => {
                   type="text"
                   className="form-control"
                   id="perTonRate"
-                  placeholder="Enter Customer Name"
+                  placeholder="Enter Per Ton Rate"
                   name="perTonRate"
                   value={competitorWOInput.perTonRate}
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.perTonRate && (
+                {hasError.perTonRate && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Enter Valid Per Ton Rate..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -785,7 +806,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.qualityCompleted && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Quality Completed field is Mandatory..!
                     </span>
                   </div>
                 )}
@@ -796,7 +817,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> Date</label>
+                <label htmlFor="date"> Date</label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -812,7 +833,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.date && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Select Valid Date..!
                     </span>
                   </div>
                 )}

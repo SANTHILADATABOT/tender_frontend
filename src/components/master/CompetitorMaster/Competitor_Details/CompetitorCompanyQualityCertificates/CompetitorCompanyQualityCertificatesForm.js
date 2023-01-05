@@ -123,6 +123,12 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   }, [competitorQCInput, file, previewForEdit]);
 
   const getQCList = () => {
+
+    // item.filetype !== 'pdf' ?
+          //   `<img src="${baseUrl}/competitorQC/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" id="qcImg" style="cursor:pointer" title="Image"></img>`
+          // :  `<img src="${baseUrl}/competitorQC/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="pdf" id="qcImg" style="cursor:pointer" title="pdf"></img>`
+          // ,
+// filepath: `<img src="${baseUrl}/storage/app/public/uploads/image/competitor/qc/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image" ></img>`,
     axios
       .get(`${baseUrl}/api/competitordetails/qclist/${compid}`)
       .then((resp) => {
@@ -130,11 +136,8 @@ const CompetitorCompanyQualityCertificatesForm = () => {
         let listarr = list.map((item, index) => ({
           ...item,
 
-          filepath:
-            `<img src="${baseUrl}/competitorQC/` +
-            item.filepath +
-            `" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image"></img>`,
-          // filepath: `<img src="${baseUrl}/storage/app/public/uploads/image/competitor/qc/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image" ></img>`,
+          filepath:`<img src="${baseUrl}/competitorQC/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image"></img>`,
+          
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
@@ -143,6 +146,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   };
 
   const getImageUrl = (s) => {
+    console.log(s);
     var pattern =
       /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
     var img_url = s.match(pattern);
@@ -167,9 +171,9 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   };
 
   const onPreview = (data) => {
+  
     var pattern =
       /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
-
     var img_url = data.filepath.match(pattern);
     window.open(img_url[0], "_blank");
   };

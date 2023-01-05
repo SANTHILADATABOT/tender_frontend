@@ -22,7 +22,7 @@ const CompetitorCompanyWorkOrderList = (props) => {
  var dataSet = []
 
  useEffect(() => {
-   table =  $('#qualityCertificateTable').DataTable({
+   table =  $('#workOrderTable').DataTable({
         data: dataSet,
         columns: [
             { data: 'sl_no' },
@@ -33,18 +33,18 @@ const CompetitorCompanyWorkOrderList = (props) => {
         ],
     })
 
-      $('#qualityCertificateTable tbody').on('click', 'tr .fa-edit', function () {
+      $('#workOrderTable tbody').on('click', 'tr .fa-edit', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onEdit(rowdata)
         
       });
 
-      $('#qualityCertificateTable tbody').on('click', 'tr .fa-trash', function () {
+      $('#workOrderTable tbody').on('click', 'tr .fa-trash', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onDelete(rowdata)
       });
 
-      $('#qualityCertificateTable tbody').on('click', 'tr #qcImg', function () {
+      $('#workOrderTable tbody').on('click', 'tr #qcImg', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onPreview(rowdata)
         
@@ -53,10 +53,10 @@ const CompetitorCompanyWorkOrderList = (props) => {
  }, [])
 
  useEffect(() => {
-    if(props.qCSubList){
-        table.clear().rows.add(props.qCSubList).draw();
+    if(props.woSubList){
+        table.clear().rows.add(props.woSubList).draw();
     }
- }, [props.qCSubList])
+ }, [props.woSubList])
  
 
   return (
@@ -66,7 +66,7 @@ const CompetitorCompanyWorkOrderList = (props) => {
       <div className="table-responsive">
         <table
           className="table   text-center"
-          id="qualityCertificateTable"
+          id="workOrderTable"
           width="100%"
           cellSpacing={0}
         >
