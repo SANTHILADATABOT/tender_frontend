@@ -17,29 +17,58 @@ const CompetitorCompanyWorkOrderForm = () => {
     compNo: null,
     custName: "",
     projectName: "",
-    fileName: "",
+    tnederId: "",
+    state: "",
+    woDate: "",
+    quantity: "",
+    unit: "",
+    projectValue: "",
+    perTonRate: "",
+    qualityCompleted: "",
+    date: "",
+    woFile: "",
+    completionFile: "",
   };
   const [competitorWOInput, setCompetitorWOInput] = useState(initialValue);
   const [formIsValid, setFormIsValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [wOList, setWOList] = useState([]);
   const [isBtnClicked, setIsBtnClicked] = useState(false);
-  const [previewObjURL, setPreviewObjURL] = useState("");
+  const [previewObjURL, setPreviewObjURL] = useState(""); //for WO upload
+  const [previewObjURL1, setPreviewObjURL1] = useState(""); // for Completion Certificate Upload
   const [progress, setProgressCompleted] = useState(0);
   const [dragover, setdragover] = useState(false);
-  const wrapperRef = useRef(null);
-  const [file, setFile] = useState("");
-  const [previewForEdit, setPreviewForEdit] = useState("");
+  const wrapperRef = useRef(null); //for WO upload
+  const wrapperRef1 = useRef(null); // for Completion Certificate Upload
+  const [file, setFile] = useState(""); //for WO upload
+  const [file1, setFile1] = useState(""); // for Completion Certificate Upload
+  const [previewForEdit, setPreviewForEdit] = useState(""); //for WO upload
+  const [previewForEdit1, setPreviewForEdit1] = useState(""); // for Completion Certificate Upload
   let tokenId = localStorage.getItem("token");
   const { server1: baseUrl } = useBaseUrl();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
+  const [hasError, setHasError] = useState({
+    custName: false,
+    projectName: false,
+    tnederId: false,
+    state: false,
+    woDate: false,
+    quantity: false,
+    unit: false,
+    projectValue: false,
+    perTonRate: false,
+    qualityCompleted: false,
+    date: false,
+    woFile: false,
+    completionFile: false,
+  });
 
   useEffect(() => {
     getCompNo();
-    getWOList();
+    // getWOList();
   }, []);
 
   const onDragEnter = () => {
@@ -55,15 +84,30 @@ const CompetitorCompanyWorkOrderForm = () => {
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const onFileDrop = (e) => {
-    const newFile = e.target.files[0];
-    if (newFile) {
-      setFile(newFile);
-      setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
-      if (previewForEdit) {
-        setPreviewForEdit("");
+    
+    if (e.target.name === "woUpload") {
+      const newFile = e.target.files[0];
+
+      if (newFile) {
+        setFile(newFile);
+        setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
+        if (previewForEdit) {
+          setPreviewForEdit("");
+        }
+      }
+    } else {
+      const newFile = e.target.files[0];
+
+      if (newFile) {
+        setFile1(newFile);
+        setPreviewObjURL1(URL.createObjectURL(e.target.files[0]));
+        if (previewForEdit1) {
+          setPreviewForEdit1("");
+        }
       }
     }
   };
+
 
   var config = {
     onUploadProgress: function (progressEvent) {
@@ -91,7 +135,7 @@ const CompetitorCompanyWorkOrderForm = () => {
         text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
         icon: "error",
         confirmButtonColor: "#2fba5f",
-      }).then(() => {
+      }).then(() => { 
         setFile("");
         setPreviewObjURL("");
       });
@@ -462,9 +506,17 @@ const CompetitorCompanyWorkOrderForm = () => {
     }
   };
   const removeImgHandler = (e) => {
-    setFile("");
+    //e.target.name receives only undefiend so used 'e.target.id'
+    if (e.target.id === "woUpload")
+   { setFile("");
     setPreviewObjURL("");
     setPreviewForEdit("");
+  }
+  else if(e.target.id === "completionCertificate")
+  { setFile1("");
+   setPreviewObjURL1("");
+   setPreviewForEdit1("");
+ }
   };
 
   return (
@@ -487,13 +539,13 @@ const CompetitorCompanyWorkOrderForm = () => {
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.projectName && (
+                {hasError.custName && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -514,13 +566,13 @@ const CompetitorCompanyWorkOrderForm = () => {
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.projectName && (
+                {hasError.projectName && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -528,26 +580,26 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> Customer Name</label>
+                <label htmlFor="tnederId"> Tender Id</label>
               </div>
               <div className="col-lg-8">
                 <input
                   type="text"
                   className="form-control"
-                  id="custName"
+                  id="tnederId"
                   placeholder="Enter Customer Name"
-                  name="custName"
-                  value={competitorWOInput.custName}
+                  name="tnederId"
+                  value={competitorWOInput.tnederId}
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.projectName && (
+                {hasError.tnederId && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
+                      Enter Tender ID..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -555,16 +607,16 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectName">Project Name</label>
+                <label htmlFor="state">State Name</label>
               </div>
               <div className="col-lg-8">
                 <input
                   type="text"
                   className="form-control"
-                  id="projectName"
+                  id="state"
                   placeholder="Enter Project Name"
-                  name="projectName"
-                  value={competitorWOInput.projectName}
+                  name="state"
+                  value={competitorWOInput.state}
                   onChange={textInputHandler}
                 />
 
@@ -582,26 +634,26 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> Customer Name</label>
+                <label htmlFor="woDate"> WO Date</label>
               </div>
               <div className="col-lg-8">
                 <input
                   type="text"
                   className="form-control"
-                  id="custName"
+                  id="woDate"
                   placeholder="Enter Customer Name"
-                  name="custName"
-                  value={competitorWOInput.custName}
+                  name="woDate"
+                  value={competitorWOInput.woDate}
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.projectName && (
+                {hasError.woDate && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -609,26 +661,26 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectName">Project Name</label>
+                <label htmlFor="qantity">Quantity</label>
               </div>
               <div className="col-lg-8">
                 <input
                   type="text"
                   className="form-control"
-                  id="projectName"
+                  id="qantity"
                   placeholder="Enter Project Name"
-                  name="projectName"
-                  value={competitorWOInput.projectName}
+                  name="qantity"
+                  value={competitorWOInput.qantity}
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.projectName && (
+                {hasError.qantity && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -636,26 +688,26 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> Customer Name</label>
+                <label htmlFor="unit">Unit</label>
               </div>
               <div className="col-lg-8">
                 <input
                   type="text"
                   className="form-control"
-                  id="custName"
+                  id="unit"
                   placeholder="Enter Customer Name"
-                  name="custName"
-                  value={competitorWOInput.custName}
+                  name="unit"
+                  value={competitorWOInput.unit}
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.projectName && (
+                {hasError.unit && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -663,26 +715,26 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectName">Project Name</label>
+                <label htmlFor="projectValue">Project Value</label>
               </div>
               <div className="col-lg-8">
                 <input
                   type="text"
                   className="form-control"
-                  id="projectName"
+                  id="projectValue"
                   placeholder="Enter Project Name"
-                  name="projectName"
-                  value={competitorWOInput.projectName}
+                  name="projectValue"
+                  value={competitorWOInput.projectValue}
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.projectName && (
+                {hasError.projectValue && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
                     </span>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
@@ -690,20 +742,20 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> Customer Name</label>
+                <label htmlFor="perTonRate">Per Ton Rate</label>
               </div>
               <div className="col-lg-8">
                 <input
                   type="text"
                   className="form-control"
-                  id="custName"
+                  id="perTonRate"
                   placeholder="Enter Customer Name"
-                  name="custName"
-                  value={competitorWOInput.custName}
+                  name="perTonRate"
+                  value={competitorWOInput.perTonRate}
                   onChange={textInputHandler}
                 />
 
-                {/* {hasError.projectName && (
+                {/* {hasError.perTonRate && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
@@ -717,9 +769,63 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectName">Project Name</label>
+                <label htmlFor="qualityCompleted">Quality Completed</label>
               </div>
               <div className="col-lg-8">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="qualityCompleted"
+                  placeholder="Enter Quality Completed"
+                  name="qualityCompleted"
+                  value={competitorWOInput.qualityCompleted}
+                  onChange={textInputHandler}
+                />
+
+                {hasError.qualityCompleted && (
+                  <div className="pt-1">
+                    <span className="text-danger font-weight-bold">
+                      Enter Valid Amount..!
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="inputgroup col-lg-6 mb-4 ">
+            <div className="row align-items-center">
+              <div className="col-lg-3 text-dark font-weight-bold pt-1">
+                <label htmlFor="custName"> Date</label>
+              </div>
+              <div className="col-lg-8">
+                <input
+                  type="date"
+                  className="form-control"
+                  id="date"
+                  placeholder="Enter Date"
+                  name="date"
+                  value={competitorWOInput.date}
+                  onChange={textInputHandler}
+                />
+
+                {hasError.date && (
+                  <div className="pt-1">
+                    <span className="text-danger font-weight-bold">
+                      Enter Valid Amount..!
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="inputgroup col-lg-6 mb-4 ">
+            <div className="row align-items-center">
+              {/*<div className="col-lg-3 text-dark font-weight-bold pt-1">
+                <label htmlFor="projectName">WO Upload</label>
+              </div>
+               <div className="col-lg-8">
                 <input
                   type="text"
                   className="form-control"
@@ -736,72 +842,17 @@ const CompetitorCompanyWorkOrderForm = () => {
                       Enter Valid Amount..!
                     </span>
                   </div>
-                )} */}
-              </div>
+                )} 
+              </div> */}
             </div>
           </div>
 
-          <div className="inputgroup col-lg-6 mb-4 ">
+          <div className="inputgroup col-lg-7 mb-4 ">
             <div className="row align-items-center">
-              <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> Customer Name</label>
+              <div className="col-lg-4 text-dark font-weight-bold pt-1">
+                <label htmlFor="woUpload"> WO Upload</label>
               </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="custName"
-                  placeholder="Enter Customer Name"
-                  name="custName"
-                  value={competitorWOInput.custName}
-                  onChange={textInputHandler}
-                />
-
-                {/* {hasError.projectName && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
-                    </span>
-                  </div>
-                )} */}
-              </div>
-            </div>
-          </div>
-
-          <div className="inputgroup col-lg-6 mb-4 ">
-            <div className="row align-items-center">
-              <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectName">Project Name</label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="projectName"
-                  placeholder="Enter Project Name"
-                  name="projectName"
-                  value={competitorWOInput.projectName}
-                  onChange={textInputHandler}
-                />
-
-                {/* {hasError.projectName && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
-                    </span>
-                  </div>
-                )} */}
-              </div>
-            </div>
-          </div>
-          
-
-          <div className="inputgroup col-lg-6 mb-4 ">
-            <div className="row align-items-center">
-              <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> File Upload</label>
-              </div>
-              <div className="col-lg-8">
+              <div className="col-lg-6">
                 <div
                   className="dashed border-primary height_of_dropbox boderradius__dropbox d-flex flex-column align-items-center justify-content-center  drop-file-input bg-gray-200"
                   ref={wrapperRef}
@@ -821,19 +872,20 @@ const CompetitorCompanyWorkOrderForm = () => {
                     value=""
                     className="h-100 w-100 position-absolute top-50 start-50 pointer "
                     onChange={onFileDrop}
+                    name="woUpload"
+                    id="woUpload"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="inputgroup col-lg-6 mb-4 ">
+          <div className="inputgroup col-lg-5 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectName">Preview</label>
+                <label htmlFor="woUpload">Preview</label>
               </div>
               <div className="col-lg-8">
-                {/* <img src={previewObjURL} /> */}
                 {file && (
                   <div className="card border-left-info shadow py-2 w-100 my-4">
                     <div className="card-body">
@@ -870,8 +922,10 @@ const CompetitorCompanyWorkOrderForm = () => {
                           &nbsp;&nbsp;&nbsp;
                           {previewObjURL !== null && (
                             <span
-                              className="fa fa-close text-danger h4 closebtn"
+                              className="fa fa-close text-danger h4 closebtn mr-3 pointer"
                               onClick={removeImgHandler}
+                              name="woUpload"
+                              id="woUpload"
                             >
                               &nbsp;
                             </span>
@@ -921,8 +975,10 @@ const CompetitorCompanyWorkOrderForm = () => {
                           &nbsp;&nbsp;&nbsp;
                           {previewForEdit !== null && (
                             <span
-                              className="fa fa-close text-danger h4 closebtn"
+                              className="fa fa-close text-danger h4 closebtn pointer"
                               onClick={removeImgHandler}
+                              name="woUpload"
+                              id="woUpload"
                             >
                               &nbsp;
                             </span>
@@ -944,16 +1000,18 @@ const CompetitorCompanyWorkOrderForm = () => {
             </div>
           </div>
 
-
-          <div className="inputgroup col-lg-6 mb-4 ">
+          <div className="inputgroup col-lg-7 mb-4 ">
             <div className="row align-items-center">
-              <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> File Upload</label>
+              <div className="col-lg-4 text-dark font-weight-bold pt-1">
+                <label htmlFor="completionCertificate">
+                  {" "}
+                  Completion Certificate Upload
+                </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-6">
                 <div
                   className="dashed border-primary height_of_dropbox boderradius__dropbox d-flex flex-column align-items-center justify-content-center  drop-file-input bg-gray-200"
-                  ref={wrapperRef}
+                  ref={wrapperRef1}
                   onDragEnter={onDragEnter}
                   onDragLeave={onDragLeave}
                   onDrop={onDrop}
@@ -970,20 +1028,22 @@ const CompetitorCompanyWorkOrderForm = () => {
                     value=""
                     className="h-100 w-100 position-absolute top-50 start-50 pointer "
                     onChange={onFileDrop}
+                    name="completionCertificate"
+                    id="completionCertificate"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="inputgroup col-lg-6 mb-4 ">
+          <div className="inputgroup col-lg-5 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
                 <label htmlFor="projectName">Preview</label>
               </div>
               <div className="col-lg-8">
-                {/* <img src={previewObjURL} /> */}
-                {file && (
+                
+                {file1 && (
                   <div className="card border-left-info shadow py-2 w-100 my-4">
                     <div className="card-body">
                       <div className="row no-gutters align-items-center">
@@ -995,32 +1055,34 @@ const CompetitorCompanyWorkOrderForm = () => {
                           <div className="row no-gutters align-items-center ">
                             <div className="col-auto">
                               <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                <p className="text-truncate">{file.name}</p>
-                                <p>({file.size / 1000} KB)</p>
+                                <p className="text-truncate">{file1.name}</p>
+                                <p>({file1.size / 1000} KB)</p>
                               </div>
                             </div>
                           </div>
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewObjURL && (
+                          {previewObjURL1 && (
                             <img
                               className="rounded-circle pointer"
-                              id="previewImg"
-                              src={previewObjURL}
+                              id="previewImg1"
+                              src={previewObjURL1}
                               alt="No Image"
                               width="75px"
                               height="75px"
                               onClick={() =>
-                                window.open(previewObjURL, "_blank")
+                                window.open(previewObjURL1, "_blank")
                               }
                               title="Click for Preview"
                             />
                           )}
                           &nbsp;&nbsp;&nbsp;
-                          {previewObjURL !== null && (
+                          {previewObjURL1 !== null && (
                             <span
                               className="fa fa-close text-danger h4 closebtn"
                               onClick={removeImgHandler}
+                              name="completionCertificate"
+                              id="completionCertificate"
                             >
                               &nbsp;
                             </span>
@@ -1032,7 +1094,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 )}
                 {/* for edit */}
 
-                {file === "" && previewForEdit !== "" && (
+                {file1 === "" && previewForEdit1 !== "" && (
                   <div className="card border-left-info shadow py-2 w-100 my-4">
                     <div className="card-body">
                       <div className="row no-gutters align-items-center">
@@ -1053,25 +1115,27 @@ const CompetitorCompanyWorkOrderForm = () => {
                             </div> */}
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewForEdit !== null && (
+                          {previewForEdit1 !== null && (
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
-                              src={previewForEdit}
+                              src={previewForEdit1}
                               alt="No Image"
                               width="75px"
                               height="75px"
                               onClick={() =>
-                                window.open(previewForEdit, "_blank")
+                                window.open(previewForEdit1, "_blank")
                               }
                               title="Click for Preview"
                             />
                           )}
                           &nbsp;&nbsp;&nbsp;
-                          {previewForEdit !== null && (
+                          {previewForEdit1 !== null && (
                             <span
-                              className="fa fa-close text-danger h4 closebtn"
+                              className="fa fa-close text-danger h4 closebtn pointer"
                               onClick={removeImgHandler}
+                              name="completionCertificate"
+                              id="completionCertificate"
                             >
                               &nbsp;
                             </span>

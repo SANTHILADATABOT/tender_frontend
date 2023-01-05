@@ -1,7 +1,7 @@
 import axios from "axios";
 // import { data } from "jquery";
 import { useState, useEffect, Fragment } from "react";
-
+import { useBaseUrl } from "../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 
 //For DataTable
@@ -22,17 +22,18 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { useNavigate } from "react-router-dom";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 window.JSZip = jsZip;
-const url = "192.168.1.25:8000";
+
 
 const UnitMasterList = () => {
   const [loading, setLoading] = useState(true);
   const [unitList, setUnitList] = useState([]);
+  const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
 
-    axios.get(`http://${url}/api/unit`).then((res) => {
+    axios.get(`${baseUrl}/api/unit`).then((res) => {
       if (isMounted) {
         if (res.status === 200) {
             setUnitList(res.data.unit);
@@ -128,7 +129,7 @@ const UnitMasterList = () => {
             width="100%"
             cellSpacing={0}
           >
-            <thead>
+            <thead className="text-center bg-primary text-white">
               <tr>
                 <th className="text-center">SNO</th>
                 <th className="text-center">UNIT NAME</th>
