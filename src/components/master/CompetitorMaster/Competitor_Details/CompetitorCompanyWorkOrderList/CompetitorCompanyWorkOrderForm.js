@@ -10,12 +10,13 @@ import CompetitorCompanyWorkOrderList from "./CompetitorCompanyWorkOrderList";
 import "./UploadDoc.css";
 import Select from "react-select";
 
+
 const CompetitorCompanyWorkOrderForm = () => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
   const initialValue = {
-    woId: null,
-    compNo: null,
+    woId: '',
+    compNo: '',
     custName: "",
     projectName: "",
     tnederId: "",
@@ -41,16 +42,16 @@ const CompetitorCompanyWorkOrderForm = () => {
   const [dragover, setdragover] = useState(false);
   const wrapperRef = useRef(null); //for WO upload
   const wrapperRef1 = useRef(null); // for Completion Certificate Upload
-  const [file, setFile] = useState(""); //for WO upload
-  const [file1, setFile1] = useState(""); // for Completion Certificate Upload
+  const [woFile, setFile] = useState(""); //for WO upload
+  const [completionFile, setFile1] = useState(""); // for Completion Certificate Upload
   const [previewForEdit, setPreviewForEdit] = useState(""); //for WO upload
   const [previewForEdit1, setPreviewForEdit1] = useState(""); // for Completion Certificate Upload
   let tokenId = localStorage.getItem("token");
   const { server1: baseUrl } = useBaseUrl();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
-  const [stateList,setStateList]=useState([]);
-  const [unitList,setUnitList]=useState([]);
+  const [stateList, setStateList]=useState();
+  const [unitList,setUnitList]=useState();
   // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
   const [hasError, setHasError] = useState({
@@ -73,9 +74,26 @@ const CompetitorCompanyWorkOrderForm = () => {
 
   useEffect(() => {
     getCompNo();
+    getStateList();
+    getUnitList();
+    
     // getWOList();
   }, []);
+const getStateList = async() =>{
+  await axios
+  .get(`${baseUrl}/api/state/list/105`)
+  .then((resp) => {
+    setStateList(resp.data.stateList);
+  });
+}
 
+const getUnitList = async() =>{
+  await axios
+  .get(`${baseUrl}/api/unit/list`)
+  .then((resp) => {
+    setUnitList(resp.data.unitList);
+  });
+}
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -124,7 +142,7 @@ const CompetitorCompanyWorkOrderForm = () => {
   };
 
   useEffect(() => {
-    if (file && file.size > maxImageSize) {
+    if (woFile && woFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
         text: "Maximum Allowed File size is 1MB",
@@ -134,7 +152,7 @@ const CompetitorCompanyWorkOrderForm = () => {
         setFile("");
         setPreviewObjURL("");
       });
-    } else if (file && !doctype.includes(file.type)) {
+    } else if (woFile && !doctype.includes(woFile.type)) {
       Swal.fire({
         title: "File Type",
         text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
@@ -145,7 +163,31 @@ const CompetitorCompanyWorkOrderForm = () => {
         setPreviewObjURL("");
       });
     }
-  }, [file]);
+  }, [woFile]);
+
+  useEffect(() => {
+    if (completionFile && completionFile.size > maxImageSize) {
+      Swal.fire({
+        title: "File Size",
+        text: "Maximum Allowed File size is 1MB",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile("");
+        setPreviewObjURL("");
+      });
+    } else if (completionFile && !doctype.includes(completionFile.type)) {
+      Swal.fire({
+        title: "File Type",
+        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => { 
+        setFile("");
+        setPreviewObjURL("");
+      });
+    }
+  }, [completionFile]);
   const getCompNo = async () => {
     await axios
       .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
@@ -163,13 +205,13 @@ const CompetitorCompanyWorkOrderForm = () => {
   useEffect(() => {
     if (
       competitorWOInput.custName !== "" &&
-      (file !== "") | (previewForEdit !== "")
+      (woFile !== "") | (previewForEdit !== "")
     ) {
       setFormIsValid(true);
     } else {
       setFormIsValid(false);
     }
-  }, [competitorWOInput, file, previewForEdit]);
+  }, [competitorWOInput, woFile, previewForEdit]);
 
   const getWOList = () => {
     axios
@@ -178,12 +220,8 @@ const CompetitorCompanyWorkOrderForm = () => {
         let list = [...resp.data.qc];
         let listarr = list.map((item, index) => ({
           ...item,
-          
           filepath:
-            
               `<img src="${baseUrl}/competitorWO/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="`+ item.filetype !== "pdf" ? "pdf" : "Image"+`" id="qcImg" style="cursor:pointer" title="`+item.filetype !== "pdf" ? "pdf" : "Image"+`"></img>`,
-            
-
 
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
@@ -278,19 +316,31 @@ const CompetitorCompanyWorkOrderForm = () => {
       ...competitorWOInput,
       [e.target.name]: e.target.value,
     });
+
+    if(e.target.value === "" || e.target.value === null || e.target.value === undefined) 
+    {
+      setHasError({hasError, [e.target.name]:true});
+    }
+    else {
+      setHasError({ ...hasError, [e.target.name]: false });
+    }
+
   };
-  const selectInputHandler = (action ,value) => {
-    // setCompetitorWOInput({
-    //   ...competitorWOInput,
-    //   [e.target.name]: e.target.value,
-    // });
+
+  const selectInputHandler = (value, action) => {
+   
+    setCompetitorWOInput({
+      ...competitorWOInput,
+      [action.name]: value,
+    });
+    if (value === "" || value === null || value === undefined) {
+      setHasError({ ...hasError, [action.name]: true });
+    } else {
+      setHasError({ ...hasError, [action.name]: false });
+    }
   };
 
-  useEffect(()=>{
 
-
-
-  },[competitorWOInput]);
 
 
 
@@ -305,7 +355,17 @@ const CompetitorCompanyWorkOrderForm = () => {
       compNo: competitorWOInput.compNo,
       projectName: competitorWOInput.projectName,
       custName: competitorWOInput.custName,
-      file: file,
+      tnederId: competitorWOInput.tnederId,
+      state: competitorWOInput.state.value,
+      woDate: competitorWOInput.woDate,
+      quantity: competitorWOInput.quantity,
+      unit: competitorWOInput.unit.value,
+      projectValue: competitorWOInput.projectValue,
+      perTonRate: competitorWOInput.perTonRate,
+      qualityCompleted: competitorWOInput.qualityCompleted,
+      date: competitorWOInput.date,
+      woFile: woFile,
+      completionFile: completionFile,
       tokenId: tokenId,
     };
 
@@ -377,13 +437,24 @@ const CompetitorCompanyWorkOrderForm = () => {
       competitorWOInput.custName !== null &&
       competitorWOInput.woId
     ) {
-      //When Image is not changed on update
-      if (previewForEdit !== "" && file === "") {
+      //When Work Order  Image is not changed on update
+      if (previewForEdit !== "" && woFile === "") {
         const datatosend = {
           compId: compid,
           compNo: competitorWOInput.compNo,
           projectName: competitorWOInput.projectName,
           custName: competitorWOInput.custName,
+          tnederId: competitorWOInput.tnederId,
+          state: competitorWOInput.state,
+          woDate: competitorWOInput.woDate,
+          quantity: competitorWOInput.quantity,
+          unit: competitorWOInput.unit,
+          projectValue: competitorWOInput.projectValue,
+          perTonRate: competitorWOInput.perTonRate,
+          qualityCompleted: competitorWOInput.qualityCompleted,
+          date: competitorWOInput.date,
+          woFile: woFile,
+          completionFile: completionFile,
           tokenId: tokenId,
         };
 
@@ -436,14 +507,14 @@ const CompetitorCompanyWorkOrderForm = () => {
           });
       }
       //When Image is changed/reuploaded on update
-      else if (previewForEdit === "" && file !== "") {
+      else if (previewForEdit === "" && woFile !== "") {
         const datatosend = {
           //woId:competitorWOInput.woId,
           compId: compid,
           compNo: competitorWOInput.compNo,
           projectName: competitorWOInput.projectName,
           custName: competitorWOInput.custName,
-          file: file,
+          woFile: woFile,
           tokenId: tokenId,
           _method: "PUT",
         };
@@ -539,6 +610,8 @@ const CompetitorCompanyWorkOrderForm = () => {
  }
   };
 
+console.log("competitorWOInput",competitorWOInput);
+
   return (
     <div className="card-body ">
       <form>
@@ -573,7 +646,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectName">Project Name</label>
+                <label htmlFor="projectName">Project Name<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -600,7 +673,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="tnederId"> Tender Id</label>
+                <label htmlFor="tnederId"> Tender Id<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -627,7 +700,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="state">State Name</label>
+                <label htmlFor="state">State Name<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
               <Select
@@ -637,7 +710,6 @@ const CompetitorCompanyWorkOrderForm = () => {
                   isClearable="true"
                   options={stateList}
                   onChange={selectInputHandler}
-                  // onBlur="{customersubcategoryBlurHandler}"
                   value={competitorWOInput.state}
                 ></Select>
 
@@ -655,7 +727,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="woDate"> WO Date</label>
+                <label htmlFor="woDate"> WO Date<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -670,7 +742,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.woDate && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Select Work Order Date ..!
+                      Invalid Work Order Date ..!
                     </span>
                   </div>
                 )}
@@ -681,7 +753,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="qantity">Quantity</label>
+                <label htmlFor="qantity">Quantity<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -708,7 +780,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="unit">Unit</label>
+                <label htmlFor="unit">Unit<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
 
@@ -725,7 +797,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 {hasError.unit && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
-                      Select Valid Unit..!
+                      Select Unit..!
                     </span>
                   </div>
                 )}
@@ -736,7 +808,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectValue">Project Value</label>
+                <label htmlFor="projectValue">Project Value<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -763,7 +835,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="perTonRate">Per Ton Rate</label>
+                <label htmlFor="perTonRate">Per Ton Rate<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -790,7 +862,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="qualityCompleted">Quality Completed</label>
+                <label htmlFor="qualityCompleted">Quality Completed<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -817,7 +889,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="date"> Date</label>
+                <label htmlFor="date"> Date<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -871,7 +943,7 @@ const CompetitorCompanyWorkOrderForm = () => {
           <div className="inputgroup col-lg-7 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold pt-1">
-                <label htmlFor="woUpload"> WO Upload</label>
+                <label htmlFor="woUpload"> WO Upload<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-6">
                 <div
@@ -907,7 +979,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 <label htmlFor="woUpload">Preview</label>
               </div>
               <div className="col-lg-8">
-                {file && (
+                {woFile && (
                   <div className="card border-left-info shadow py-2 w-100 my-4">
                     <div className="card-body">
                       <div className="row no-gutters align-items-center">
@@ -919,8 +991,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                           <div className="row no-gutters align-items-center ">
                             <div className="col-auto">
                               <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                <p className="text-truncate">{file.name}</p>
-                                <p>({file.size / 1000} KB)</p>
+                                <p className="text-truncate">{woFile.name}</p>
+                                <p>({woFile.size / 1000} KB)</p>
                               </div>
                             </div>
                           </div>
@@ -958,7 +1030,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 )}
                 {/* for edit */}
 
-                {file === "" && previewForEdit !== "" && (
+                {woFile === "" && previewForEdit !== "" && (
                   <div className="card border-left-info shadow py-2 w-100 my-4">
                     <div className="card-body">
                       <div className="row no-gutters align-items-center">
@@ -1027,7 +1099,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 <label htmlFor="completionCertificate">
                   {" "}
                   Completion Certificate Upload
-                </label>
+                <span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
               </div>
               <div className="col-lg-6">
                 <div
@@ -1064,7 +1136,7 @@ const CompetitorCompanyWorkOrderForm = () => {
               </div>
               <div className="col-lg-8">
                 
-                {file1 && (
+                {completionFile && (
                   <div className="card border-left-info shadow py-2 w-100 my-4">
                     <div className="card-body">
                       <div className="row no-gutters align-items-center">
@@ -1076,8 +1148,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                           <div className="row no-gutters align-items-center ">
                             <div className="col-auto">
                               <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                <p className="text-truncate">{file1.name}</p>
-                                <p>({file1.size / 1000} KB)</p>
+                                <p className="text-truncate">{completionFile.name}</p>
+                                <p>({completionFile.size / 1000} KB)</p>
                               </div>
                             </div>
                           </div>
@@ -1115,7 +1187,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                 )}
                 {/* for edit */}
 
-                {file1 === "" && previewForEdit1 !== "" && (
+                {completionFile === "" && previewForEdit1 !== "" && (
                   <div className="card border-left-info shadow py-2 w-100 my-4">
                     <div className="card-body">
                       <div className="row no-gutters align-items-center">

@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+  import { Fragment } from "react";
 import { useEffect } from "react";
 //For DataTable
 import "jquery/dist/jquery.min.js";
@@ -26,9 +26,19 @@ const CompetitorCompanyWorkOrderList = (props) => {
         data: dataSet,
         columns: [
             { data: 'sl_no' },
-            { data: 'cerName' },
-            { data: 'remark' },
-            { data: 'filepath' },
+            { data: 'custName' },
+            { data: 'projectName'},
+            { data: 'tnederId'},
+            { data: 'state'},
+            { data: 'woDate'},
+            { data: 'quantity'},
+            { data: 'unit'},
+            { data: 'projectValue'},
+            { data: 'perTonRate'},
+            { data: 'qualityCompleted'},
+            { data: 'date'},
+            { data: 'woFile'},
+            { data: 'completionFile'},
             { data: 'buttons' },
         ],
     })
@@ -67,15 +77,25 @@ const CompetitorCompanyWorkOrderList = (props) => {
         <table
           className="table   text-center"
           id="workOrderTable"
-          width="100%"
+          width="50%"
           cellSpacing={0}
         >
-          <thead className="text-center bg-primary text-white">
+          <thead className="text-center bg-primary text-white ">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Certificate</th>
-              <th scope="col">Remarks</th>
-              <th scope="col">Image</th>
+              <th scope="col">Customer Name</th>
+              <th scope="col">Project Name</th>
+              <th scope="col">Tender Id</th>
+              <th scope="col">State Name</th>
+              <th scope="col">WO Date</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Unit</th>
+              <th scope="col">Project Value</th>
+              <th scope="col">Per Ton Rate</th>
+              <th scope="col">Quality Completed</th>
+              <th scope="col">Date</th>
+              <th scope="col">WO Upload</th>
+              <th scope="col">Completion Certificate Upload</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
