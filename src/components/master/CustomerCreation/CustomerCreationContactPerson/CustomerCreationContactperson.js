@@ -70,39 +70,23 @@ const CustomerCreationContactPerson = () => {
   } = useInputValidation(isMobileValidation);
 
 
-  const isNumber = (evt) => {
-      if(!isFinite(evt.key)) {
-          evt.preventDefault();
-      }
-  }
+  // const isNumber = (evt) => {
+  //   evt = (evt) ? evt : window.event;
+  //   var charCode = (evt.which) ? evt.which : evt.keyCode;
+  //   if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+  //       return false;
+  //   }
+  //   return true;
+  // }
 
   useEffect(() => {
    if(id){
     setCustomerCreationMainID(id)
+    getsublist()
    }
-   getsublist()
   }, [])
 
-  useEffect(() => {
-    // const getCustCreationMainId = async () => {
-    //   let data = {tokenid: localStorage.getItem("token")}
-    //   let response = await axios.post(`${baseUrl}/api/customercreationmain/getmainid`, data);
-    //   setMainId(response.data.customercreation.id)
-    //   getsublist(response.data.customercreation.id)
-    // }
-
-    // const getFormNo = async () => {
-    //   let response = await axios.get(`${baseUrl}/api/customercreation/contact/getFormNo`);
-    //   setFormNo(response.data.form_no);
-    // }
-   
-    // getCustCreationMainId();
-    // getFormNo();
-  },[])
-
-  
-
-  const getsublist =() =>{
+   const getsublist =() =>{
     let data ={
       mainid : id,
     }
@@ -115,7 +99,7 @@ const CustomerCreationContactPerson = () => {
         buttons:`<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
         sl_no : index+1
       }))
-
+      console.log(listarr)
       setcontactlist(listarr)
     });
   }
@@ -217,7 +201,7 @@ const CustomerCreationContactPerson = () => {
 
     if (!formIsValid) {
       console.log("Inavlid Form!");
-      setdatasending(true)
+      setdatasending(false)
       return;
     }
 
@@ -357,7 +341,7 @@ const CustomerCreationContactPerson = () => {
                 </div>
                 <div className="col-lg-8">
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     id="mobile"
                     placeholder="Enter Mobile No"
@@ -365,7 +349,6 @@ const CustomerCreationContactPerson = () => {
                     value={mobileValue}
                     onChange={mobileChangeHandler}
                     onBlur={mobileBlurHandler}
-                    onKeyPress={ isNumber}
                     maxLength={10}
                     />
                   {mobileHasError && (
@@ -381,20 +364,30 @@ const CustomerCreationContactPerson = () => {
             <div className="col-lg-12 d-flex justify-content-center">
               {!isEditbtn && 
               <button
-                className="btn btn-outline-primary rounded-pill px-4"
+                className={(!formIsValid) ?  "btn btn-outline-primary rounded-pill px-4" :  "btn btn-primary rounded-pill px-4"} 
                 disabled={!formIsValid || isDatasending}
               >
+                {isDatasending && <span className="spinner-border spinner-border-sm mr-2"></span> }
                 {isDatasending && 'Saving...'}
                 {!isDatasending && 'Add'}
               </button>}
               {isEditbtn && 
                <button
-                className="btn btn-outline-primary rounded-pill px-4"
+                className={(!formIsValid) ?  "btn btn-outline-primary rounded-pill px-4" :  "btn btn-primary rounded-pill px-4"} 
                 disabled={!formIsValid || isDatasending}
               >
+                {isDatasending && <span className="spinner-border spinner-border-sm mr-2"></span> }
                 {isDatasending && 'Updating...'}
                 {!isDatasending && 'Update'}
               </button>  }  
+
+              <button
+                className="btn  btn-outline-dark rounded-pill mx-3"
+                onClick={resetform}
+                disabled={isDatasending}
+              >
+                Clear
+              </button>
             </div>
           </div>
         </form>
@@ -405,11 +398,13 @@ const CustomerCreationContactPerson = () => {
         <div className = "col-lg-12 mt-3 d-flex justify-content-end">
           <button
               className="btn btn-outline-primary mr-3 rounded-pill"
+              onClick = {() => navigate("/tender/master/customercreation/list/main/swmprojectstatus/"+id)}
             >
             Next
           </button>
           <button className="btn  btn-outline-dark rounded-pill"
             onClick = {() => navigate("/tender/master/customercreation/list")}
+            
             >
               Cancel
           </button>

@@ -23,7 +23,7 @@ import CompetitorBranchForm from "./components/master/CompetitorMaster/Competito
 import CustomerCreationProfile from "./components/master/CustomerCreation/CustomerCreationProfile/CustomerCreationProfile";
 import CustomerCreationMain from "./components/master/CustomerCreation/CustomerCreationMain";
 import CustomerCreationContactPerson from "./components/master/CustomerCreation/CustomerCreationContactPerson/CustomerCreationContactperson";
-import CustomerCreationBankDetails from "./components/master/CustomerCreation/CustomerCreationBankdetails";
+// import CustomerCreationBankDetails from "./components/master/CustomerCreation/CustomerCreationBankdetails";
 import CustomerCreationSWMProjectStatus from "./components/master/CustomerCreation/SWMProjectStatus/CustomerCreationSWMProjectStatus";
 import StateMasterView from "./components/master/StateMaster/StateMasterView";
 import CountryMasterView from "./components/master/CountryMaster/CountryMasterView";
@@ -41,6 +41,12 @@ import ProejctTypeMaster from "./components/master/ProjectType/ProjectTypeMaster
 import CustSubCategView from "./components/master/CustomerSubCategory/CustSubCategView";
 import CustSubCategMaster from "./components/master/CustomerSubCategory/CustSubCategMaster";
 import ProjectstatusMaster from "./components/master/Projectstatus/ProjectstatusMaster";
+import CustomerCreationBankDetails from "./components/master/CustomerCreation/Bankdetails/CustomerCreationBankdetails";
+import BidmanagementMain from "./components/tender/Bidmanagement/BidmanagementMain";
+import BidCreationMain from "./components/tender/Bidmanagement/Bidcreation/BidCreationMain";
+import BidSubmission from "./components/tender/Bidmanagement/Bidsubmission/BidSubmission";
+import TenderStatus from "./components/tender/Bidmanagement/TenderStatus/TenderStatus";
+import Workorder from "./components/tender/Bidmanagement/Workorder/Workorder";
 
 
 function App() {
@@ -56,7 +62,16 @@ function App() {
             <Route path="tendertracker" element={<Tendertracker />} />
             <Route path="tendercreation" element={<Tendercreation />} />
             <Route path="legacystatement" element={<Legacystatement />} />
-            <Route path="bidmanagement" element={<Bidmanagement />} />
+            <Route path="bidmanagement">
+              <Route path="list" element={<Bidmanagement />}/>
+              <Route path="list/main" element={<BidmanagementMain />}>
+                <Route path="bidcreationmain" element={<BidCreationMain/>}/>
+                <Route path="bidcreationmain/:id" element={<BidCreationMain/>}/>
+                <Route path="bidsubmission" element={<BidSubmission/>}/>
+                <Route path="tenderstatus" element={<TenderStatus/>}/>
+                <Route path="workorder" element={<Workorder/>}/>
+              </Route>
+            </Route>
             <Route path="master">
             <Route
                 path="customercreation/list"

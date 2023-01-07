@@ -27,6 +27,11 @@ a{
 .formContent{
     position: relative;
 }
+
+.Content-display{
+    position: relative;
+}
+
 .loading {
     position: absolute;
     display: flex;

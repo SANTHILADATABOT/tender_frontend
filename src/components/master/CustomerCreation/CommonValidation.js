@@ -12,6 +12,13 @@ export const isMobileValidation = (value) => {
     return true;
 }
 
+export const isIFSCvalid = (value) => {
+  if(!/^[A-Za-z]{4}0[A-Z0-9a-z]{6}$/.test(value)){
+      return false;
+  }else{
+      return true;
+  }
+}
 
 export const isPincodeValid = (value) => {
     if(!/^[1-9][0-9]{5}$/.test(value)){

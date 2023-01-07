@@ -32,7 +32,7 @@ const SWMProjectStatusSubTable = (props) => {
             { data : 'status_label'},
             { data : 'vendor'},
             { data : 'vendortype_label'},
-            { data : 'projectstatus'},
+            { data : 'projectstatus_label'},
             { data : 'projectvalue'},
             { data : 'duration'},
             { data : 'buttons' },

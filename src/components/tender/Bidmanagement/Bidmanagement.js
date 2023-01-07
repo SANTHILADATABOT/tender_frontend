@@ -1,21 +1,31 @@
-import {props} from 'react';
+import { Link, useLocation, useNavigate, useOutletContext } from "react-router-dom";
 
 function Bidmanagement(props)
 {
 	return(
 	<>
-		<h1>Hello</h1>
-      	<p>{props.chprops}</p>
-      
-      
-
-	{/*	<div className="d-sm-flex align-items-center justify-content-between mb-4">
-              <h1 className="h3 mb-0 text-gray-800">Bid's Management</h1>
+		<div className="container-fluid p-0">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="card shadow mb-4">
+              <div className="card-body">
+                <div className="float-right ">
+                  <Link to ="main/bidcreationmain"  /*onClick={createCustomer}*/ className="rounded-pill btn btn-primary btn-icon-split">
+                    <span className="icon text-white-50">
+                      <i className="fas fa-plus-circle" />
+                    </span>
+                    <span className="text">New</span>
+                  </Link>
+                </div>
+                
+              </div>
+              <div>
+                {/* <CustomerCreationList /> */}
+              </div>
+            </div>
+          </div>
         </div>
-		
-		<div id="bidmanagement-wrapper">
-			Bid's Management Page
-		</div>		*/}
+      </div>
 	</>
 	);
 }

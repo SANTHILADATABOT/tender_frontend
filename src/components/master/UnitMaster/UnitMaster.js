@@ -3,8 +3,9 @@ import Swal from "sweetalert2";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { useBaseUrl } from "../../hooks/useBaseUrl";
 
-const url = "192.168.1.25:8000";
+
 const UnitMaster = () => {
   usePageTitle("Unit Creation Master ");
 
@@ -17,9 +18,11 @@ const UnitMaster = () => {
   });
   const [unitValidation, setUnitValidation] = useState({ unitName: "" });
   const [dataSending, setDataSending]=useState(false);
+  const { server1: baseUrl } = useBaseUrl();
+
   useEffect(() => {
     if(id){
-      axios.get(`http://${url}/api/unit/${id}`).then((resp)=> {
+      axios.get(`${baseUrl}/api/unit/${id}`).then((resp)=> {
         setunitInput({
           unitName: resp.data.unit.unit_name,
           unitStatus: resp.data.unit.unit_status,
@@ -59,8 +62,8 @@ const UnitMaster = () => {
     };
 
     if (!id) {
-      console.log("If !id");
-      axios.post(`http://${url}/api/unit`, data).then((res) => {
+      
+      axios.post(`${baseUrl}/api/unit`, data).then((res) => {
         
         if (res.data.status === 200) {
           Swal.fire({
@@ -83,8 +86,8 @@ const UnitMaster = () => {
       });
     }
     else {
-      console.log("If id");
-      axios.put(`http://${url}/api/unit/${id}`, data).then((res) => {
+      
+      axios.put(`${baseUrl}/api/unit/${id}`, data).then((res) => {
         if (res.data.status === 200) {
           Swal.fire({
             icon: "success",

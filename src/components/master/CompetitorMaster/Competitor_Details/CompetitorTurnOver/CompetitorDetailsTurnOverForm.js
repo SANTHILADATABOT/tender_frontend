@@ -139,8 +139,7 @@ useEffect(()=>{
               Swal.fire({
                 //success msg
                 icon: "success",
-                title: "Accounting year "+data.accountYear.value
-                ,
+                title: "Accounting year "+data.accountYear,
                 text: `removed!`,
                 timer: 2000,
                 showConfirmButton: false,
