@@ -7,5 +7,3 @@ const useBaseUrl = () => {
 };
 
 export { useBaseUrl };
-
-export { useBaseUrl };
