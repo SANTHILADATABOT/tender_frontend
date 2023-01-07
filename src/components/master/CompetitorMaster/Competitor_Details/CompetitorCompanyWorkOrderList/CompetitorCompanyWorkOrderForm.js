@@ -9,6 +9,8 @@ import Swal from "sweetalert2";
 import CompetitorCompanyWorkOrderList from "./CompetitorCompanyWorkOrderList";
 import "./UploadDoc.css";
 import Select from "react-select";
+import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
+
 
 
 const CompetitorCompanyWorkOrderForm = () => {
@@ -50,8 +52,13 @@ const CompetitorCompanyWorkOrderForm = () => {
   const { server1: baseUrl } = useBaseUrl();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
-  const [stateList, setStateList]=useState();
-  const [unitList,setUnitList]=useState();
+  const [woStateList, setWoStateList]=useState("");
+  const [woUnitList,setWoUnitList]=useState("");
+  const { woFile: woFilePath, woCompletionFile: woCompletionFilePath} = useImageStoragePath();
+  const [editDataState, setEditDataState]=useState("");
+  const [editDataUnit, setEditDataUnit]=useState("");
+  
+  
   // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
   const [hasError, setHasError] = useState({
@@ -76,14 +83,14 @@ const CompetitorCompanyWorkOrderForm = () => {
     getCompNo();
     getStateList();
     getUnitList();
-    
-    // getWOList();
+    getWOList();
   }, []);
+
 const getStateList = async() =>{
   await axios
   .get(`${baseUrl}/api/state/list/105`)
   .then((resp) => {
-    setStateList(resp.data.stateList);
+    setWoStateList(resp.data.stateList);
   });
 }
 
@@ -91,7 +98,7 @@ const getUnitList = async() =>{
   await axios
   .get(`${baseUrl}/api/unit/list`)
   .then((resp) => {
-    setUnitList(resp.data.unitList);
+    setWoUnitList(resp.data.unitList);
   });
 }
   const onDragEnter = () => {
@@ -165,6 +172,7 @@ const getUnitList = async() =>{
     }
   }, [woFile]);
 
+  
   useEffect(() => {
     if (completionFile && completionFile.size > maxImageSize) {
       Swal.fire({
@@ -173,8 +181,8 @@ const getUnitList = async() =>{
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
-        setFile("");
-        setPreviewObjURL("");
+        setFile1("");
+        setPreviewObjURL1("");
       });
     } else if (completionFile && !doctype.includes(completionFile.type)) {
       Swal.fire({
@@ -183,11 +191,12 @@ const getUnitList = async() =>{
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => { 
-        setFile("");
-        setPreviewObjURL("");
+        setFile1("");
+        setPreviewObjURL1("");
       });
     }
   }, [completionFile]);
+
   const getCompNo = async () => {
     await axios
       .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
@@ -217,12 +226,16 @@ const getUnitList = async() =>{
     axios
       .get(`${baseUrl}/api/competitordetails/wolist/${compid}`)
       .then((resp) => {
-        let list = [...resp.data.qc];
+        
+        let list = [...resp.data.wo];
         let listarr = list.map((item, index) => ({
           ...item,
-          filepath:
-              `<img src="${baseUrl}/competitorWO/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="`+ item.filetype !== "pdf" ? "pdf" : "Image"+`" id="qcImg" style="cursor:pointer" title="`+item.filetype !== "pdf" ? "pdf" : "Image"+`"></img>`,
-
+          woFile:
+              `<img src="${woFilePath}`+item.woFile+`" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img>`,
+          
+          completionFile:
+              `<img src="${woCompletionFilePath}`+item.completionFile+`" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg2" style="cursor:pointer" title="File"></img>`,
+            
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
@@ -230,29 +243,67 @@ const getUnitList = async() =>{
       });
   };
 
-  const getImageUrl = (s) => {
+  //set image preview on Edit button clicked
+  const getImageUrl = (wo, comp) => {
     var pattern =
       /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
-    var img_url = s.match(pattern);
+    var img_url = wo.match(pattern);
+    var img_url1 = comp.match(pattern);
+    //setting preview image for Work Order File
     if (!(img_url[0] === null || img_url[0] === undefined)) {
       setPreviewForEdit(img_url[0]);
     } else {
       setPreviewForEdit("");
     }
+    //setting preview image for Work Order Completion File
+    if (!(img_url1[0] === null || img_url1[0] === undefined)) {
+      setPreviewForEdit1(img_url1[0]);
+    } else {
+      setPreviewForEdit1("");
+    }
   };
-
+   
   const onEdit = (data) => {
     setFile("");
-    var imgUrl = getImageUrl(data.filepath);
-
+    setFile1("");
+    getImageUrl(data.woFile, data.completionFile);
+    
     setFormIsValid(true);
     setCompetitorWOInput({
       woId: data.id,
       compNo: data.compNo,
       custName: data.custName,
       projectName: data.projectName,
+      tnederId: data.tnederId,
+      woDate: data.woDate,
+      quantity: data.quantity,
+      projectValue: data.projectValue,
+      perTonRate: data.perTonRate,
+      qualityCompleted: data.qualityCompleted,
+      date: data.date,
+      woFile: data.woFile,
+      completionFile: data.completionFile,
     });
+    
+    setEditDataState(data.state);
+    setEditDataUnit(data.unit);
+
+    
   };
+//set State on Edit
+  useEffect (()=>{
+    
+    if(woStateList !=="" && woStateList!==undefined && editDataState!=="" )
+    {
+      setCompetitorWOInput((prev)=>{return{...prev,state: woStateList.find((x)=>x.value===editDataState)}});
+    }
+    
+    if( woUnitList !=="" && woUnitList!==undefined && editDataUnit!=="" ){
+      setCompetitorWOInput((prev)=>{return{...prev,unit:woUnitList.find((x)=>x.value===editDataUnit)}});
+    }
+    
+  },[editDataState, woStateList,editDataUnit, woUnitList]);
+
 
   const onPreview = (data) => {
     var pattern =
@@ -445,10 +496,10 @@ const getUnitList = async() =>{
           projectName: competitorWOInput.projectName,
           custName: competitorWOInput.custName,
           tnederId: competitorWOInput.tnederId,
-          state: competitorWOInput.state,
+          state: competitorWOInput.state.value,
           woDate: competitorWOInput.woDate,
           quantity: competitorWOInput.quantity,
-          unit: competitorWOInput.unit,
+          unit: competitorWOInput.unit.value,
           projectValue: competitorWOInput.projectValue,
           perTonRate: competitorWOInput.perTonRate,
           qualityCompleted: competitorWOInput.qualityCompleted,
@@ -610,7 +661,7 @@ const getUnitList = async() =>{
  }
   };
 
-console.log("competitorWOInput",competitorWOInput);
+
 
   return (
     <div className="card-body ">
@@ -708,7 +759,7 @@ console.log("competitorWOInput",competitorWOInput);
                   id="state"
                   isSearchable="true"
                   isClearable="true"
-                  options={stateList}
+                  options={woStateList}
                   onChange={selectInputHandler}
                   value={competitorWOInput.state}
                 ></Select>
@@ -789,7 +840,7 @@ console.log("competitorWOInput",competitorWOInput);
                   id="unit"
                   isSearchable="true"
                   isClearable="true"
-                  options={unitList}
+                  options={woUnitList}
                   onChange={selectInputHandler}
                   value={competitorWOInput.unit}
                 ></Select>
@@ -1274,7 +1325,7 @@ console.log("competitorWOInput",competitorWOInput);
         </div>
       </form>
       <CompetitorCompanyWorkOrderList
-        qCSubList={wOList}
+        wOList={wOList}
         onEdit={onEdit}
         onDelete={onDelete}
         onPreview={onPreview}

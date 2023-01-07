@@ -7,6 +7,7 @@ import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import CompetitorCompanyQualityCertificatesList from "./CompetitorCompanyQualityCertificatesList";
+import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
 import "./UploadDoc.css";
 
 const CompetitorCompanyQualityCertificatesForm = () => {
@@ -34,6 +35,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const { server1: baseUrl } = useBaseUrl();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  const { qcFile: filePath} = useImageStoragePath();
   // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
 
@@ -124,11 +126,6 @@ const CompetitorCompanyQualityCertificatesForm = () => {
 
   const getQCList = () => {
 
-    // item.filetype !== 'pdf' ?
-          //   `<img src="${baseUrl}/competitorQC/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" id="qcImg" style="cursor:pointer" title="Image"></img>`
-          // :  `<img src="${baseUrl}/competitorQC/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="pdf" id="qcImg" style="cursor:pointer" title="pdf"></img>`
-          // ,
-// filepath: `<img src="${baseUrl}/storage/app/public/uploads/image/competitor/qc/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image" ></img>`,
     axios
       .get(`${baseUrl}/api/competitordetails/qclist/${compid}`)
       .then((resp) => {
@@ -136,7 +133,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
         let listarr = list.map((item, index) => ({
           ...item,
 
-          filepath:`<img src="${baseUrl}/competitorQC/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image"></img>`,
+          filepath:`<img src="${filePath}`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image"></img>`,
           
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,

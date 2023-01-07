@@ -29,10 +29,10 @@ const CompetitorCompanyWorkOrderList = (props) => {
             { data: 'custName' },
             { data: 'projectName'},
             { data: 'tnederId'},
-            { data: 'state'},
+            { data: 'state_name'},
             { data: 'woDate'},
             { data: 'quantity'},
-            { data: 'unit'},
+            { data: 'unit_name'},
             { data: 'projectValue'},
             { data: 'perTonRate'},
             { data: 'qualityCompleted'},
@@ -54,7 +54,7 @@ const CompetitorCompanyWorkOrderList = (props) => {
         props.onDelete(rowdata)
       });
 
-      $('#workOrderTable tbody').on('click', 'tr #qcImg', function () {
+      $('#workOrderTable tbody').on('click', 'tr #woImg', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onPreview(rowdata)
         
@@ -63,10 +63,10 @@ const CompetitorCompanyWorkOrderList = (props) => {
  }, [])
 
  useEffect(() => {
-    if(props.woSubList){
-        table.clear().rows.add(props.woSubList).draw();
+    if(props.wOList){
+        table.clear().rows.add(props.wOList).draw();
     }
- }, [props.woSubList])
+ }, [props.wOList])
  
 
   return (
