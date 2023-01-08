@@ -9,16 +9,14 @@ import Swal from "sweetalert2";
 import CompetitorCompanyWorkOrderList from "./CompetitorCompanyWorkOrderList";
 import "./UploadDoc.css";
 import Select from "react-select";
-import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
-
-
+import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 
 const CompetitorCompanyWorkOrderForm = () => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
   const initialValue = {
-    woId: '',
-    compNo: '',
+    woId: "",
+    compNo: "",
     custName: "",
     projectName: "",
     tnederId: "",
@@ -52,13 +50,13 @@ const CompetitorCompanyWorkOrderForm = () => {
   const { server1: baseUrl } = useBaseUrl();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
-  const [woStateList, setWoStateList]=useState("");
-  const [woUnitList,setWoUnitList]=useState("");
-  const { woFile: woFilePath, woCompletionFile: woCompletionFilePath} = useImageStoragePath();
-  const [editDataState, setEditDataState]=useState("");
-  const [editDataUnit, setEditDataUnit]=useState("");
-  
-  
+  const [woStateList, setWoStateList] = useState("");
+  const [woUnitList, setWoUnitList] = useState("");
+  const { woFile: woFilePath, woCompletionFile: woCompletionFilePath } =
+    useImageStoragePath();
+  const [editDataState, setEditDataState] = useState("");
+  const [editDataUnit, setEditDataUnit] = useState("");
+
   // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
   const [hasError, setHasError] = useState({
@@ -77,8 +75,6 @@ const CompetitorCompanyWorkOrderForm = () => {
     completionFile: false,
   });
 
-  
-
   useEffect(() => {
     getCompNo();
     getStateList();
@@ -86,21 +82,17 @@ const CompetitorCompanyWorkOrderForm = () => {
     getWOList();
   }, []);
 
-const getStateList = async() =>{
-  await axios
-  .get(`${baseUrl}/api/state/list/105`)
-  .then((resp) => {
-    setWoStateList(resp.data.stateList);
-  });
-}
+  const getStateList = async () => {
+    await axios.get(`${baseUrl}/api/state/list/105`).then((resp) => {
+      setWoStateList(resp.data.stateList);
+    });
+  };
 
-const getUnitList = async() =>{
-  await axios
-  .get(`${baseUrl}/api/unit/list`)
-  .then((resp) => {
-    setWoUnitList(resp.data.unitList);
-  });
-}
+  const getUnitList = async () => {
+    await axios.get(`${baseUrl}/api/unit/list`).then((resp) => {
+      setWoUnitList(resp.data.unitList);
+    });
+  };
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -114,7 +106,6 @@ const getUnitList = async() =>{
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const onFileDrop = (e) => {
-    
     if (e.target.name === "woUpload") {
       const newFile = e.target.files[0];
 
@@ -137,7 +128,6 @@ const getUnitList = async() =>{
       }
     }
   };
-
 
   var config = {
     onUploadProgress: function (progressEvent) {
@@ -165,14 +155,13 @@ const getUnitList = async() =>{
         text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
         icon: "error",
         confirmButtonColor: "#2fba5f",
-      }).then(() => { 
+      }).then(() => {
         setFile("");
         setPreviewObjURL("");
       });
     }
   }, [woFile]);
 
-  
   useEffect(() => {
     if (completionFile && completionFile.size > maxImageSize) {
       Swal.fire({
@@ -190,7 +179,7 @@ const getUnitList = async() =>{
         text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
         icon: "error",
         confirmButtonColor: "#2fba5f",
-      }).then(() => { 
+      }).then(() => {
         setFile1("");
         setPreviewObjURL1("");
       });
@@ -226,16 +215,27 @@ const getUnitList = async() =>{
     axios
       .get(`${baseUrl}/api/competitordetails/wolist/${compid}`)
       .then((resp) => {
-        
         let list = [...resp.data.wo];
         let listarr = list.map((item, index) => ({
           ...item,
           woFile:
-              `<img src="${woFilePath}`+item.woFile+`" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img>`,
-          
+            item.woFile === "pdf"
+              ? `<img src="${woFilePath}` +
+                item.woFile +
+                `" class="rounded-circle pointer" width="0" height="0" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
+              : `<img src="${woFilePath}` +
+                item.woFile +
+                `" class="rounded-circle pointer" width="75" height="75" alt="Image" id="woImg1" style="cursor:pointer" title="File"></img>`,
+
           completionFile:
-              `<img src="${woCompletionFilePath}`+item.completionFile+`" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg2" style="cursor:pointer" title="File"></img>`,
-            
+            item.completionFile === "pdf"
+              ? `<img src="${woCompletionFilePath}` +
+                item.completionFile +
+                `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg2" style="cursor:pointer" title="File"></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
+              : `<img src="${woCompletionFilePath}` +
+                item.completionFile +
+                `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg2" style="cursor:pointer" title="File"></img>`,
+
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
@@ -245,29 +245,37 @@ const getUnitList = async() =>{
 
   //set image preview on Edit button clicked
   const getImageUrl = (wo, comp) => {
-    var pattern =
-      /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
-    var img_url = wo.match(pattern);
-    var img_url1 = comp.match(pattern);
+    var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+    var result = wo.match(pattern);
+    var result1 = comp.match(pattern);
+
+    var img_url = woFilePath + result; //filePath is a state value, which indicates server storage location
+    var img_url1 = woCompletionFilePath + result1; //filePath is a state value, which indicates server storage location
+    // console.log("img Url  ", img_url);
+
+    // var pattern =
+    //   /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
+    // var img_url = wo.match(pattern);
+    // var img_url1 = comp.match(pattern);
     //setting preview image for Work Order File
-    if (!(img_url[0] === null || img_url[0] === undefined)) {
-      setPreviewForEdit(img_url[0]);
+    if (!(img_url === null || img_url === undefined)) {
+      setPreviewForEdit(img_url);
     } else {
       setPreviewForEdit("");
     }
     //setting preview image for Work Order Completion File
-    if (!(img_url1[0] === null || img_url1[0] === undefined)) {
-      setPreviewForEdit1(img_url1[0]);
+    if (!(img_url1 === null || img_url1 === undefined)) {
+      setPreviewForEdit1(img_url1);
     } else {
       setPreviewForEdit1("");
     }
   };
-   
+
   const onEdit = (data) => {
     setFile("");
     setFile1("");
     getImageUrl(data.woFile, data.completionFile);
-    
+
     setFormIsValid(true);
     setCompetitorWOInput({
       woId: data.id,
@@ -284,26 +292,34 @@ const getUnitList = async() =>{
       woFile: data.woFile,
       completionFile: data.completionFile,
     });
-    
+
     setEditDataState(data.state);
     setEditDataUnit(data.unit);
-
-    
   };
-//set State on Edit
-  useEffect (()=>{
-    
-    if(woStateList !=="" && woStateList!==undefined && editDataState!=="" )
-    {
-      setCompetitorWOInput((prev)=>{return{...prev,state: woStateList.find((x)=>x.value===editDataState)}});
+  //set State on Edit
+  useEffect(() => {
+    if (
+      woStateList !== "" &&
+      woStateList !== undefined &&
+      editDataState !== ""
+    ) {
+      setCompetitorWOInput((prev) => {
+        return {
+          ...prev,
+          state: woStateList.find((x) => x.value === editDataState),
+        };
+      });
     }
-    
-    if( woUnitList !=="" && woUnitList!==undefined && editDataUnit!=="" ){
-      setCompetitorWOInput((prev)=>{return{...prev,unit:woUnitList.find((x)=>x.value===editDataUnit)}});
-    }
-    
-  },[editDataState, woStateList,editDataUnit, woUnitList]);
 
+    if (woUnitList !== "" && woUnitList !== undefined && editDataUnit !== "") {
+      setCompetitorWOInput((prev) => {
+        return {
+          ...prev,
+          unit: woUnitList.find((x) => x.value === editDataUnit),
+        };
+      });
+    }
+  }, [editDataState, woStateList, editDataUnit, woUnitList]);
 
   const onPreview = (data) => {
     var pattern =
@@ -368,18 +384,18 @@ const getUnitList = async() =>{
       [e.target.name]: e.target.value,
     });
 
-    if(e.target.value === "" || e.target.value === null || e.target.value === undefined) 
-    {
-      setHasError({hasError, [e.target.name]:true});
-    }
-    else {
+    if (
+      e.target.value === "" ||
+      e.target.value === null ||
+      e.target.value === undefined
+    ) {
+      setHasError({ hasError, [e.target.name]: true });
+    } else {
       setHasError({ ...hasError, [e.target.name]: false });
     }
-
   };
 
   const selectInputHandler = (value, action) => {
-   
     setCompetitorWOInput({
       ...competitorWOInput,
       [action.name]: value,
@@ -390,10 +406,6 @@ const getUnitList = async() =>{
       setHasError({ ...hasError, [action.name]: false });
     }
   };
-
-
-
-
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -649,19 +661,16 @@ const getUnitList = async() =>{
   };
   const removeImgHandler = (e) => {
     //e.target.name receives only undefiend so used 'e.target.id'
-    if (e.target.id === "woUpload")
-   { setFile("");
-    setPreviewObjURL("");
-    setPreviewForEdit("");
-  }
-  else if(e.target.id === "completionCertificate")
-  { setFile1("");
-   setPreviewObjURL1("");
-   setPreviewForEdit1("");
- }
+    if (e.target.id === "woUpload") {
+      setFile("");
+      setPreviewObjURL("");
+      setPreviewForEdit("");
+    } else if (e.target.id === "completionCertificate") {
+      setFile1("");
+      setPreviewObjURL1("");
+      setPreviewForEdit1("");
+    }
   };
-
-
 
   return (
     <div className="card-body ">
@@ -670,7 +679,13 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="custName"> Customer Name<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="custName">
+                  {" "}
+                  Customer Name
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -697,7 +712,12 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectName">Project Name<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="projectName">
+                  Project Name
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -724,7 +744,13 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="tnederId"> Tender Id<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="tnederId">
+                  {" "}
+                  Tender Id
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -751,10 +777,15 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="state">State Name<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="state">
+                  State Name
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
-              <Select
+                <Select
                   name="state"
                   id="state"
                   isSearchable="true"
@@ -778,7 +809,13 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="woDate"> WO Date<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="woDate">
+                  {" "}
+                  WO Date
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -804,7 +841,12 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="qantity">Quantity<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="qantity">
+                  Quantity
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -831,11 +873,15 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="unit">Unit<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="unit">
+                  Unit
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
-
-              <Select
+                <Select
                   name="unit"
                   id="unit"
                   isSearchable="true"
@@ -859,7 +905,12 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="projectValue">Project Value<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="projectValue">
+                  Project Value
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -886,7 +937,12 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="perTonRate">Per Ton Rate<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="perTonRate">
+                  Per Ton Rate
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -913,7 +969,12 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="qualityCompleted">Quality Completed<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="qualityCompleted">
+                  Quality Completed
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -940,7 +1001,13 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
-                <label htmlFor="date"> Date<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="date">
+                  {" "}
+                  Date
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -994,7 +1061,13 @@ const getUnitList = async() =>{
           <div className="inputgroup col-lg-7 mb-4 ">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold pt-1">
-                <label htmlFor="woUpload"> WO Upload<span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                <label htmlFor="woUpload">
+                  {" "}
+                  WO Upload
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-6">
                 <div
@@ -1119,7 +1192,7 @@ const getUnitList = async() =>{
                           &nbsp;&nbsp;&nbsp;
                           {previewForEdit !== null && (
                             <span
-                              className="fa fa-close text-danger h4 closebtn pointer"
+                              className="fa fa-close text-danger ml-n4 h4 closebtn pointer"
                               onClick={removeImgHandler}
                               name="woUpload"
                               id="woUpload"
@@ -1150,7 +1223,10 @@ const getUnitList = async() =>{
                 <label htmlFor="completionCertificate">
                   {" "}
                   Completion Certificate Upload
-                <span className="text-danger h6 font-weight-bold">&nbsp;*</span></label>
+                  <span className="text-danger h6 font-weight-bold">
+                    &nbsp;*
+                  </span>
+                </label>
               </div>
               <div className="col-lg-6">
                 <div
@@ -1186,7 +1262,6 @@ const getUnitList = async() =>{
                 <label htmlFor="projectName">Preview</label>
               </div>
               <div className="col-lg-8">
-                
                 {completionFile && (
                   <div className="card border-left-info shadow py-2 w-100 my-4">
                     <div className="card-body">
@@ -1199,7 +1274,9 @@ const getUnitList = async() =>{
                           <div className="row no-gutters align-items-center ">
                             <div className="col-auto">
                               <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                <p className="text-truncate">{completionFile.name}</p>
+                                <p className="text-truncate">
+                                  {completionFile.name}
+                                </p>
                                 <p>({completionFile.size / 1000} KB)</p>
                               </div>
                             </div>
