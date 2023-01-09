@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+  import { Fragment } from "react";
 import { useEffect } from "react";
 //For DataTable
 import "jquery/dist/jquery.min.js";
@@ -22,29 +22,39 @@ const CompetitorCompanyWorkOrderList = (props) => {
  var dataSet = []
 
  useEffect(() => {
-   table =  $('#qualityCertificateTable').DataTable({
+   table =  $('#workOrderTable').DataTable({
         data: dataSet,
         columns: [
             { data: 'sl_no' },
-            { data: 'cerName' },
-            { data: 'remark' },
-            { data: 'filepath' },
+            { data: 'custName' },
+            { data: 'projectName'},
+            { data: 'tnederId'},
+            { data: 'state_name'},
+            { data: 'woDate'},
+            { data: 'quantity'},
+            { data: 'unit_name'},
+            { data: 'projectValue'},
+            { data: 'perTonRate'},
+            { data: 'qualityCompleted'},
+            { data: 'date'},
+            { data: 'woFile'},
+            { data: 'completionFile'},
             { data: 'buttons' },
         ],
     })
 
-      $('#qualityCertificateTable tbody').on('click', 'tr .fa-edit', function () {
+      $('#workOrderTable tbody').on('click', 'tr .fa-edit', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onEdit(rowdata)
         
       });
 
-      $('#qualityCertificateTable tbody').on('click', 'tr .fa-trash', function () {
+      $('#workOrderTable tbody').on('click', 'tr .fa-trash', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onDelete(rowdata)
       });
 
-      $('#qualityCertificateTable tbody').on('click', 'tr #qcImg', function () {
+      $('#workOrderTable tbody').on('click', 'tr #woImg', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onPreview(rowdata)
         
@@ -53,10 +63,10 @@ const CompetitorCompanyWorkOrderList = (props) => {
  }, [])
 
  useEffect(() => {
-    if(props.qCSubList){
-        table.clear().rows.add(props.qCSubList).draw();
+    if(props.wOList){
+        table.clear().rows.add(props.wOList).draw();
     }
- }, [props.qCSubList])
+ }, [props.wOList])
  
 
   return (
@@ -66,16 +76,26 @@ const CompetitorCompanyWorkOrderList = (props) => {
       <div className="table-responsive">
         <table
           className="table   text-center"
-          id="qualityCertificateTable"
-          width="100%"
+          id="workOrderTable"
+          width="50%"
           cellSpacing={0}
         >
-          <thead className="text-center bg-primary text-white">
+          <thead className="text-center bg-primary text-white ">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Certificate</th>
-              <th scope="col">Remarks</th>
-              <th scope="col">Image</th>
+              <th scope="col">Customer Name</th>
+              <th scope="col">Project Name</th>
+              <th scope="col">Tender Id</th>
+              <th scope="col">State Name</th>
+              <th scope="col">WO Date</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Unit</th>
+              <th scope="col">Project Value</th>
+              <th scope="col">Per Ton Rate</th>
+              <th scope="col">Quality Completed</th>
+              <th scope="col">Date</th>
+              <th scope="col">WO Upload</th>
+              <th scope="col">Completion Certificate Upload</th>
               <th scope="col">Action</th>
             </tr>
           </thead>

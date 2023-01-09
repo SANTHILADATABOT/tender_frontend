@@ -7,6 +7,7 @@ import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import CompetitorCompanyQualityCertificatesList from "./CompetitorCompanyQualityCertificatesList";
+import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 import "./UploadDoc.css";
 
 const CompetitorCompanyQualityCertificatesForm = () => {
@@ -34,6 +35,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const { server1: baseUrl } = useBaseUrl();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  const { qcFile: filePath } = useImageStoragePath();
   // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
 
@@ -131,10 +133,14 @@ const CompetitorCompanyQualityCertificatesForm = () => {
           ...item,
 
           filepath:
-            `<img src="${baseUrl}/competitorQC/` +
-            item.filepath +
-            `" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image"></img>`,
-          // filepath: `<img src="${baseUrl}/storage/app/public/uploads/image/competitor/qc/`+item.filepath+`" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="image" ></img>`,
+            item.filetype === "pdf"
+              ? `<embed src="${filePath}` +
+                item.filepath +
+                `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" title="Pdf"/><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
+              : `<img src="${filePath}` +
+                item.filepath +
+                `" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="Image"></img>`,
+
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
@@ -143,11 +149,21 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   };
 
   const getImageUrl = (s) => {
-    var pattern =
-      /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
-    var img_url = s.match(pattern);
-    if (!(img_url[0] === null || img_url[0] === undefined)) {
-      setPreviewForEdit(img_url[0]);
+    //console.log("filepath" + filePath);
+    // let pat = "/" + filePath + "[a-zA-Z0-9]*.(?:png|jpeg|jpg|pdf)/";
+    // let pattern = new RegExp(pat, "gi");
+    //var pattern1 = /${filepath}[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+    ///((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*\.(?:png|jpeg|jpg|pdf))/;
+    // var url_splited = s.split('""');
+    // console.log("url_splited", url_splited);
+    var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+
+    var result = s.match(pattern);
+    var img_url = filePath + result; //filePath is a state value, which indicates server storage location
+    // console.log("img Url  ", img_url);
+
+    if (!(img_url === null || !img_url === undefined)) {
+      setPreviewForEdit(img_url);
     } else {
       setPreviewForEdit("");
     }
@@ -167,11 +183,9 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   };
 
   const onPreview = (data) => {
-    var pattern =
-      /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
-
+    var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     var img_url = data.filepath.match(pattern);
-    window.open(img_url[0], "_blank");
+    window.open(filePath + img_url, "_blank");
   };
 
   const onDelete = (data) => {
@@ -341,12 +355,14 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                   qcId: null,
                   remark: "",
                   cerName: "",
+                  fileName: "",
                 });
                 getQCList();
                 setIsBtnClicked(false);
                 setLoading(false);
                 setFile("");
                 setPreviewObjURL("");
+                setPreviewForEdit("");
               });
             } else if (resp.data.status === 404) {
               Swal.fire({
@@ -369,6 +385,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                 setIsBtnClicked(false);
               });
             }
+            console.log("competitorQCInput", competitorQCInput);
           });
       }
       //When Image is changed/reuploaded on update
@@ -409,12 +426,14 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                   qcId: null,
                   remark: "",
                   cerName: "",
+                  fileName: "",
                 });
                 getQCList();
                 setIsBtnClicked(false);
                 setLoading(false);
                 setFile("");
                 setPreviewObjURL("");
+                setPreviewForEdit("");
               });
             } else if (resp.data.status === 404) {
               Swal.fire({
@@ -633,7 +652,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                             </div> */}
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewForEdit !== null && (
+                          {previewForEdit !== "" && (
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
@@ -648,7 +667,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                             />
                           )}
                           &nbsp;&nbsp;&nbsp;
-                          {previewForEdit !== null && (
+                          {previewForEdit !== "" && (
                             <span
                               className="fa fa-close text-danger h4 closebtn"
                               onClick={removeImgHandler}
