@@ -223,7 +223,7 @@ const UploadDoc = () => {
         </div>}
       </div>
       <LockCard locked={locked}>
-      <form onSubmit={submitHandler}  enctype="multipart/form-data">
+      <form onSubmit={submitHandler}  encType="multipart/form-data">
         <div className="row align-items-baseline">
           <div className="inputgroup col-lg-6 mb-4 ">
             <div className="row align-items-center font-weight-bold">
