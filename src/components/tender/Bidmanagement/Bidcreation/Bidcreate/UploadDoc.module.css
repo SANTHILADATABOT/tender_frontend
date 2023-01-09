@@ -10,16 +10,17 @@
 
 .pointer {cursor: pointer;}
 
-.drop-file-input:hover,
-.drop-file-input.dragover {
+.drop_file_input:hover,
+.drop_file_input.dragover {
     opacity: 0.6;
 }
 
-.drop-file-input input {
+.drop_file_input input {
     opacity: 0;
 }
 
 .doclist{
-    height: 500px;
-  
+    max-height: 500px;
 }
+
+.docrow:hover{background-color:rgba(152, 189, 215, 0.039);}
