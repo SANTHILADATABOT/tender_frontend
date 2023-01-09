@@ -1,9 +1,15 @@
 // export const isNotEmpty = (value) => value.trim() !== "";
 
 export const isNotEmpty = (value) => {
+
+  if (typeof value === 'number'){
+    value = value.toString()
+  }
+
+
   if (value === null) {
     return false;
-  } else if (value.trim() === "") {
+  }else if (value.trim() === "") {
     return false;
   }
   return true;

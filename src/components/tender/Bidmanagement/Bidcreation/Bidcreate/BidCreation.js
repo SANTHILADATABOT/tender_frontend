@@ -13,6 +13,7 @@ import UploadDoc from "./UploadDoc";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 
+
 const initialOptions = {
   options: [],
   isLoading: false,
@@ -36,7 +37,6 @@ const BidCreation = () => {
   const navigate = useNavigate();
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId ] = useOutletContext();
 
-  console.log(id)
   const {
     value: bidnoValue,
     isValid: bidnoIsValid,
@@ -283,9 +283,51 @@ const BidCreation = () => {
     setulbOptions(ulbList);
   };
 
+  const setDatatoBidCreationForm = (response) =>{
+
+    let data = response.data.bidcreationdata
+    setFormId(data.id)
+    setbidnoValue(data.bidno)
+    setcustomernameValue(data.customername)
+    setbidcallValue(data.bidcall)
+    settenderidValue(data.tenderid)
+    settenderinvtauthValue(data.tenderinvtauth)
+    settenderrefValue(data.tenderref)
+    setState(data.state)
+    setulb(data.ulb)
+    setTenderDescriptionValue(data.TenderDescription)
+    setNITdateValue(data.NITdate)
+    setprebiddateValue(data.prebiddate)
+    setsubmissiondateValue(data.submissiondate)
+    setqualityValue(data.quality)
+    setprojectperioddate1Value(data.projectperioddate1)
+    setprojectperioddate2Value(data.projectperioddate2)
+    setestprojectvalueValue(data.estprojectvalue)
+    settenderfeevalueValue(data.tenderfeevalue)
+    setpriceperunitValue(data.priceperunit)
+    setemdmodeValue(data.emdmode)
+    setemdamtValue(data.emdamt)
+    setdumpsiterValue(data.dumpsiter)
+    setlocationValue(data.location)
+    setunitValue(data.unit)
+    setEMDValue(data.EMD)
+    settenderevalutionsysytemValue(data.tenderevalutionsysytem)
+  }
+
+  const getBidCreationData = async () => {
+    let response = await axios.get(`${baseUrl}/api/bidcreation/creation/${id}`);
+    if(response.status === 200){
+      setDatatoBidCreationForm(response);
+    }
+  }
+
   useEffect(() => {
     getStateListOptions();
     getulbListOptions();
+
+    if(id){
+      getBidCreationData();
+    }
 
   }, []);
 
@@ -321,7 +363,7 @@ const BidCreation = () => {
       }
       setdatasending(false)
     }).catch((err) => {
-        // console.log(err.message)
+
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
@@ -331,6 +373,26 @@ const BidCreation = () => {
     });
   };
 
+
+  const putData = (data) => {
+    axios.put(`${baseUrl}/api/bidcreation/creation/${id}`, data).then((resp) =>{
+  
+      if (resp.data.status === 200) {
+        toastSuccess(resp.data.message)
+      }else {
+        toastError("Something went wrong!")
+      }
+      setdatasending(false)
+    }).catch((err) => {
+      
+      Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+        })
+        setdatasending(false)
+    });
+  }
   let formIsValid = false;
 
   if (
@@ -410,10 +472,9 @@ const BidCreation = () => {
     if(formId === 0){
         postData(data);
     }else if(formId > 0){
-        // putData(data)
+        putData(data)
     }
 
-    setdatasending(false);
   };
 
   const cancelHandler = (e) => {
