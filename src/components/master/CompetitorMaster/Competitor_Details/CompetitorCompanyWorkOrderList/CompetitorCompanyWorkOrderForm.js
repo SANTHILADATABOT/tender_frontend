@@ -253,10 +253,6 @@ const CompetitorCompanyWorkOrderForm = () => {
     var img_url1 = woCompletionFilePath + result1; //filePath is a state value, which indicates server storage location
     // console.log("img Url  ", img_url);
 
-    // var pattern =
-    //   /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
-    // var img_url = wo.match(pattern);
-    // var img_url1 = comp.match(pattern);
     //setting preview image for Work Order File
     if (!(img_url === null || img_url === undefined)) {
       setPreviewForEdit(img_url);
@@ -501,7 +497,7 @@ const CompetitorCompanyWorkOrderForm = () => {
       competitorWOInput.woId
     ) {
       //When Work Order  Image is not changed on update
-      if (previewForEdit !== "" && woFile === "") {
+      if (previewForEdit !== "" && woFile === "" ) {
         const datatosend = {
           compId: compid,
           compNo: competitorWOInput.compNo,
@@ -572,16 +568,33 @@ const CompetitorCompanyWorkOrderForm = () => {
       //When Image is changed/reuploaded on update
       else if (previewForEdit === "" && woFile !== "") {
         const datatosend = {
-          //woId:competitorWOInput.woId,
           compId: compid,
           compNo: competitorWOInput.compNo,
           projectName: competitorWOInput.projectName,
           custName: competitorWOInput.custName,
-          woFile: woFile,
+          tnederId: competitorWOInput.tnederId,
+          state: competitorWOInput.state.value,
+          woDate: competitorWOInput.woDate,
+          quantity: competitorWOInput.quantity,
+          unit: competitorWOInput.unit.value,
+          projectValue: competitorWOInput.projectValue,
+          perTonRate: competitorWOInput.perTonRate,
+          qualityCompleted: competitorWOInput.qualityCompleted,
+          date: competitorWOInput.date,
+          woFile: "",
+          completionFile: "",
           tokenId: tokenId,
           _method: "PUT",
         };
 
+        if(woFile!=="")
+        {
+          
+        }
+        else if(completionFile!=="")
+        {
+
+        }
         const formdata = new FormData();
 
         for (var key in datatosend) {
@@ -1139,7 +1152,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                           &nbsp;&nbsp;&nbsp;
                           {previewObjURL !== null && (
                             <span
-                              className="fa fa-close text-danger h4 closebtn mr-3 pointer"
+                              className="fa fa-close text-danger h4 closebtn pointer"
                               onClick={removeImgHandler}
                               name="woUpload"
                               id="woUpload"
@@ -1192,7 +1205,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                           &nbsp;&nbsp;&nbsp;
                           {previewForEdit !== null && (
                             <span
-                              className="fa fa-close text-danger ml-n4 h4 closebtn pointer"
+                              className="fa fa-close text-danger h4 closebtn pointer"
                               onClick={removeImgHandler}
                               name="woUpload"
                               id="woUpload"

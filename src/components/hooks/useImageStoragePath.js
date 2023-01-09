@@ -5,7 +5,8 @@ const useImageStoragePath = () => {
     return {
         qcFile : baseUrl+'/uploads/competitor/qc/',
         woFile : baseUrl+'/uploads/competitor/woFile/',
-        woCompletionFile : baseUrl+'/uploads/competitor/woCompletionFile/',       
+        woCompletionFile : baseUrl+'/uploads/competitor/woCompletionFile/',
+               
     }
 }
 
