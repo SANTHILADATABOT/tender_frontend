@@ -212,7 +212,7 @@ const UploadDoc = () => {
     });
   }
 
-  console.log(file)
+  
 
   return (
     <Fragment>
