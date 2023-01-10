@@ -1404,7 +1404,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
                         {previewFileType.woFile[1]}     {previewFileType.woCompletionFile[1]} { previewForEdit1 !== "" && previewFileType.woCompletionFile[1]!=="pdf" 
-                        ? 
+                        ?                  
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
@@ -1429,11 +1429,9 @@ const CompetitorCompanyWorkOrderForm = () => {
                                   window.open(previewForEdit1, "_blank")
                                 }
                                 title="Click for Preview"
-                              />  
-
-
-
-                          }
+                              >}
+                                {/* <img src="assets/icons/pdf_logo.png" className="rounded-circle pointer" width="75" height="75" alt="PDF" id="woImg" style="cursor:pointer" title="PDF"></img> */}
+                          
                           &nbsp;&nbsp;&nbsp; 
                           {previewForEdit1 !== "" && (
                             <span
