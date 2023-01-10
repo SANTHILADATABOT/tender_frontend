@@ -6,7 +6,7 @@ const useImageStoragePath = () => {
         qcFile : baseUrl+'/public/uploads/competitor/qc/',
         woFile : baseUrl+'/public/uploads/competitor/woFile/',
         woCompletionFile : baseUrl+'/public/uploads/competitor/woCompletionFile/',
-               
+        biddocs : baseUrl+'/uploads/BidManagement/biddocs/',        
     }
 }
 

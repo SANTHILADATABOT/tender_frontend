@@ -353,9 +353,9 @@ const BidCreation = () => {
         setBidManagementMainId(resp.data.id)
         toastSuccess(resp.data.message)
         // resetall()
+        window.history.replaceState({},"Bid Creation", "/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
         navigate("/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
         myRef.current.scrollIntoView({ behavior: 'smooth' })    
-        // window.history.replaceState({},"Bid Creation", "/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
        
 
       } else if (resp.data.status === 400) {

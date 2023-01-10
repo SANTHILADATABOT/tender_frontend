@@ -2,6 +2,7 @@ import axios from "axios";
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
+import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 import { ImageConfig } from "../../Config";
 import styles from './UploadDoc.module.css';
 
@@ -9,7 +10,7 @@ import styles from './UploadDoc.module.css';
 const DocCard = (props) => {
 
     const { server1: baseUrl } = useBaseUrl();
-
+    const { biddocs: biddocs_filePath } = useImageStoragePath();
     const downloadDoc = (filename, docname, ext) => {
         // const link = document.createElement('a');
         let url = `${baseUrl}/storage/BidDocs/${filename}`
@@ -51,7 +52,7 @@ const DocCard = (props) => {
 
                             {props.item.file_type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"  && <img src={ImageConfig['doc']} alt="" width="75px" height="75px" />}
 
-                            {props.item.file_type.split('/')[0] === "image" && <img src={`${baseUrl}/storage/BidDocs/${props.item.file_new_name}`} alt="" width="75px" height="75px" />}
+                            {props.item.file_type.split('/')[0] === "image" && <img src={biddocs_filePath+props.item.file_new_name} alt="" width="75px" height="75px" />}
 
                             {(props.item.file_type !== "application/pdf" && 
                               props.item.file_type !== "application/msword" && 
