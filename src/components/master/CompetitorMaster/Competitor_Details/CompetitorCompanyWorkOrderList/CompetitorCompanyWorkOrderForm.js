@@ -222,19 +222,21 @@ const CompetitorCompanyWorkOrderForm = () => {
             item.woFile === "pdf"
               ? `<img src="${woFilePath}` +
                 item.woFile +
-                `" class="rounded-circle pointer" width="0" height="0" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
+                `" class="rounded-circle pointer" width="0" height="0" alt="No File" id="woImg" style="cursor:pointer" title="File" ></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
               : `<img src="${woFilePath}` +
                 item.woFile +
-                `" class="rounded-circle pointer" width="75" height="75" alt="Image" id="woImg1" style="cursor:pointer" title="File"></img>`,
+                `" class="rounded-circle pointer" width="75" height="75" alt="Image" id="woImg" style="cursor:pointer" title="File"></img>`,
 
           completionFile:
-            item.completionFile === "pdf"
-              ? `<img src="${woCompletionFilePath}` +
-                item.completionFile +
-                `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg2" style="cursor:pointer" title="File"></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
-              : `<img src="${woCompletionFilePath}` +
-                item.completionFile +
-                `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg2" style="cursor:pointer" title="File"></img>`,
+          item.completionFile !=="" 
+            ?  item.completionFile === "pdf"
+                ? `<img src="${woCompletionFilePath}` +
+                  item.completionFile +
+                  `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
+                : `<img src="${woCompletionFilePath}` +
+                  item.completionFile +
+                  `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img>`
+            : `<span class="text-danger">-NA-</span>`,
 
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
@@ -245,13 +247,16 @@ const CompetitorCompanyWorkOrderForm = () => {
 
   //set image preview on Edit button clicked
   const getImageUrl = (wo, comp) => {
-    var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+    var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)+/;
     var result = wo.match(pattern);
     var result1 = comp.match(pattern);
 
     var img_url = woFilePath + result; //filePath is a state value, which indicates server storage location
+    if(result1!==null){
     var img_url1 = woCompletionFilePath + result1; //filePath is a state value, which indicates server storage location
-    // console.log("img Url  ", img_url);
+     console.log("img Url1  ", result1);
+    }
+   
 
     //setting preview image for Work Order File
     if (!(img_url === null || img_url === undefined)) {
@@ -292,8 +297,10 @@ const CompetitorCompanyWorkOrderForm = () => {
     setEditDataState(data.state);
     setEditDataUnit(data.unit);
   };
+  
   //set State on Edit
-  useEffect(() => {
+    useEffect(() => {
+      
     if (
       woStateList !== "" &&
       woStateList !== undefined &&
@@ -318,11 +325,23 @@ const CompetitorCompanyWorkOrderForm = () => {
   }, [editDataState, woStateList, editDataUnit, woUnitList]);
 
   const onPreview = (data) => {
-    var pattern =
-      /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
+    console.log("data :", data);
+    // var pattern =
+    //   /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
 
-    var img_url = data.filepath.match(pattern);
-    window.open(img_url[0], "_blank");
+    // var img_url = data.filepath.match(pattern);
+    // window.open(img_url[0], "_blank");
+    let filePath=data.woFile;
+    var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+    var img_url = filePath.match(pattern);
+    window.open(woFilePath + img_url, "_blank");
+  };
+  const onPreview1 = (data) => {
+    console.log("data :", data);
+    let filePath=data.completionFile;
+    var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+    var img_url =  filePath.match(pattern);
+    window.open(woCompletionFilePath + img_url, "_blank");
   };
 
   const onDelete = (data) => {
@@ -1311,7 +1330,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                             />
                           )}
                           &nbsp;&nbsp;&nbsp;
-                          {previewObjURL1 !== null && (
+                          {previewObjURL1  && (
                             <span
                               className="fa fa-close text-danger h4 closebtn"
                               onClick={removeImgHandler}
@@ -1349,7 +1368,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                             </div> */}
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewForEdit1 !== null && (
+                          {previewForEdit1 !== "" && (
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
@@ -1362,9 +1381,10 @@ const CompetitorCompanyWorkOrderForm = () => {
                               }
                               title="Click for Preview"
                             />
+                            
                           )}
-                          &nbsp;&nbsp;&nbsp;
-                          {previewForEdit1 !== null && (
+                          &nbsp;&nbsp;&nbsp; {previewForEdit1}
+                          {previewForEdit1 !== "" && (
                             <span
                               className="fa fa-close text-danger h4 closebtn pointer"
                               onClick={removeImgHandler}
@@ -1419,6 +1439,7 @@ const CompetitorCompanyWorkOrderForm = () => {
         onEdit={onEdit}
         onDelete={onDelete}
         onPreview={onPreview}
+        onPreview1={onPreview1}
       />
     </div>
   );

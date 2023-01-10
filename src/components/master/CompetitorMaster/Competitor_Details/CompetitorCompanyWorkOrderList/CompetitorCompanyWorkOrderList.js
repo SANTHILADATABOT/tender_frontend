@@ -54,10 +54,13 @@ const CompetitorCompanyWorkOrderList = (props) => {
         props.onDelete(rowdata)
       });
 
-      $('#workOrderTable tbody').on('click', 'tr #woImg', function () {
+      $('#workOrderTable tbody').on('click', 'td #woImg', function () {
         let rowdata =table.row($(this).closest('tr')).data();
         props.onPreview(rowdata)
-        
+      });
+        $('#workOrderTable tbody').on('click', 'td #woImg1', function () {
+          let rowdata =table.row($(this).closest('tr')).data();
+          props.onPreview1(rowdata)
       });
 
  }, [])
