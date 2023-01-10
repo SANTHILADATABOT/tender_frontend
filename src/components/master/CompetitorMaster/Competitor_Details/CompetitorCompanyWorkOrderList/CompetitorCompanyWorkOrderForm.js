@@ -1,7 +1,7 @@
 import { usePageTitle } from "../../../../hooks/usePageTitle";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
@@ -10,8 +10,10 @@ import CompetitorCompanyWorkOrderList from "./CompetitorCompanyWorkOrderList";
 import "./UploadDoc.css";
 import Select from "react-select";
 import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
+import { data } from "jquery";
 
 const CompetitorCompanyWorkOrderForm = () => {
+  // const compNo=useContext(CompNoContext);
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
   const initialValue = {
@@ -50,6 +52,10 @@ const CompetitorCompanyWorkOrderForm = () => {
   const { server1: baseUrl } = useBaseUrl();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  const [previewFileType, setPreviewFileType]=useState({
+    woFile: "",
+    woCompletionFile:""
+  });
   const [woStateList, setWoStateList] = useState("");
   const [woUnitList, setWoUnitList] = useState("");
   const { woFile: woFilePath, woCompletionFile: woCompletionFilePath } =
@@ -76,7 +82,7 @@ const CompetitorCompanyWorkOrderForm = () => {
   });
 
   useEffect(() => {
-    getCompNo();
+     getCompNo();
     getStateList();
     getUnitList();
     getWOList();
@@ -219,20 +225,20 @@ const CompetitorCompanyWorkOrderForm = () => {
         let listarr = list.map((item, index) => ({
           ...item,
           woFile:
-            item.woFile === "pdf"
+            item.woFileType === "pdf"
               ? `<img src="${woFilePath}` +
                 item.woFile +
-                `" class="rounded-circle pointer" width="0" height="0" alt="No File" id="woImg" style="cursor:pointer" title="File" ></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
+                `" class="rounded-circle pointer" width="0" height="0" alt="" id="woImg" style="cursor:pointer" title="File" ></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="woImg" style="cursor:pointer" title="PDF"></img>`
               : `<img src="${woFilePath}` +
                 item.woFile +
                 `" class="rounded-circle pointer" width="75" height="75" alt="Image" id="woImg" style="cursor:pointer" title="File"></img>`,
 
           completionFile:
           item.completionFile !=="" 
-            ?  item.completionFile === "pdf"
+            ?  item.completionFileType === "pdf"
                 ? `<img src="${woCompletionFilePath}` +
                   item.completionFile +
-                  `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
+                  `" class="rounded-circle pointer" width="0" height="0" alt="" id="woImg1" style="cursor:pointer" title="File"><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="woImg1" style="cursor:pointer" title="PDF"></img></img>`
                 : `<img src="${woCompletionFilePath}` +
                   item.completionFile +
                   `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img>`
@@ -250,17 +256,21 @@ const CompetitorCompanyWorkOrderForm = () => {
     var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)+/;
     var result = wo.match(pattern);
     var result1 = comp.match(pattern);
+    var type=result.match(/\.(?:png|jpeg|jpg|pdf)+/); // To Find type of document 
+    var type1=result1.match(/\.(?:png|jpeg|jpg|pdf)+/);// To Find type of document 
 
     var img_url = woFilePath + result; //filePath is a state value, which indicates server storage location
     if(result1!==null){
     var img_url1 = woCompletionFilePath + result1; //filePath is a state value, which indicates server storage location
-     console.log("img Url1  ", result1);
     }
-   
+    
 
     //setting preview image for Work Order File
     if (!(img_url === null || img_url === undefined)) {
       setPreviewForEdit(img_url);
+      setPreviewFileType((prev)=>{
+        return{...prev,woCompletionFile:}
+      })
     } else {
       setPreviewForEdit("");
     }
@@ -275,8 +285,11 @@ const CompetitorCompanyWorkOrderForm = () => {
   const onEdit = (data) => {
     setFile("");
     setFile1("");
+    getStateList();
+    getUnitList();
+    setEditDataState(data.state);
+    setEditDataUnit(data.unit);
     getImageUrl(data.woFile, data.completionFile);
-
     setFormIsValid(true);
     setCompetitorWOInput({
       woId: data.id,
@@ -293,14 +306,11 @@ const CompetitorCompanyWorkOrderForm = () => {
       woFile: data.woFile,
       completionFile: data.completionFile,
     });
-
-    setEditDataState(data.state);
-    setEditDataUnit(data.unit);
+    
   };
   
   //set State on Edit
     useEffect(() => {
-      
     if (
       woStateList !== "" &&
       woStateList !== undefined &&
@@ -324,20 +334,17 @@ const CompetitorCompanyWorkOrderForm = () => {
     }
   }, [editDataState, woStateList, editDataUnit, woUnitList]);
 
-  const onPreview = (data) => {
-    console.log("data :", data);
-    // var pattern =
-    //   /((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*.(?:png|jpeg|jpg|pdf))/;
 
-    // var img_url = data.filepath.match(pattern);
-    // window.open(img_url[0], "_blank");
+//Show preview For Wo Document upload in Form on Edit
+  const onPreview = (data) => {   
     let filePath=data.woFile;
     var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     var img_url = filePath.match(pattern);
     window.open(woFilePath + img_url, "_blank");
   };
+
+//Show preview For Completion Document upload in Form on Edit
   const onPreview1 = (data) => {
-    console.log("data :", data);
     let filePath=data.completionFile;
     var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     var img_url =  filePath.match(pattern);
@@ -503,6 +510,21 @@ const CompetitorCompanyWorkOrderForm = () => {
     }
   };
 
+  const resetFields = ()=>{
+      setIsBtnClicked(false);
+      setLoading(false);
+      setFile("");
+      setFile1("");
+      setPreviewObjURL("");
+      setPreviewObjURL1("");
+      setPreviewForEdit("");
+      setPreviewForEdit1("");
+      setCompetitorWOInput(initialValue);
+  }
+
+  console.log("completionFile :",completionFile);
+  console.log("woFile :",woFile);
+
   const updateHandler = (e) => {
     e.preventDefault();
     setLoading(true);
@@ -515,8 +537,10 @@ const CompetitorCompanyWorkOrderForm = () => {
       competitorWOInput.custName !== null &&
       competitorWOInput.woId
     ) {
-      //When Work Order  Image is not changed on update
-      if (previewForEdit !== "" && woFile === "" ) {
+
+      //When wo file &  wo completionFile Image is not changed on update
+      if(previewForEdit !== "" && woFile === "" && (previewForEdit1 !== "" && completionFile === "" )){
+        console.log(" Image is not changed ")
         const datatosend = {
           compId: compid,
           compNo: competitorWOInput.compNo,
@@ -531,8 +555,6 @@ const CompetitorCompanyWorkOrderForm = () => {
           perTonRate: competitorWOInput.perTonRate,
           qualityCompleted: competitorWOInput.qualityCompleted,
           date: competitorWOInput.date,
-          woFile: woFile,
-          completionFile: completionFile,
           tokenId: tokenId,
         };
 
@@ -549,17 +571,17 @@ const CompetitorCompanyWorkOrderForm = () => {
                 text: resp.data.message,
                 timer: 2000,
               }).then(function () {
-                setCompetitorWOInput({
-                  ...competitorWOInput,
-                  woId: null,
-                  projectName: "",
-                  custName: "",
-                });
                 getWOList();
-                setIsBtnClicked(false);
-                setLoading(false);
-                setFile("");
-                setPreviewObjURL("");
+                resetFields();
+                setCompetitorWOInput(initialValue);
+                // setIsBtnClicked(false);
+                // setLoading(false);
+                // setFile("");
+                // setFile1("");
+                // setPreviewObjURL("");
+                // setPreviewObjURL1("");
+                // setPreviewForEdit("");
+                // setPreviewForEdit1("");
               });
             } else if (resp.data.status === 404) {
               Swal.fire({
@@ -584,8 +606,9 @@ const CompetitorCompanyWorkOrderForm = () => {
             }
           });
       }
-      //When Image is changed/reuploaded on update
-      else if (previewForEdit === "" && woFile !== "") {
+      //When Image is changed/reuploaded on update (either woFile or completionFile)
+      else if ((previewForEdit === "" && woFile !== "") | (previewForEdit !== "" && woFile === "") | (previewForEdit1 === "" && completionFile !== "") | (previewForEdit1 !== "" && completionFile ==="")){
+        console.log("When Image is changed/reuploaded on update");
         const datatosend = {
           compId: compid,
           compNo: competitorWOInput.compNo,
@@ -600,20 +623,24 @@ const CompetitorCompanyWorkOrderForm = () => {
           perTonRate: competitorWOInput.perTonRate,
           qualityCompleted: competitorWOInput.qualityCompleted,
           date: competitorWOInput.date,
-          woFile: "",
-          completionFile: "",
           tokenId: tokenId,
           _method: "PUT",
         };
-
-        if(woFile!=="")
-        {
-          
-        }
-        else if(completionFile!=="")
-        {
-
-        }
+    if(woFile!=="")
+    {
+      datatosend.woFile= woFile;
+    };
+   console.log("previewForEdit1",previewForEdit1);
+    if(completionFile!=="")
+    {
+      datatosend.completionFile = completionFile;
+    }
+  else if(previewForEdit1==="")
+      {
+        datatosend.completionFile = "removed";
+      }
+    
+       
         const formdata = new FormData();
 
         for (var key in datatosend) {
@@ -634,17 +661,18 @@ const CompetitorCompanyWorkOrderForm = () => {
                 text: resp.data.message,
                 timer: 2000,
               }).then(function () {
-                setCompetitorWOInput({
-                  ...competitorWOInput,
-                  woId: null,
-                  projectName: "",
-                  custName: "",
-                });
+                
                 getWOList();
-                setIsBtnClicked(false);
-                setLoading(false);
-                setFile("");
-                setPreviewObjURL("");
+                resetFields();
+                // setCompetitorWOInput(initialValue);
+                // setIsBtnClicked(false);
+                // setLoading(false);
+                // setFile("");
+                // setFile1("");
+                // setPreviewObjURL("");
+                // setPreviewObjURL1("");
+                // setPreviewForEdit("");
+                // setPreviewForEdit1("");
               });
             } else if (resp.data.status === 404) {
               Swal.fire({
@@ -1099,6 +1127,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                   <span className="text-danger h6 font-weight-bold">
                     &nbsp;*
                   </span>
+                  <p className="text-info mt-2 mb-n2">Max File size 1 MB</p>
+                  <p className="text-info ">Allowed File Type JPG/JPEG/PNG/PDF</p>
                 </label>
               </div>
               <div className="col-lg-6">
@@ -1255,9 +1285,11 @@ const CompetitorCompanyWorkOrderForm = () => {
                 <label htmlFor="completionCertificate">
                   {" "}
                   Completion Certificate Upload
-                  <span className="text-danger h6 font-weight-bold">
+                  {/* <span className="text-danger h6 font-weight-bold">
                     &nbsp;*
-                  </span>
+                  </span> */}
+                  <p className="text-info mt-2 mb-n2">Max File size 1 MB</p>
+                  <p className="text-info ">Allowed File Type JPG/JPEG/PNG/PDF</p>
                 </label>
               </div>
               <div className="col-lg-6">
@@ -1368,7 +1400,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                             </div> */}
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewForEdit1 !== "" && (
+                        {data.completionFileType}{previewForEdit1 !== "" && (
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
@@ -1383,7 +1415,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                             />
                             
                           )}
-                          &nbsp;&nbsp;&nbsp; {previewForEdit1}
+                          &nbsp;&nbsp;&nbsp; 
                           {previewForEdit1 !== "" && (
                             <span
                               className="fa fa-close text-danger h4 closebtn pointer"

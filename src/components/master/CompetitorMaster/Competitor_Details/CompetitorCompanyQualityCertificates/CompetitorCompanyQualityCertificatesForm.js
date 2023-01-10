@@ -20,6 +20,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     remark: "",
     fileName: "",
   };
+  
   const [competitorQCInput, setCompetitorQCInput] = useState(initialValue);
   const [formIsValid, setFormIsValid] = useState(false);
   const [loading, setLoading] = useState(false);

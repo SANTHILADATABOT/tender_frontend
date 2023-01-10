@@ -1,9 +1,5 @@
 import { usePageTitle } from "../../hooks/usePageTitle";
 import {  useState, useEffect } from "react";
-// import Select from "react-select";
-// import { useEffect } from "react";
-// import Swal from "sweetalert2";
-// import axios from "axios";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
 import { useNavigate, useParams, NavLink, useOutletContext } from "react-router-dom";
 import CompetitorBranchForm from "./Competitor_Details/CompetitorBranch/CompetitorBranchForm";
@@ -22,7 +18,10 @@ const CompetitorDetails = () => {
   const { server1: baseUrl } = useBaseUrl();
   const setCompetitorId = useOutletContext();
 
+
+  
   return (
+
     <div className="formContent">
       {!compid && (
         <div className="loading">
