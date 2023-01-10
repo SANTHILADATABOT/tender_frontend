@@ -256,8 +256,9 @@ const CompetitorCompanyWorkOrderForm = () => {
     var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)+/;
     var result = wo.match(pattern);
     var result1 = comp.match(pattern);
-    var type=result.match(/\.(?:png|jpeg|jpg|pdf)+/); // To Find type of document 
-    var type1=result1.match(/\.(?:png|jpeg|jpg|pdf)+/);// To Find type of document 
+    console.log("result",result);
+    var type=result[0].split("."); // To Find type of document 
+    var type1=result1[0].split(".");// To Find type of document 
 
     var img_url = woFilePath + result; //filePath is a state value, which indicates server storage location
     if(result1!==null){
@@ -269,14 +270,17 @@ const CompetitorCompanyWorkOrderForm = () => {
     if (!(img_url === null || img_url === undefined)) {
       setPreviewForEdit(img_url);
       setPreviewFileType((prev)=>{
-        return{...prev,woCompletionFile:}
-      })
+        return{...prev,woFile:type}
+      });
     } else {
       setPreviewForEdit("");
     }
     //setting preview image for Work Order Completion File
     if (!(img_url1 === null || img_url1 === undefined)) {
       setPreviewForEdit1(img_url1);
+      setPreviewFileType((prev)=>{
+        return{...prev,woCompletionFile:type1}
+      });
     } else {
       setPreviewForEdit1("");
     }
@@ -522,8 +526,7 @@ const CompetitorCompanyWorkOrderForm = () => {
       setCompetitorWOInput(initialValue);
   }
 
-  console.log("completionFile :",completionFile);
-  console.log("woFile :",woFile);
+  
 
   const updateHandler = (e) => {
     e.preventDefault();
@@ -1400,7 +1403,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                             </div> */}
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                        {data.completionFileType}{previewForEdit1 !== "" && (
+                        {previewFileType.woFile[1]}     {previewFileType.woCompletionFile[1]} { previewForEdit1 !== "" && previewFileType.woCompletionFile[1]!=="pdf" 
+                        ? 
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
@@ -1413,8 +1417,23 @@ const CompetitorCompanyWorkOrderForm = () => {
                               }
                               title="Click for Preview"
                             />
-                            
-                          )}
+                          : 
+                              <img
+                                className="rounded-circle pointer"
+                                id="previewImg"
+                                src={previewForEdit1}
+                                alt="No Image"
+                                width="75px"
+                                height="75px"
+                                onClick={() =>
+                                  window.open(previewForEdit1, "_blank")
+                                }
+                                title="Click for Preview"
+                              />  
+
+
+
+                          }
                           &nbsp;&nbsp;&nbsp; 
                           {previewForEdit1 !== "" && (
                             <span
