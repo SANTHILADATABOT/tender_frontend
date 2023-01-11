@@ -112,19 +112,27 @@ const CompetitorCompanyWorkOrderForm = () => {
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const onFileDrop = (e) => {
+
+
+    
     if (e.target.name === "woUpload") {
       const newFile = e.target.files[0];
 
       if (newFile) {
         setFile(newFile);
         setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
+        // var uploaded_wo_file_name=e.target.files[0].name;
+        var type=e.target.files[0].name.split("."); // To Find type of File 
+        setPreviewFileType((prev)=>{return{...prev,woFile:type}});
+  
         if (previewForEdit) {
           setPreviewForEdit("");
         }
       }
     } else {
       const newFile = e.target.files[0];
-
+      var type=e.target.files[0].name.split("."); // To Find type of File
+      setPreviewFileType((prev)=>{return{...prev,woCompletionFile:type}});  
       if (newFile) {
         setFile1(newFile);
         setPreviewObjURL1(URL.createObjectURL(e.target.files[0]));
@@ -254,16 +262,23 @@ const CompetitorCompanyWorkOrderForm = () => {
   //set image preview on Edit button clicked
   const getImageUrl = (wo, comp) => {
     var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)+/;
-    var result = wo.match(pattern);
-    var result1 = comp.match(pattern);
-    console.log("result",result);
-    var type=result[0].split("."); // To Find type of document 
-    var type1=result1[0].split(".");// To Find type of document 
 
-    var img_url = woFilePath + result; //filePath is a state value, which indicates server storage location
-    if(result1!==null){
-    var img_url1 = woCompletionFilePath + result1; //filePath is a state value, which indicates server storage location
+    if(wo!==""){
+      var result = wo.match(pattern);
+      if(result1!==null){
+      var type=result[0].split("."); // To Find type of document 
+      var img_url = woFilePath + result; //filePath is a state value, which indicates server storage location
+      } 
     }
+    if(comp){
+    var result1 = comp.match(pattern);
+    if(result1!==null){
+      var type1=result1[0].split(".");// To Find type of document 
+      var img_url1 = woCompletionFilePath + result1; //filePath is a state value, which indicates server storage location
+      }
+    }
+    
+    
     
 
     //setting preview image for Work Order File
@@ -478,16 +493,17 @@ const CompetitorCompanyWorkOrderForm = () => {
               text: resp.data.message,
               timer: 2000,
             }).then(function () {
-              setLoading(false);
-              setIsBtnClicked(false);
-              setCompetitorWOInput({
-                ...competitorWOInput,
-                projectName: "",
-                custName: "",
-              });
-              getWOList();
-              setFile("");
-              setPreviewObjURL("");
+              resetFields();
+              // setLoading(false);
+              // setIsBtnClicked(false);
+              // setCompetitorWOInput({
+              //   ...competitorWOInput,
+              //   projectName: "",
+              //   custName: "",
+              // });
+              // getWOList();
+              // setFile("");
+              // setPreviewObjURL("");
             });
           } else if (resp.data.status === 404) {
             Swal.fire({
@@ -543,7 +559,6 @@ const CompetitorCompanyWorkOrderForm = () => {
 
       //When wo file &  wo completionFile Image is not changed on update
       if(previewForEdit !== "" && woFile === "" && (previewForEdit1 !== "" && completionFile === "" )){
-        console.log(" Image is not changed ")
         const datatosend = {
           compId: compid,
           compNo: competitorWOInput.compNo,
@@ -633,7 +648,7 @@ const CompetitorCompanyWorkOrderForm = () => {
     {
       datatosend.woFile= woFile;
     };
-   console.log("previewForEdit1",previewForEdit1);
+  
     if(completionFile!=="")
     {
       datatosend.completionFile = completionFile;
@@ -1187,7 +1202,9 @@ const CompetitorCompanyWorkOrderForm = () => {
                           </div>
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewObjURL && (
+                           
+                          {previewObjURL && previewFileType.woFile[1]!=="pdf" 
+                           ?  
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
@@ -1200,7 +1217,21 @@ const CompetitorCompanyWorkOrderForm = () => {
                               }
                               title="Click for Preview"
                             />
-                          )}
+                            :
+                            <img
+                              className="rounded-circle pointer"
+                              id="previewImg"
+                              // src={previewObjURL}
+                              src="assets/icons/pdf_logo.png"
+                              alt="No Image"
+                              width="75px"
+                              height="75px"
+                              onClick={() =>
+                                window.open(previewObjURL, "_blank")
+                              }
+                              title="Click for Preview"
+                            />
+                          }
                           &nbsp;&nbsp;&nbsp;
                           {previewObjURL !== null && (
                             <span
@@ -1240,7 +1271,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                             </div> */}
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewForEdit !== null && (
+                        { previewForEdit !== "" && previewFileType.woFile[1]!=="pdf" 
+                        ?                
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
@@ -1253,7 +1285,21 @@ const CompetitorCompanyWorkOrderForm = () => {
                               }
                               title="Click for Preview"
                             />
-                          )}
+                          :
+                          <img
+                              className="rounded-circle pointer"
+                              id="previewImg"
+                              src="assets/icons/pdf_logo.png"
+                              // src={previewForEdit}
+                              alt="No Image"
+                              width="75px"
+                              height="75px"
+                              onClick={() =>
+                                window.open(previewForEdit, "_blank")
+                              }
+                              title="Click for Preview"
+                            />
+                          }
                           &nbsp;&nbsp;&nbsp;
                           {previewForEdit !== null && (
                             <span
@@ -1350,8 +1396,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                           </div>
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewObjURL1 && (
-                            <img
+                          {previewObjURL1 && previewFileType.woCompletionFile[1]!=="pdf" 
+                           ? <img
                               className="rounded-circle pointer"
                               id="previewImg1"
                               src={previewObjURL1}
@@ -1363,7 +1409,20 @@ const CompetitorCompanyWorkOrderForm = () => {
                               }
                               title="Click for Preview"
                             />
-                          )}
+                            :
+                            <img
+                              className="rounded-circle pointer"
+                              id="previewImg1"
+                              src="assets/icons/pdf_logo.png"
+                              alt="No Image"
+                              width="75px"
+                              height="75px"
+                              onClick={() =>
+                                window.open(previewObjURL1, "_blank")
+                              }
+                              title="Click for Preview"
+                            />
+                          }
                           &nbsp;&nbsp;&nbsp;
                           {previewObjURL1  && (
                             <span
@@ -1403,8 +1462,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                             </div> */}
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                        {previewFileType.woFile[1]}     {previewFileType.woCompletionFile[1]} { previewForEdit1 !== "" && previewFileType.woCompletionFile[1]!=="pdf" 
-                        ?                  
+                        { previewForEdit1 !== "" && previewFileType.woCompletionFile[1]!=="pdf" 
+                        ?                 
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
@@ -1417,11 +1476,12 @@ const CompetitorCompanyWorkOrderForm = () => {
                               }
                               title="Click for Preview"
                             />
-                          : 
+                            :
                               <img
                                 className="rounded-circle pointer"
                                 id="previewImg"
-                                src={previewForEdit1}
+                                src="assets/icons/pdf_logo.png"
+                                // src={previewForEdit1}
                                 alt="No Image"
                                 width="75px"
                                 height="75px"
@@ -1429,8 +1489,9 @@ const CompetitorCompanyWorkOrderForm = () => {
                                   window.open(previewForEdit1, "_blank")
                                 }
                                 title="Click for Preview"
-                              >}
-                                {/* <img src="assets/icons/pdf_logo.png" className="rounded-circle pointer" width="75" height="75" alt="PDF" id="woImg" style="cursor:pointer" title="PDF"></img> */}
+                              />
+                               
+                            }
                           
                           &nbsp;&nbsp;&nbsp; 
                           {previewForEdit1 !== "" && (
