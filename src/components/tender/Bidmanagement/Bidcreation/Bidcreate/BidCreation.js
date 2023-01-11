@@ -273,7 +273,7 @@ const BidCreation = () => {
   const getulbData = async (savedulb) => {
     let response = await axios.get(`${baseUrl}/api/ulb-list/${savedulb}`);
     return { options: response.data.ulbList, isLoading: false };
-  };
+  };      
 
   const getulbListOptions = async (savedulb = null) => {
     setulbOptions((c) => {
