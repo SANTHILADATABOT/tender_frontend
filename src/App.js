@@ -68,7 +68,9 @@ function App() {
                 <Route path="bidcreationmain" element={<BidCreationMain/>}/>
                 <Route path="bidcreationmain/:id" element={<BidCreationMain/>}/>
                 <Route path="bidsubmission" element={<BidSubmission/>}/>
+                <Route path="bidsubmission/:id" element={<BidSubmission/>}/>
                 <Route path="tenderstatus" element={<TenderStatus/>}/>
+                <Route path="tenderstatus/:id" element={<TenderStatus/>}/>
                 <Route path="workorder" element={<Workorder/>}/>
               </Route>
             </Route>
