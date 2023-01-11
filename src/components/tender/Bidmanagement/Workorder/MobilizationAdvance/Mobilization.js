@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import CollapseCard from "../../../../UI/CollapseCard";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
@@ -13,23 +13,12 @@ import Swal from "sweetalert2";
 const Mobilization = () => {
   const { id } = useParams();
   const [dataSending, setDataSending] = useState(false);
-  const [formId, setFormId] = useState(0);
   const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
   const myRef = useRef(null);
-  const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
+  const [mobId, setmobId] = useState(0);
+  const [toastSuccess, toastError] =
     useOutletContext();
-
-    
-  const {
-    value: bankNamevalue,
-    isValid: bankNameIsValid,
-    hasError: bankNameHasError,
-    valueChangeHandler: bankNameChangeHandler,
-    inputBlurHandler: bankNameBlurHandler,
-    setInputValue: setbankNameValue,
-    reset: resetbankName,
-  } = useInputValidation(isNotEmpty);
 
   const {
     value: mobAdvancevalue,
@@ -39,6 +28,16 @@ const Mobilization = () => {
     inputBlurHandler: mobAdvanceBlurHandler,
     setInputValue: setmobAdvanceValue,
     reset: resetmobAdvance,
+  } = useInputValidation(isNotEmpty);
+
+  const {
+    value: bankNamevalue,
+    isValid: bankNameIsValid,
+    hasError: bankNameHasError,
+    valueChangeHandler: bankNameChangeHandler,
+    inputBlurHandler: bankNameBlurHandler,
+    setInputValue: setbankNameValue,
+    reset: resetbankName,
   } = useInputValidation(isNotEmpty);
 
   const {
@@ -83,16 +82,35 @@ const Mobilization = () => {
 
   let formIsValid = false;
 
+  if (
+    mobAdvanceIsValid &&
+    bankNameIsValid &&
+    bankBranchIsValid &&
+    mobAdvModeIsValid &&
+    dateMobAdvIsValid &&
+    validUptoIsValid
+  ) {
+    formIsValid = true;
+  }
+
+  const resetform = () => {
+    resetmobAdvance();
+    resetbankName();
+    resetbankBranch();
+    resetmobAdvMode();
+    resetdateMobAdv();
+    resetvalidUpto();
+  };
   const postData = (data) => {
     axios
       .post(`${baseUrl}/api/mobilization/creation`, data)
       .then((resp) => {
         if (resp.data.status === 200) {
-          // console.log(resp.data.id);
-          setBidManagementMainId(resp.data.id);
+          setmobId(resp.data.id);
           toastSuccess(resp.data.message);
-          navigate("/tender/bidmanagement/list/main/workorder/" + resp.data.id);
-        //   myRef.current.scrollIntoView({ behavior: "smooth" });
+          resetform();
+          navigate("/tender/bidmanagement/list/main/workorder/" + id);
+          // myRef.current.scrollIntoView({ behavior: "smooth" });
         } else if (resp.data.status === 400) {
           toastError(resp.data.message);
         }
@@ -109,16 +127,58 @@ const Mobilization = () => {
       });
   };
 
-  if (
-    mobAdvanceIsValid &&
-    bankNameIsValid &&
-    bankBranchIsValid &&
-    mobAdvModeIsValid &&
-    dateMobAdvIsValid &&
-    validUptoIsValid
-  ) {
-    formIsValid = true;
-  }
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${baseUrl}/api/mobilization/creation/${id}`)
+        .then((response) => {
+          setmobId(response.data.MobilizationAdvance[0].id);
+        });
+    }
+  }, [id, baseUrl]);
+    
+  
+  useEffect(() => {
+    if (mobId) {
+      axios
+        .get(`${baseUrl}/api/moilization/getMobList/${mobId}`)
+        .then((respon) => {
+          //console.log(respon.data.Mobilization);
+          setmobAdvanceValue(respon.data.Mobilization[0].mobadvance);
+          setbankNameValue(respon.data.Mobilization[0].bankname);
+          setbankBranchValue(respon.data.Mobilization[0].bankbranch);
+          setmobAdvModeValue(respon.data.Mobilization[0].mobadvmode);
+          setdateMobAdvValue(respon.data.Mobilization[0].datemobadv);
+          setvalidUptoValue(respon.data.Mobilization[0].validupto);
+        });
+    }
+  }, [mobId, baseUrl]);
+
+  const putData = (data) => {
+    axios
+      .put(`${baseUrl}/api/mobilization/creation/${mobId}`, data)
+      .then((res) => {
+        if (res.data.status === 200) {
+          // console.log(res.data.id)
+          Swal.fire({
+            icon: "success",
+            title: "Workorder",
+            text: "Updated Successfully!",
+            confirmButtonColor: "#5156ed",
+          });
+          setDataSending(false);
+          // navigate("/tender/bidmanagement/list/main/workorder/");
+        } else if (res.data.status === 400) {
+          Swal.fire({
+            icon: "error",
+            title: "",
+            text: res.data.message,
+            confirmButtonColor: "#5156ed",
+          });
+          setDataSending(false);
+        }
+      });
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -138,18 +198,17 @@ const Mobilization = () => {
       dateMobAdv: dateMobAdvvalue,
       validUpto: validUptovalue,
     };
-    console.log(mobilizationData);
 
     let data = {
-      mobilizationData: mobilizationData,
+      mobilizationData,
       tokenid: localStorage.getItem("token"),
-      form_id: formId,
+      bidid: id,
     };
-
-    if (formId === 0) {
+  
+    if (mobId === 0) {
       postData(data);
-    } else if (formId > 0) {
-      // putData(data)
+    } else if (mobId > 0) {
+      putData(data);
     }
   };
   return (
@@ -309,7 +368,7 @@ const Mobilization = () => {
         </div>
         <div className="row text-center">
           <div className="col-12">
-            {id ? (
+            {mobId ? (
               <button
                 className="btn btn-primary"
                 disabled={!formIsValid || dataSending}

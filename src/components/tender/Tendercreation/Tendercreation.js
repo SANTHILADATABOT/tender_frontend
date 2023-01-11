@@ -6,175 +6,61 @@ import { useBaseUrl } from "../../hooks/useBaseUrl";
 import axios from "axios";
 import Swal from "sweetalert2/src/sweetalert2.js";
 
-const initialDistrictList = {
-  options: [],
-  isLoading: false,
-};
-
-const initialStateList = {
-  options: [],
-  isLoading: false,
-};
-
-const initialCountryList = {
-  options: [],
-  isLoading: true,
-};
 
 const initialState = {
-  country: null,
-  state: null,
-  district: null,
-  city: "",
-  status: "Active",
+  organisation: null,
+  customerName: null,
+  nitDate: null,
+  tenderType: "",
 };
 
 const initialStateErr = {
-  countryErr: "",
-  stateErr: "",
-  districtErr: "",
-  cityErr: "",
+  organisationErr: "",
+  customerNameErr: "",
+  nitDateErr: "",
+  tenderTypeErr: "",
 };
 
 const Tendercreation = () => {
   usePageTitle("Tender Creation");
   const { id } = useParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const { server1: baseUrl } = useBaseUrl();
 
   const [dataSending, setDataSending] = useState(false);
   const [input, setInput] = useState(initialState);
   const [inputValidation, setInputValidation] = useState(initialStateErr);
-  const [countryList, setCountryList] = useState(initialCountryList);
-  const [stateList, setStateList] = useState(initialStateList);
-  const [districtList, setDistrictList] = useState(initialDistrictList);
+  const [organisationList, setOrganisationList] = useState();
+  const [customerNameList, setCustomerNameList] = useState();
+  const [tenderTypeList, setTenderTypeList] = useState();
 
   const [savedData, setSavedData] = useState({});
 
   useEffect(() => {
-    axios.get(`${baseUrl}/api/country/list`).then((resp) => {
-      setCountryList({ options: resp.data.countryList, isLoading: false });
+    getOrganisationList();
+    getCustomerNameList();
+    getTenderTypeList();
+  }, []);
+
+  
+  const getOrganisationList = () =>{
+    axios.get(`${baseUrl}/api/organisation/list`).then((resp) => {
+      setOrganisationList(resp.data.organisationList);
     });
-  }, [baseUrl]);
-
-  useEffect(() => {
-    if (id) {
-      axios.get(`${baseUrl}/api/city/${id}`).then((resp) => {
-        setSavedData(resp.data.city);
-        setInput((prevState) => {
-          return { ...prevState, city: resp.data.city.city_name, status: resp.data.city.city_status}
-        })
-      });
-    }
-  }, [id, baseUrl]);
-
-  useEffect(() => {
-    if (id && countryList.options.length>0 && savedData) {
-      setInput((prevstate) => {
-        return {
-          ...prevstate,
-          country: countryList.options.find(
-            (x) => x.value === savedData.country_id
-          ),
-        };
-      });
-    }
-  }, [id, countryList.options, savedData]);
-
-  useEffect(() => {
-    if (id && stateList.options.length>0 && savedData) {
-      setInput((prevstate) => {
-        return {
-          ...prevstate,
-          state: stateList.options.find(
-            (x) => x.value === savedData.state_id
-          ),
-        };
-      });
-    }
-  }, [id, stateList.options , savedData])
-
-  useEffect(() => {
-    if (id && districtList.options.length>0 && savedData) {
-      setInput((prevstate) => {
-        return {
-          ...prevstate,
-          district: districtList.options.find(
-            (x) => x.value === savedData.district_id
-          ),
-        };
-      });
-      setSavedData(null)
-    }
-  }, [id, districtList.options , savedData])
-
-  // useEffect(() => {
-  //   if (id && savedData.country_id) {
-  //     setInput((prev) => {
-  //       return {
-  //         ...prev,
-  //         country: countryList.options.find(
-  //           (x) => x.value === savedData.country_id
-  //         ),
-  //       };
-  //     });
-  //   }
-  // }, [id, savedData]);
-
-  useEffect(() => {
-    setStateList(initialStateList);
-    setInput((prevState) => {
-      return {
-        ...prevState,
-        state: null,
-      };
+  }
+  const getCustomerNameList = () =>{
+    axios.get(`${baseUrl}/api/customerName/list`).then((resp) => {
+      setCustomerNameList(resp.data.customerNameList);
     });
-
-    if (input.country) {
-      setStateList((prevList) => {
-        return { ...prevList, isLoading: true };
-      });
-      let countryid = input.country.value;
-      axios.get(`${baseUrl}/api/state/list/${countryid}`).then((resp) => {
-        setStateList({ options: resp.data.stateList, isLoading: false });
-      });
-    }
-  }, [baseUrl, input.country]);
-
-  // useEffect(() => {
-  //   console.log(stateList.options);
-  //   if (id && stateList.options) {
-  //   }
-  // }, [stateList]);
-
-  useEffect(() => {
-    setDistrictList(initialDistrictList);
-    setInput((prevState) => {
-      return {
-        ...prevState,
-        district: null,
-      };
+  }
+  
+  const getTenderTypeList = () =>{
+    axios.get(`${baseUrl}/api/tenderType/list`).then((resp) => {
+      setTenderTypeList(resp.data.tenderTypeList);
     });
+  }
 
-    if (input.state && input.country) {
-      let countryid = input.country.value;
-      let stateid = input.state.value;
-      setDistrictList((prevList) => {
-        return { ...prevList, isLoading: true };
-      });
-      axios
-        .get(`${baseUrl}/api/district/list/${countryid}/${stateid}`)
-        .then((resp) => {
-          setDistrictList({
-            options: resp.data.districtList,
-            isLoading: false,
-          });
-        });
-    }
-  }, [baseUrl, input.country, input.state]);
-
-  // console.log(input)
 
   const inputHandler = (e) => {
     setInput({
@@ -200,7 +86,7 @@ const Tendercreation = () => {
           confirmButtonColor: "#5156ed",
         });
         setInput(initialState);
-        navigate("/tender/master/citymaster");
+     
       } else if (resp.data.status === 400) {
         Swal.fire({
           icon: "error",
@@ -223,7 +109,7 @@ const Tendercreation = () => {
           confirmButtonColor: "#5156ed",
         });
         setInput(initialState)
-        navigate('/tender/master/citymaster')
+       
       } else if (res.data.status === 400) {
         Swal.fire({
           icon: "error",
@@ -241,41 +127,41 @@ const Tendercreation = () => {
     setDataSending(true);
     var errors = { ...inputValidation };
 
-    input.country === null
-      ? (errors.countryErr = "Select Country")
-      : (errors.countryErr = "");
-    input.state === null
-      ? (errors.stateErr = "Select State")
-      : (errors.stateErr = "");
-    input.district === null
-      ? (errors.districtErr = "Select District")
-      : (errors.districtErr = "");
-    input.city === ""
-      ? (errors.cityErr = "Enter City Name")
-      : (errors.cityErr = "");
+    input.organisation === null
+      ? (errors.organisationErr = "Select Organisation")
+      : (errors.organisationErr = "");
+    input.customerName === null
+      ? (errors.customerNameErr = "Select Customer Name")
+      : (errors.customerNameErr = "");
+    input.nitDate === null
+      ? (errors.nitDateErr = "Select District")
+      : (errors.nitDateErr = "");
+    input.tenderTypeList === ""
+      ? (errors.tenderTypeErr = "Enter City Name")
+      : (errors.tenderTypeErr = "");
 
-    const { stateErr, countryErr, districtErr, cityErr } = errors;
+    const { customerNameErr, organisationErr, nitDateErr, tenderTypeErr } = errors;
     setInputValidation(errors);
 
     if (
-      stateErr !== "" ||
-      countryErr !== "" ||
-      districtErr !== "" ||
-      cityErr !== ""
+      customerNameErr !== "" ||
+      organisationErr !== "" ||
+      nitDateErr !== "" ||
+      tenderTypeErr !== ""
     ) {
       setDataSending(false);
       return;
     }
 
     if (
-      stateErr === "" &&
-      countryErr === "" &&
-      districtErr === "" &&
-      cityErr === ""
+      customerNameErr === "" &&
+      organisationErr === "" &&
+      nitDateErr === "" &&
+      tenderTypeErr === ""
     ) {
       const data = {
-        country_id: input.country.value,
-        state_id: input.state.value,
+        organisation_id: input.organisation.value,
+        customerName_id: input.customerName.value,
         district_id: input.district.value,
         city_name: input.city,
         city_status: input.status,
@@ -303,20 +189,20 @@ const Tendercreation = () => {
               <div className="row">
                 <div className="col-5 mr-5 ">
                   <Select
-                    name="country"
-                    id="country"
+                    name="organisation"
+                    id="organisation"
                     isSearchable="true"
                     isClearable="true"
-                    options={countryList.options}
+                    options={organisationList}
                     onChange={inputHandlerForSelect}
-                    // onBlur={countrylistBlurHandler}
-                    value={input.country}
-                    isLoading={countryList.isLoading}
+                    // onBlur={organisationlistBlurHandler}
+                    value={input.organisation}
+                    isLoading={organisationList.isLoading}
                   ></Select>
                 </div>
                 <div className="col-6 ml-n5 mt-2">
                   <span style={{ color: "red" }}>
-                    {inputValidation.countryErr}
+                    {inputValidation.organisationErr}
                   </span>
                 </div>
               </div>
@@ -328,24 +214,25 @@ const Tendercreation = () => {
             </div>
             <div className="col-10 mb-3">
               <div className="row">
-                <div className="col-5 mr-5 ">
-                  <Select
-                    name="state"
-                    id="state"
-                    isSearchable="true"
-                    isClearable="true"
-                    options={stateList.options}
-                    onChange={inputHandlerForSelect}
-                    // onBlur={countrylistBlurHandler}
-                    isLoading={stateList.isLoading}
-                    value={input.state}
-                  ></Select>
-                </div>
-                <div className="col-6 ml-n5 mt-2">
-                  <span style={{ color: "red" }}>
-                    {inputValidation.stateErr}
-                  </span>
-                </div>
+              <div className="col-lg-6">
+              <input
+                  type="text"
+                  className="form-control"
+                  id="customerName"
+                  placeholder="Enter Customer Name"
+                  name="customerName"
+                  value={input.customerName}
+                  onChange={inputHandler}                   
+                />
+                
+                 {inputValidation.customerNameErr && (
+                  <div className="pt-1">
+                    <span className="text-danger font-weight-bold">
+                      Enter Valid Input..!
+                    </span>
+                  </div>
+                )}
+              </div>
               </div>
             </div>
           </div>
@@ -357,20 +244,19 @@ const Tendercreation = () => {
               <div className="row">
                 <div className="col-5 mr-5 ">
                   <Select
-                    name="district"
-                    id="district"
+                    name="tenderType"
+                    id="tenderType"
                     isSearchable="true"
                     isClearable="true"
-                    options={districtList.options}
+                    options={tenderTypeList}
                     onChange={inputHandlerForSelect}
-                    // onBlur={countrylistBlurHandler}
-                    value={input.district}
-                    isLoading={districtList.isLoading}
+                    
+                    value={input.tenderType}
                   ></Select>
                 </div>
                 <div className="col-6 ml-n5 mt-2">
                   <span style={{ color: "red" }}>
-                    {inputValidation.districtErr}
+                    {inputValidation.nitDateErr}
                   </span>
                 </div>
               </div>
@@ -394,7 +280,7 @@ const Tendercreation = () => {
                 </div>
                 <div className="col-6 ml-n5 mt-2">
                   <span style={{ color: "red" }}>
-                    {inputValidation.cityErr}
+                    {inputValidation.tenderTypeErr}
                   </span>
                 </div>
               </div>

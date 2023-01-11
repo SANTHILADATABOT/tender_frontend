@@ -1,129 +1,275 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import CollapseCard from "../../../../UI/CollapseCard";
+import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import useInputValidation from "../../../../hooks/useInputValidation";
 import {
   isNotEmpty,
   isNotNull,
 } from "../../../CommonFunctions/CommonFunctions";
+import axios from "axios";
+import Swal from "sweetalert2";
 
+  const ProjetDetails = () => {
+  const [dataSending, setDataSending] = useState(false);
+  const { id } = useParams();
+  const { server1: baseUrl } = useBaseUrl();
+  const [proid, setproid] = useState(0);
+  const myRef = useRef(null);
+  const navigate = useNavigate();
+  const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
+    useOutletContext();
 
-const ProjetDetails = () => {
+  const {
+    value: proPeriodvalue,
+    isValid: proPeriodIsValid,
+    hasError: proPeriodHasError,
+    valueChangeHandler: proPeriodChangeHandler,
+    inputBlurHandler: proPeriodBlurHandler,
+    setInputValue: setproPeriodValue,
+    reset: resetproPeriod,
+  } = useInputValidation(isNotEmpty);
 
-    const {
-        value: proPeriodvalue,
-        isValid: proPeriodIsValid,
-        hasError: proPeriodHasError,
-        valueChangeHandler: proPeriodChangeHandler,
-        inputBlurHandler: proPeriodBlurHandler,
-        setInputValue: setproPeriodValue,
-        reset: resetproPeriod,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: mobPeriodvalue,
+    isValid: mobPeriodIsValid,
+    hasError: mobPeriodHasError,
+    valueChangeHandler: mobPeriodChangeHandler,
+    inputBlurHandler: mobPeriodBlurHandler,
+    setInputValue: setmobPeriodValue,
+    reset: resetmobPeriod,
+  } = useInputValidation(isNotEmpty);
 
-    const {
-        value: mobPeriodvalue,
-        isValid: mobPeriodIsValid,
-        hasError: mobPeriodHasError,
-        valueChangeHandler: mobPeriodChangeHandler,
-        inputBlurHandler: mobPeriodBlurHandler,
-        setInputValue: setmobPeriodValue,
-        reset: resetmobPeriod,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: monsoonPeriodvalue,
+    isValid: monsoonPeriodIsValid,
+    hasError: monsoonPeriodHasError,
+    valueChangeHandler: monsoonPeriodChangeHandler,
+    inputBlurHandler: monsoonPeriodBlurHandler,
+    setInputValue: setmonsoonPeriodValue,
+    reset: resetmonsoonPeriod,
+  } = useInputValidation(isNotEmpty);
 
-      const {
-        value: monsoonPeriodvalue,
-        isValid: monsoonPeriodIsValid,
-        hasError: monsoonPeriodHasError,
-        valueChangeHandler: monsoonPeriodChangeHandler,
-        inputBlurHandler: monsoonPeriodBlurHandler,
-        setInputValue: setmonsoonPeriodValue,
-        reset: resetmonsoonPeriod,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: monthDurationvalue,
+    isValid: monthDurationIsValid,
+    hasError: monthDurationHasError,
+    valueChangeHandler: monthDurationChangeHandler,
+    inputBlurHandler: monthDurationBlurHandler,
+    setInputValue: setmonthDurationValue,
+    reset: resetmonthDuration,
+  } = useInputValidation(isNotEmpty);
 
-      const {
-        value: monthDurationvalue,
-        isValid: monthDurationIsValid,
-        hasError: monthDurationHasError,
-        valueChangeHandler: monthDurationChangeHandler,
-        inputBlurHandler: monthDurationBlurHandler,
-        setInputValue: setmonthDurationValue,
-        reset: resetmonthDuration,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: supplyScapevalue,
+    isValid: supplyScapeIsValid,
+    hasError: supplyScapeHasError,
+    valueChangeHandler: supplyScapeChangeHandler,
+    inputBlurHandler: supplyScapeBlurHandler,
+    setInputValue: setsupplyScapeValue,
+    reset: resetsupplyScape,
+  } = useInputValidation(isNotEmpty);
 
-      const {
-        value: supplyScapevalue,
-        isValid: supplyScapeIsValid,
-        hasError: supplyScapeHasError,
-        valueChangeHandler: supplyScapeChangeHandler,
-        inputBlurHandler: supplyScapeBlurHandler,
-        setInputValue: setsupplyScapeValue,
-        reset: resetsupplyScape,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: supplyDatevalue,
+    isValid: supplyDateIsValid,
+    hasError: supplyDateHasError,
+    valueChangeHandler: supplyDateChangeHandler,
+    inputBlurHandler: supplyDateBlurHandler,
+    setInputValue: setsupplyDateValue,
+    reset: resetsupplyDate,
+  } = useInputValidation(isNotEmpty);
 
-      const {
-        value: supplyDatevalue,
-        isValid: supplyDateIsValid,
-        hasError: supplyDateHasError,
-        valueChangeHandler: supplyDateChangeHandler,
-        inputBlurHandler: supplyDateBlurHandler,
-        setInputValue: setsupplyDateValue,
-        reset: resetsupplyDate,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: erectionStartvalue,
+    isValid: erectionStartIsValid,
+    hasError: erectionStartHasError,
+    valueChangeHandler: erectionStartChangeHandler,
+    inputBlurHandler: erectionStartBlurHandler,
+    setInputValue: seterectionStartValue,
+    reset: reseterectionStart,
+  } = useInputValidation(isNotEmpty);
 
-      const {
-        value: erectionStartvalue,
-        isValid: erectionStartIsValid,
-        hasError: erectionStartHasError,
-        valueChangeHandler: erectionStartChangeHandler,
-        inputBlurHandler: erectionStartBlurHandler,
-        setInputValue: seterectionStartValue,
-        reset: reseterectionStart,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: commercialProducvalue,
+    isValid: commercialProducIsValid,
+    hasError: commercialProducHasError,
+    valueChangeHandler: commercialProducChangeHandler,
+    inputBlurHandler: commercialProducBlurHandler,
+    setInputValue: setcommercialProducValue,
+    reset: resetcommecrcialProduc,
+  } = useInputValidation(isNotEmpty);
 
-      const {
-        value: commercialProducvalue,
-        isValid: commercialProducIsValid,
-        hasError: commercialProducHasError,
-        valueChangeHandler: commercialProducChangeHandler,
-        inputBlurHandler: commercialProducBlurHandler,
-        setInputValue: setcommercialProducValue,
-        reset: resetcommecrcialProduc,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: tarCompletionvalue,
+    isValid: tarCompletionIsValid,
+    hasError: tarCompletionHasError,
+    valueChangeHandler: tarCompletionChangeHandler,
+    inputBlurHandler: tarCompletionBlurHandler,
+    setInputValue: settarCompletionValue,
+    reset: resettarCompletion,
+  } = useInputValidation(isNotEmpty);
 
-      const {
-        value: tarCompletionvalue,
-        isValid: tarCompletionIsValid,
-        hasError: tarCompletionHasError,
-        valueChangeHandler: tarCompletionChangeHandler,
-        inputBlurHandler: tarCompletionBlurHandler,
-        setInputValue: settarCompletionValue,
-        reset: resettarCompletion,
-      } = useInputValidation(isNotEmpty);
+  const {
+    value: producCompletionvalue,
+    isValid: producCompletionIsValid,
+    hasError: producCompletionHasError,
+    valueChangeHandler: producCompletionChangeHandler,
+    inputBlurHandler: producCompletionBlurHandler,
+    setInputValue: setproducCompletionValue,
+    reset: resetproducCompletion,
+  } = useInputValidation(isNotEmpty);
 
-      const {
-        value: producComletionvalue,
-        isValid: producCompletionIsValid,
-        hasError: producCompletionHasError,
-        valueChangeHandler: producCompletionChangeHandler,
-        inputBlurHandler: producCompletionBlurHandler,
-        setInputValue: setproducCompletionValue,
-        reset: resetproducCompletion,
-      } = useInputValidation(isNotEmpty);
-    
-
-      let formIsValid = false;
+  let formIsValid = false;
 
   if (
-    proPeriodIsValid && mobPeriodIsValid && monsoonPeriodIsValid && monthDurationIsValid && supplyScapeIsValid && supplyDateIsValid && erectionStartIsValid && commercialProducIsValid && tarCompletionIsValid && producCompletionIsValid
-    
+    proPeriodIsValid &&
+    mobPeriodIsValid &&
+    monsoonPeriodIsValid &&
+    monthDurationIsValid &&
+    supplyScapeIsValid &&
+    supplyDateIsValid &&
+    erectionStartIsValid &&
+    commercialProducIsValid &&
+    tarCompletionIsValid &&
+    producCompletionIsValid
   ) {
     formIsValid = true;
   }
 
+  const resetform = () => {
+    resetproPeriod();
+    resetmobPeriod();
+    resetmonsoonPeriod();
+    resetmonthDuration();
+    resetsupplyScape();
+    resetsupplyDate();
+    reseterectionStart();
+    resetcommecrcialProduc();
+    resettarCompletion();
+    resetproducCompletion();
+  };
+
+  const postData = (data) => {
+    axios
+      .post(`${baseUrl}/api/ProjectDetails/Creation`, data)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          setproid(resp.data.id);
+          toastSuccess(resp.data.message);
+          resetform();
+          navigate("/tender/bidmanagement/list/main/workorder/" + id);
+        } else if (resp.data.status === 400) {
+          toastError(resp.data.message);
+        }
+        setDataSending(false);
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+        setDataSending(false);
+      });
+  };
+ //check id already exist
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${baseUrl}/api/ProjectDetails/Creation/${id}`)
+        .then((response) => {
+          setproid(response.data.MobilizationAdvance[0].id);
+        });
+    }
+  }, [id, baseUrl]);
+
   
 
-return(
+  useEffect(() => {
+    if (proid) {
+      axios
+        .get(`${baseUrl}/api/ProjectDetails/getProList/${proid}`)
+        .then((respon) => {
+          //console.log(respon.data.Projectdetails)
+          setproPeriodValue(respon.data.Projectdetails[0].properiod);
+          setmobPeriodValue(respon.data.Projectdetails[0].mobPeriod);
+          setmonsoonPeriodValue(respon.data.Projectdetails[0].monsoonperiod);
+          setmonthDurationValue(respon.data.Projectdetails[0].monthduration);
+          setsupplyScapeValue(respon.data.Projectdetails[0].supplyscape);
+          setsupplyDateValue(respon.data.Projectdetails[0].supplydate);
+          seterectionStartValue(respon.data.Projectdetails[0].erectionstart);
+          setcommercialProducValue(respon.data.Projectdetails[0].commercialproduc);
+          settarCompletionValue(respon.data.Projectdetails[0].tarcompletion);
+          setproducCompletionValue(respon.data.Projectdetails[0].produccompletion);
+        });
+    }
+  }, [proid, baseUrl]);
+
+  const putData = (data) => {
+    axios
+      .put(`${baseUrl}/api/ProjectDetails/Creation/${proid}`, data)
+      .then((res) => {
+        if (res.data.status === 200) {
+          
+          Swal.fire({
+            icon: "success",
+            title: "Workorder",
+            text: "Updated Successfully!",
+            confirmButtonColor: "#5156ed",
+          });
+          setDataSending(false);
+        } else if (res.data.status === 400) {
+          Swal.fire({
+            icon: "error",
+            title: "",
+            text: res.data.message,
+            confirmButtonColor: "#5156ed",
+          });
+          setDataSending(false);
+        }
+      });
+  };
+
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+
+    setDataSending(true);
+
+    if (!formIsValid) {
+      setDataSending(false);
+      return;
+    }
+
+    let projectDetails = {
+      ProPeriod: proPeriodvalue,
+      mobPeriod: mobPeriodvalue,
+      monsoonPeriod: monsoonPeriodvalue,
+      monthDuration: monthDurationvalue,
+      supplyScape: supplyScapevalue,
+      supplyDate: supplyDatevalue,
+      erectionStart: erectionStartvalue,
+      commercialProduc: commercialProducvalue,
+      tarCompletion: tarCompletionvalue,
+      producCompletion: producCompletionvalue,
+    };
+    let data = {
+      projectDetails,
+      tokenid: localStorage.getItem("token"),
+      bidid: id,
+    };
+
+    if (proid === 0) {
+      postData(data);
+    } else if (proid > 0) {
+      putData(data);
+    }
+  };
+
+  return (
     <CollapseCard id={"ProjectDetails"} title={"Project details"}>
-        <form >
+      <form onSubmit={submitHandler}>
         <div className="row align-items-center ">
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
@@ -143,7 +289,7 @@ return(
                 {proPeriodHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                    Project Period In Month is invalid
+                      Project Period In Month is invalid
                     </span>
                   </div>
                 )}
@@ -153,7 +299,9 @@ return(
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="refrence_no">Mobilization Period In Month</label>
+                <label htmlFor="refrence_no">
+                  Mobilization Period In Month
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -168,7 +316,7 @@ return(
                 {mobPeriodHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                    Mobilization Period In Month is invalid
+                      Mobilization Period In Month is invalid
                     </span>
                   </div>
                 )}
@@ -193,7 +341,7 @@ return(
                 {monsoonPeriodHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                    Monsoon Period In Months  is invalid
+                      Monsoon Period In Months is invalid
                     </span>
                   </div>
                 )}
@@ -218,13 +366,13 @@ return(
                 {monthDurationHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                     Total  Duration In Months is invalid
+                      Total Duration In Months is invalid
                     </span>
                   </div>
                 )}
               </div>
             </div>
-          </div>       
+          </div>
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
@@ -243,7 +391,7 @@ return(
                 {supplyScapeHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                    Power supply Scape Submission is invalid
+                      Power supply Scape Submission is invalid
                     </span>
                   </div>
                 )}
@@ -257,7 +405,7 @@ return(
               </div>
               <div className="col-lg-8">
                 <input
-                  type="text"
+                  type="date"
                   name="supplyDate"
                   id="supplyDate"
                   className="form-control"
@@ -268,7 +416,7 @@ return(
                 {supplyDateHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                       Power Supply Date is invalid
+                      Power Supply Date is invalid
                     </span>
                   </div>
                 )}
@@ -293,7 +441,7 @@ return(
                 {erectionStartHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                    Date Of Erection Started is invalid
+                      Date Of Erection Started is invalid
                     </span>
                   </div>
                 )}
@@ -303,7 +451,9 @@ return(
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="refrence_no">Date Of Commercial Production</label>
+                <label htmlFor="refrence_no">
+                  Date Of Commercial Production
+                </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -318,7 +468,7 @@ return(
                 {commercialProducHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                    Date Of Commercial Production is invalid
+                      Date Of Commercial Production is invalid
                     </span>
                   </div>
                 )}
@@ -343,7 +493,7 @@ return(
                 {tarCompletionHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                    Target Date For Completion is invalid
+                      Target Date For Completion is invalid
                     </span>
                   </div>
                 )}
@@ -361,25 +511,24 @@ return(
                   name="producCompletion"
                   id="producCompletion"
                   className="form-control"
-                  value={producComletionvalue}
+                  value={producCompletionvalue}
                   onChange={producCompletionChangeHandler}
                   onBlur={producCompletionBlurHandler}
                 />
                 {producCompletionHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                    Completion Date Production is invalid
+                      Completion Date Production is invalid
                     </span>
                   </div>
                 )}
               </div>
             </div>
           </div>
-          
         </div>
-        {/* <div className="row text-center">
+        <div className="row text-center">
           <div className="col-12">
-            {id ? (
+            {proid ? (
               <button
                 className="btn btn-primary"
                 disabled={!formIsValid || dataSending}
@@ -395,10 +544,10 @@ return(
               </button>
             )}
           </div>
-        </div> */}
+        </div>
       </form>
     </CollapseCard>
-);
-}
+  );
+};
 
 export default ProjetDetails;
