@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
-
 function Sidebar() {
   const [active, setActive] = useState("");
 
@@ -13,14 +12,14 @@ function Sidebar() {
   };
 
   useEffect(() => {
-    const script = document.createElement("script")
-    script.src =  "js/sb-admin-2.min.js"
-    document.body.appendChild(script)
+    const script = document.createElement("script");
+    script.src = "js/sb-admin-2.min.js";
+    document.body.appendChild(script);
     return () => {
       // clean up the script when the component in unmounted
-      document.body.removeChild(script)
-    }
-  }, [])
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <ul
@@ -80,7 +79,7 @@ function Sidebar() {
           <div className="bg-white py-2 collapse-inner rounded">
             <NavLink
               className={`collapse-item ${({ isActive }) =>
-              isActive ? "active" : undefined}`}
+                isActive ? "active" : undefined}`}
               to={`/${pathName}/tendercreation`}
               onClick={() => hideSidebarElement("tenderMenu")}
             >
@@ -88,15 +87,15 @@ function Sidebar() {
             </NavLink>
             <NavLink
               className={`collapse-item ${({ isActive }) =>
-              isActive ? "active" : undefined}`}
+                isActive ? "active" : undefined}`}
               to={`/${pathName}/tendertracker`}
               onClick={() => hideSidebarElement("tenderMenu")}
             >
               Tender Tracker
             </NavLink>
             <NavLink
-               className={`collapse-item ${({ isActive }) =>
-               isActive ? "active" : undefined}`}
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
               to={`/${pathName}/legacystatement`}
               onClick={() => hideSidebarElement("tenderMenu")}
             >
@@ -109,7 +108,7 @@ function Sidebar() {
               onClick={() => hideSidebarElement("tenderMenu")}
             >
               Bid's Management
-            </NavLink> 
+            </NavLink>
           </div>
         </div>
       </li>
@@ -160,7 +159,7 @@ function Sidebar() {
             <NavLink
               className={`collapse-item ${({ isActive }) =>
                 isActive ? "active" : undefined}`}
-              to={`/${pathName}/master/countrymaster`}  
+              to={`/${pathName}/master/countrymaster`}
               onClick={() => hideSidebarElement("MasterMenu")}
             >
               Country Creation
@@ -181,7 +180,7 @@ function Sidebar() {
             >
               ULB Creation
             </NavLink> */}
-           
+
             <NavLink
               className={`collapse-item ${({ isActive }) =>
                 isActive ? "active" : undefined}`}
@@ -196,7 +195,7 @@ function Sidebar() {
               to={`/${pathName}/master/citymaster`}
               onClick={() => hideSidebarElement("MasterMenu")}
             >
-             City Creation
+              City Creation
             </NavLink>
             <NavLink
               className={`collapse-item ${({ isActive }) =>
@@ -220,7 +219,7 @@ function Sidebar() {
               to={`/${pathName}/master/projectstatus`}
               onClick={() => hideSidebarElement("MasterMenu")}
             >
-              Project Status 
+              Project Status
             </NavLink>
             <NavLink
               className={`collapse-item ${({ isActive }) =>
@@ -228,7 +227,15 @@ function Sidebar() {
               to={`/${pathName}/master/customersubcategory`}
               onClick={() => hideSidebarElement("MasterMenu")}
             >
-              Customer Sub Category 
+              Customer Sub Category
+            </NavLink>
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
+              to={`/${pathName}/master/tendertypemaster`}
+              onClick={() => hideSidebarElement("MasterMenu")}
+            >
+              Tender Type Master
             </NavLink>
           </div>
         </div>

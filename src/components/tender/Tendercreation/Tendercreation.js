@@ -6,7 +6,6 @@ import { useBaseUrl } from "../../hooks/useBaseUrl";
 import axios from "axios";
 import Swal from "sweetalert2/src/sweetalert2.js";
 
-
 const initialState = {
   organisation: null,
   customerName: null,
@@ -43,24 +42,22 @@ const Tendercreation = () => {
     getTenderTypeList();
   }, []);
 
-  
-  const getOrganisationList = () =>{
+  const getOrganisationList = () => {
     axios.get(`${baseUrl}/api/organisation/list`).then((resp) => {
       setOrganisationList(resp.data.organisationList);
     });
-  }
-  const getCustomerNameList = () =>{
+  };
+  const getCustomerNameList = () => {
     axios.get(`${baseUrl}/api/customerName/list`).then((resp) => {
       setCustomerNameList(resp.data.customerNameList);
     });
-  }
-  
-  const getTenderTypeList = () =>{
+  };
+
+  const getTenderTypeList = () => {
     axios.get(`${baseUrl}/api/tenderType/list`).then((resp) => {
       setTenderTypeList(resp.data.tenderTypeList);
     });
-  }
-
+  };
 
   const inputHandler = (e) => {
     setInput({
@@ -86,7 +83,6 @@ const Tendercreation = () => {
           confirmButtonColor: "#5156ed",
         });
         setInput(initialState);
-     
       } else if (resp.data.status === 400) {
         Swal.fire({
           icon: "error",
@@ -108,8 +104,7 @@ const Tendercreation = () => {
           text: "Updated Successfully!",
           confirmButtonColor: "#5156ed",
         });
-        setInput(initialState)
-       
+        setInput(initialState);
       } else if (res.data.status === 400) {
         Swal.fire({
           icon: "error",
@@ -117,7 +112,7 @@ const Tendercreation = () => {
           text: res.data.errors,
           confirmButtonColor: "#5156ed",
         });
-        setDataSending(false)
+        setDataSending(false);
       }
     });
   };
@@ -140,7 +135,8 @@ const Tendercreation = () => {
       ? (errors.tenderTypeErr = "Enter City Name")
       : (errors.tenderTypeErr = "");
 
-    const { customerNameErr, organisationErr, nitDateErr, tenderTypeErr } = errors;
+    const { customerNameErr, organisationErr, nitDateErr, tenderTypeErr } =
+      errors;
     setInputValidation(errors);
 
     if (
@@ -173,8 +169,6 @@ const Tendercreation = () => {
         putData(data, id);
       }
     }
-
-  
   };
 
   return (
@@ -182,10 +176,10 @@ const Tendercreation = () => {
       <div className="card p-4">
         <form onSubmit={submitHandler}>
           <div className="row">
-            <div className="col-2">
+            <div className="col-lg-2">
               <label>Organisation</label>
             </div>
-            <div className="col-10 mb-3">
+            <div className="col-lg-4 mb-3">
               <div className="row">
                 <div className="col-5 mr-5 ">
                   <Select
@@ -197,14 +191,12 @@ const Tendercreation = () => {
                     onChange={inputHandlerForSelect}
                     // onBlur={organisationlistBlurHandler}
                     value={input.organisation}
-                    isLoading={organisationList.isLoading}
                   ></Select>
                 </div>
-                <div className="col-6 ml-n5 mt-2">
-                  <span style={{ color: "red" }}>
-                    {inputValidation.organisationErr}
-                  </span>
-                </div>
+
+                <span style={{ color: "red" }}>
+                  {inputValidation.organisationErr}
+                </span>
               </div>
             </div>
           </div>
@@ -214,25 +206,25 @@ const Tendercreation = () => {
             </div>
             <div className="col-10 mb-3">
               <div className="row">
-              <div className="col-lg-6">
-              <input
-                  type="text"
-                  className="form-control"
-                  id="customerName"
-                  placeholder="Enter Customer Name"
-                  name="customerName"
-                  value={input.customerName}
-                  onChange={inputHandler}                   
-                />
-                
-                 {inputValidation.customerNameErr && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Enter Valid Input..!
-                    </span>
-                  </div>
-                )}
-              </div>
+                <div className="col-lg-6">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="customerName"
+                    placeholder="Enter Customer Name"
+                    name="customerName"
+                    value={input.customerName}
+                    onChange={inputHandler}
+                  />
+
+                  {inputValidation.customerNameErr && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Enter Valid Input..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -250,7 +242,6 @@ const Tendercreation = () => {
                     isClearable="true"
                     options={tenderTypeList}
                     onChange={inputHandlerForSelect}
-                    
                     value={input.tenderType}
                   ></Select>
                 </div>
@@ -286,7 +277,7 @@ const Tendercreation = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="row text-center">
             <div className="col-12">
               {id ? (

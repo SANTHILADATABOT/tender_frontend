@@ -30,6 +30,8 @@ import CountryMasterView from "./components/master/CountryMaster/CountryMasterVi
 import CountryMaster from "./components/master/CountryMaster/CountryMaster";
 import UnitMaster from "./components/master/UnitMaster/UnitMaster";
 import UnitMasterView from "./components/master/UnitMaster/UnitMasterView";
+import TenderTypeMaster from "./components/master/TenderTypeMaster/TenderTypeMaster";
+import TenderTypeMasterView from "./components/master/TenderTypeMaster/TenderTypeMasterView";
 import DistrictMaster from "./components/master/DistrictMaster/DistrictMaster";
 import DistrictMasterView from "./components/master/DistrictMaster/DistrictMasterView";
 import CityMasterView from "./components/master/CityCreation/CityMasterView";
@@ -48,7 +50,6 @@ import BidSubmission from "./components/tender/Bidmanagement/Bidsubmission/BidSu
 import TenderStatus from "./components/tender/Bidmanagement/TenderStatus/TenderStatus";
 import Workorder from "./components/tender/Bidmanagement/Workorder/Workorder";
 
-
 function App() {
   const authCtx = useContext(AuthContext);
   return (
@@ -63,20 +64,23 @@ function App() {
             <Route path="tendercreation" element={<Tendercreation />} />
             <Route path="legacystatement" element={<Legacystatement />} />
             <Route path="bidmanagement">
-              <Route path="list" element={<Bidmanagement />}/>
+              <Route path="list" element={<Bidmanagement />} />
               <Route path="list/main" element={<BidmanagementMain />}>
-                <Route path="bidcreationmain" element={<BidCreationMain/>}/>
-                <Route path="bidcreationmain/:id" element={<BidCreationMain/>}/>
-                <Route path="bidsubmission" element={<BidSubmission/>}/>
-                <Route path="bidsubmission/:id" element={<BidSubmission/>}/>
-                <Route path="tenderstatus" element={<TenderStatus/>}/>
-                <Route path="tenderstatus/:id" element={<TenderStatus/>}/>
-                <Route path="workorder" element={<Workorder/>}/>
-                <Route path="workorder/:id" element={<Workorder/>}/>
+                <Route path="bidcreationmain" element={<BidCreationMain />} />
+                <Route
+                  path="bidcreationmain/:id"
+                  element={<BidCreationMain />}
+                />
+                <Route path="bidsubmission" element={<BidSubmission />} />
+                <Route path="bidsubmission/:id" element={<BidSubmission />} />
+                <Route path="tenderstatus" element={<TenderStatus />} />
+                <Route path="tenderstatus/:id" element={<TenderStatus />} />
+                <Route path="workorder" element={<Workorder />} />
+                <Route path="workorder/:id" element={<Workorder />} />
               </Route>
             </Route>
             <Route path="master">
-            <Route
+              <Route
                 path="customercreation/list"
                 element={<CustomerCreation />}
               />
@@ -85,12 +89,15 @@ function App() {
                 element={<CustomerCreationMain />}
               >
                 <Route path="profile" element={<CustomerCreationProfile />} />
-                <Route path="profile/:id" element={<CustomerCreationProfile />} />
+                <Route
+                  path="profile/:id"
+                  element={<CustomerCreationProfile />}
+                />
                 <Route
                   path="contactperson"
                   element={<CustomerCreationContactPerson />}
                 />
-                 <Route
+                <Route
                   path="contactperson/:id"
                   element={<CustomerCreationContactPerson />}
                 />
@@ -124,67 +131,107 @@ function App() {
                 element={<CustomerCreationProfile />}
               />
               <Route
-                path="competitorcreation" element={<CompetitorCreation />}
-               />
-                
-                <Route path="competitorcreation/competitor" element={<Competitor />} >
-                  <Route path="profile" element={<CompetitorProfile />}/>
-                  <Route path="profile/:id" element={<CompetitorProfile />}/>
-                  <Route path="details" element={<CompetitorDetails />}>
-                      <Route path="branches" element={<CompetitorBranchForm />}/>
-                      
-                  </Route>
-                
-                {/*route for to edit with id*/} 
-                  <Route path="details/:compid" element={<CompetitorDetails />}>
-                    <Route path="branches/:compid" element={<CompetitorBranchForm />}/>
-                  </Route>
+                path="competitorcreation"
+                element={<CompetitorCreation />}
+              />
+
+              <Route
+                path="competitorcreation/competitor"
+                element={<Competitor />}
+              >
+                <Route path="profile" element={<CompetitorProfile />} />
+                <Route path="profile/:id" element={<CompetitorProfile />} />
+                <Route path="details" element={<CompetitorDetails />}>
+                  <Route path="branches" element={<CompetitorBranchForm />} />
                 </Route>
-             
-              <Route path="statemaster" >
+
+                {/*route for to edit with id*/}
+                <Route path="details/:compid" element={<CompetitorDetails />}>
+                  <Route
+                    path="branches/:compid"
+                    element={<CompetitorBranchForm />}
+                  />
+                </Route>
+              </Route>
+
+              <Route path="statemaster">
                 <Route index element={<StateMasterView />} />
-                <Route path="statecreation" element={<StateMaster />}/>
-                <Route path="statecreation/:id" element={<StateMaster />}/>
+                <Route path="statecreation" element={<StateMaster />} />
+                <Route path="statecreation/:id" element={<StateMaster />} />
               </Route>
-              <Route path="countrymaster" >
+              <Route path="countrymaster">
                 <Route index element={<CountryMasterView />} />
-                <Route path="countrycreation" element={<CountryMaster />}/>
-                <Route path="countrycreation/:id" element={<CountryMaster />}/>
+                <Route path="countrycreation" element={<CountryMaster />} />
+                <Route path="countrycreation/:id" element={<CountryMaster />} />
               </Route>
-              <Route path="ulbmaster" >
+              <Route path="ulbmaster">
                 <Route index element={<ULBMasterView />} />
-                <Route path="ulbcreation" element={<ULBMaster />}/>
-                <Route path="ulbcreation/:id" element={<ULBMaster />}/>
+                <Route path="ulbcreation" element={<ULBMaster />} />
+                <Route path="ulbcreation/:id" element={<ULBMaster />} />
               </Route>
-              <Route path="unitmaster" >
+              <Route path="unitmaster">
                 <Route index element={<UnitMasterView />} />
-                <Route path="unitcreation" element={<UnitMaster />}/>
-                <Route path="unitcreation/:id" element={<UnitMaster />}/>
+                <Route path="unitcreation" element={<UnitMaster />} />
+                <Route path="unitcreation/:id" element={<UnitMaster />} />
               </Route>
-              <Route path="districtmaster" >
+
+              <Route path="tendertypemaster">
+                <Route index element={<TenderTypeMasterView />} />
+                <Route
+                  path="tendertypecreation"
+                  element={<TenderTypeMaster />}
+                />
+                <Route
+                  path="tendertypecreation/:id"
+                  element={<TenderTypeMaster />}
+                />
+              </Route>
+
+              <Route path="districtmaster">
                 <Route index element={<DistrictMasterView />} />
-                <Route path="districtcreation" element={<DistrictMaster />}/>
-                <Route path="districtcreation/:id" element={<DistrictMaster />}/>
+                <Route path="districtcreation" element={<DistrictMaster />} />
+                <Route
+                  path="districtcreation/:id"
+                  element={<DistrictMaster />}
+                />
               </Route>
               <Route path="citymaster">
-                <Route index element={<CityMasterView/>}/>
-                <Route path="citycreation" element={<CityCreation />}/>
-                <Route path="citycreation/:id" element={<CityCreation />}/>
+                <Route index element={<CityMasterView />} />
+                <Route path="citycreation" element={<CityCreation />} />
+                <Route path="citycreation/:id" element={<CityCreation />} />
               </Route>
-              <Route path="projecttype" >
+              <Route path="projecttype">
                 <Route index element={<ProjectTypeView />} />
-                <Route path="projecttypecreation" element={<ProejctTypeMaster />}/>
-                <Route path="projecttypecreation/:id" element={<ProejctTypeMaster />}/>
+                <Route
+                  path="projecttypecreation"
+                  element={<ProejctTypeMaster />}
+                />
+                <Route
+                  path="projecttypecreation/:id"
+                  element={<ProejctTypeMaster />}
+                />
               </Route>
-              <Route path="projectstatus" >
+              <Route path="projectstatus">
                 <Route index element={<ProjectstatusView />} />
-                <Route path="projectstatuscreation" element={<ProjectstatusMaster />}/>
-                <Route path="projectstatuscreation/:id" element={<ProjectstatusMaster />}/>
+                <Route
+                  path="projectstatuscreation"
+                  element={<ProjectstatusMaster />}
+                />
+                <Route
+                  path="projectstatuscreation/:id"
+                  element={<ProjectstatusMaster />}
+                />
               </Route>
-              <Route path="customersubcategory" >
+              <Route path="customersubcategory">
                 <Route index element={<CustSubCategView />} />
-                <Route path="customersubcategorycreation" element={<CustSubCategMaster />}/>
-                <Route path="customersubcategorycreation/:id" element={<CustSubCategMaster />}/>
+                <Route
+                  path="customersubcategorycreation"
+                  element={<CustSubCategMaster />}
+                />
+                <Route
+                  path="customersubcategorycreation/:id"
+                  element={<CustSubCategMaster />}
+                />
               </Route>
             </Route>
           </Route>
