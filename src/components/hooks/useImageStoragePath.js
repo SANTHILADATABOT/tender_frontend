@@ -7,9 +7,8 @@ const useImageStoragePath = () => {
         qcFile : baseUrl+'/uploads/competitor/qc/',
         woFile : baseUrl+'/uploads/competitor/woFile/',
         woCompletionFile : baseUrl+'/uploads/competitor/woCompletionFile/',
-        
-        
-        
+        prebiddocs : baseUrl+'/uploads/BidManagement/prebidqueries/',   
+        CorrigendumPublishdocs : baseUrl+'/uploads/BidManagement/CorrigendumPublish/',   
         
         
         // Uncomment when build App

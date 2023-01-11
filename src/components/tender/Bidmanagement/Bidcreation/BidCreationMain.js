@@ -24,8 +24,8 @@ const BidCreationMain = () => {
     return(
         <Fragment>
             <BidCreation/>
-            <CorrigendumPublish/>
             <PrebidQueries/>
+            <CorrigendumPublish/>
             <TenderParticipation/>
         </Fragment>
     )

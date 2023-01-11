@@ -46,7 +46,7 @@ const BidmanagementMain = () => {
                             className="nav-link"
                             id="bidsubmission-tab"
                             data-toggle="tab"
-                            to={(bidManageMainId===0) ? "bidsubmission" : `bidsubmission/${bidManageMainId}`}
+                            to={(bidManageMainId===0) ? "bidsubmission" : `bidsubmission/${+bidManageMainId}`}
                             role="tab"
                             aria-controls="bidsubmission"
                             aria-selected="false"
@@ -61,7 +61,7 @@ const BidmanagementMain = () => {
                             className="nav-link"
                             id="tenderstatus-tab"
                             data-toggle="tab"
-                            to={(bidManageMainId===0) ? "tenderstatus" : `tenderstatus/${bidManageMainId}`}
+                            to={(bidManageMainId===0) ? "tenderstatus" : `tenderstatus/${+bidManageMainId}`}
                             role="tab"
                             aria-controls="tenderstatus"
                             aria-selected="false"
