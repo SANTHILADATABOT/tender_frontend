@@ -17,7 +17,6 @@ const UploadDoc = () => {
   const ref = useRef()
   const [isDatasending, setdatasending] = useState(false);
   const [FetchLoading, setFetchLoading] = useState(false);
-  
   const [isEditbtn, setisEditbtn] = useState(false)
   const [UploadDocId, setUploadDocId] = useState(null);
   const [file, setFile] = useState(null);
@@ -51,14 +50,13 @@ const UploadDoc = () => {
 
     let filetypes = newFile.type
 
-    if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetypes.split('/')[0] === "image") {
+    if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetypes.split('/')[0] === "image"){
       setFile(newFile);
     } else {
       alert("File format not suppoted. Upload pdf, doc, docx and images only")
     }
 
   }
-
 
   const {
     value: docnameValue,
@@ -70,13 +68,11 @@ const UploadDoc = () => {
     reset: resetdocname,
   } = useInputValidation(isNotEmpty);
 
-
   var config = {
     onUploadProgress: function (progressEvent) {
       var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
       setProgressCompleted(percentCompleted)
     }
-
   }
 
   const resetform = () => {
@@ -116,7 +112,7 @@ const UploadDoc = () => {
   const putData = (data,UploadDocId ) => {
 
     axios.post(`${baseUrl}/api/bidcreation/creation/docupload/${UploadDocId}`, data, config).then((resp) => {
-      if (resp.data.status === 200) {
+      if (resp.data.status === 200){
         ref.current.getDocList()
         resetform()
         toastSuccess(resp.data.message)
@@ -174,20 +170,16 @@ const UploadDoc = () => {
       data.file = new File([file], file.name);
     }
 
-
-
-
     for (var key in data) {
       formdata.append(key, data[key]);
     }
-
 
     if (id && UploadDocId === null && !isEditbtn) {
       postData(formdata)
     }else if(id && UploadDocId !== null && isEditbtn){
       // postData(formdata)
       putData(formdata, UploadDocId)
-    }
+    } 
 
   }
 

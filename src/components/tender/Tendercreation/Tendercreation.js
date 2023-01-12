@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+// import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import Select from "react-select";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
@@ -7,55 +8,62 @@ import axios from "axios";
 import Swal from "sweetalert2/src/sweetalert2.js";
 
 const initialState = {
-  organisation: null,
-  customerName: null,
-  nitDate: null,
+  organisation: "",
+  customerName: "",
+  nitDate: "",
   tenderType: "",
 };
 
 const initialStateErr = {
-  organisationErr: "",
-  customerNameErr: "",
-  nitDateErr: "",
-  tenderTypeErr: "",
+  organisation: null,
+  customerName: null,
+  nitDate: null,
+  tenderType: null,
 };
 
 const Tendercreation = () => {
   usePageTitle("Tender Creation");
-  const { id } = useParams();
-  // const navigate = useNavigate();
+  // const { id } = useParams();
+  const navigate = useNavigate();
 
   const { server1: baseUrl } = useBaseUrl();
 
   const [dataSending, setDataSending] = useState(false);
   const [input, setInput] = useState(initialState);
   const [inputValidation, setInputValidation] = useState(initialStateErr);
-  const [organisationList, setOrganisationList] = useState();
-  const [customerNameList, setCustomerNameList] = useState();
-  const [tenderTypeList, setTenderTypeList] = useState();
+  // const [organisationList, setOrganisationList] = useState();
+  // const [customerNameList, setCustomerNameList] = useState();
+  const [tenderTypeList, setTenderTypeList] = useState({
+    value: "",
+    label:""
+  });
+  const [formIsValid, setFormIsValid] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  let tokenId = localStorage.getItem("token");
+  // const [savedData, setSavedData] = useState({});
 
-  const [savedData, setSavedData] = useState({});
+ 
 
   useEffect(() => {
-    getOrganisationList();
-    getCustomerNameList();
+    // getOrganisationList();
+    // getCustomerNameList();
     getTenderTypeList();
   }, []);
 
-  const getOrganisationList = () => {
-    axios.get(`${baseUrl}/api/organisation/list`).then((resp) => {
-      setOrganisationList(resp.data.organisationList);
-    });
-  };
-  const getCustomerNameList = () => {
-    axios.get(`${baseUrl}/api/customerName/list`).then((resp) => {
-      setCustomerNameList(resp.data.customerNameList);
-    });
-  };
+  // const getOrganisationList = () => {
+  //   axios.get(`${baseUrl}/api/organisation/list`).then((resp) => {
+  //     setOrganisationList(resp.data.organisationList);
+  //   });
+  // };
+  // const getCustomerNameList = () => {
+  //   axios.get(`${baseUrl}/api/customerName/list`).then((resp) => {
+  //     setCustomerNameList(resp.data.customerNameList);
+  //   });
+  // };
 
   const getTenderTypeList = () => {
-    axios.get(`${baseUrl}/api/tenderType/list`).then((resp) => {
-      setTenderTypeList(resp.data.tenderTypeList);
+    axios.get(`${baseUrl}/api/tendertype/list`).then((resp) => {
+      setTenderTypeList(resp.data.tendertypeList);
     });
   };
 
@@ -64,25 +72,48 @@ const Tendercreation = () => {
       ...input,
       [e.target.name]: e.target.value,
     });
+    if(e.target.value === "")
+    {
+        setInputValidation({...inputValidation, [e.target.name]:true});
+    }
+    else{
+      setInputValidation({...inputValidation, [e.target.name]:false});
+    }
   };
 
   const inputHandlerForSelect = (value, action) => {
+    
     setInput({
       ...input,
       [action.name]: value,
     });
+    if(value === "" | value === null)
+    {
+        setInputValidation({...inputValidation, [action.name]:true});
+    }
+    else{
+      setInputValidation({...inputValidation, [action.name]:false});
+    }
   };
+ 
+  useEffect(()=>{
+    if(input.customerName!=="" && input.nitDate!=="" && input.organisation!=="" && (input.tenderType.value!=="" | input.tenderType.value!==undefined))
+    {
+      setFormIsValid(true);
+    }
+  },[input]);
 
   const postData = (data) => {
-    axios.post(`${baseUrl}/api/city`, data).then((resp) => {
+    axios.post(`${baseUrl}/api/tendercreation`, data).then((resp) => {
       if (resp.data.status === 200) {
         Swal.fire({
           icon: "success",
-          title: "New City " + resp.data.message,
-          text: "",
+          title: "Tender",
+          text:  resp.data.message,
           confirmButtonColor: "#5156ed",
         });
-        setInput(initialState);
+        // setInput(initialState);
+      navigate("/tender/bidmanagement/list/main/bidcreationmain/");
       } else if (resp.data.status === 400) {
         Swal.fire({
           icon: "error",
@@ -90,210 +121,219 @@ const Tendercreation = () => {
           text: resp.data.errors,
           confirmButtonColor: "#5156ed",
         });
-        setDataSending(false);
+       
       }
+      setDataSending(false);
+      setFormIsValid(false);
     });
   };
 
-  const putData = (data, id) => {
-    axios.put(`${baseUrl}/api/city/${id}`, data).then((res) => {
-      if (res.data.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "City",
-          text: "Updated Successfully!",
-          confirmButtonColor: "#5156ed",
-        });
-        setInput(initialState);
-      } else if (res.data.status === 400) {
-        Swal.fire({
-          icon: "error",
-          title: "City",
-          text: res.data.errors,
-          confirmButtonColor: "#5156ed",
-        });
-        setDataSending(false);
-      }
-    });
-  };
+  // const putData = (data, id) => {
+  //   axios.put(`${baseUrl}/api/city/${id}`, data).then((res) => {
+  //     if (res.data.status === 200) {
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: "City",
+  //         text: "Updated Successfully!",
+  //         confirmButtonColor: "#5156ed",
+  //       });
+  //       setInput(initialState);
+  //     } else if (res.data.status === 400) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "City",
+  //         text: res.data.errors,
+  //         confirmButtonColor: "#5156ed",
+  //       });
+  //       setDataSending(false);
+  //     }
+  //   });
+  // };
 
   const submitHandler = (e) => {
     e.preventDefault();
-    setDataSending(true);
-    var errors = { ...inputValidation };
-
-    input.organisation === null
-      ? (errors.organisationErr = "Select Organisation")
-      : (errors.organisationErr = "");
-    input.customerName === null
-      ? (errors.customerNameErr = "Select Customer Name")
-      : (errors.customerNameErr = "");
-    input.nitDate === null
-      ? (errors.nitDateErr = "Select District")
-      : (errors.nitDateErr = "");
-    input.tenderTypeList === ""
-      ? (errors.tenderTypeErr = "Enter City Name")
-      : (errors.tenderTypeErr = "");
-
-    const { customerNameErr, organisationErr, nitDateErr, tenderTypeErr } =
-      errors;
-    setInputValidation(errors);
-
-    if (
-      customerNameErr !== "" ||
-      organisationErr !== "" ||
-      nitDateErr !== "" ||
-      tenderTypeErr !== ""
-    ) {
+    setDataSending(true); 
+    if(input.customerName!=="" && input.nitDate!=="" && input.organisation!=="" && (input.tenderType.value!=="" | input.tenderType.value!==undefined))
+    {
       setDataSending(false);
-      return;
-    }
-
-    if (
-      customerNameErr === "" &&
-      organisationErr === "" &&
-      nitDateErr === "" &&
-      tenderTypeErr === ""
-    ) {
+    
       const data = {
-        organisation_id: input.organisation.value,
-        customerName_id: input.customerName.value,
-        district_id: input.district.value,
-        city_name: input.city,
-        city_status: input.status,
+        organisation: input.organisation,
+        customername: input.customerName,
+        nitdate: input.nitDate,
+        tendertype: input.tenderType.value,
+        tokenId:tokenId
       };
-
-      if (!id) {
-        postData(data);
-      } else {
-        putData(data, id);
-      }
+      postData(data)
+      // if (!id) {
+      //   postData(data);
+      // } else {
+      //   putData(data, id);
+      // }
     }
   };
 
-  return (
-    <div className="container-fluid">
-      <div className="card p-4">
-        <form onSubmit={submitHandler}>
-          <div className="row">
-            <div className="col-lg-2">
-              <label>Organisation</label>
-            </div>
-            <div className="col-lg-4 mb-3">
-              <div className="row">
-                <div className="col-5 mr-5 ">
-                  <Select
-                    name="organisation"
-                    id="organisation"
-                    isSearchable="true"
-                    isClearable="true"
-                    options={organisationList}
-                    onChange={inputHandlerForSelect}
-                    // onBlur={organisationlistBlurHandler}
-                    value={input.organisation}
-                  ></Select>
-                </div>
+  // const updateHandler = (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   //Have to write, when need Update option 
+  // }
+    
 
-                <span style={{ color: "red" }}>
-                  {inputValidation.organisationErr}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-2">
-              <label>Customer Name</label>
-            </div>
-            <div className="col-10 mb-3">
-              <div className="row">
-                <div className="col-lg-6">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="customerName"
-                    placeholder="Enter Customer Name"
-                    name="customerName"
-                    value={input.customerName}
-                    onChange={inputHandler}
-                  />
 
-                  {inputValidation.customerNameErr && (
-                    <div className="pt-1">
-                      <span className="text-danger font-weight-bold">
-                        Enter Valid Input..!
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
+  const cancelHandler = () => {
+    setInput(initialState);
+    setInputValidation(initialStateErr);
+    setFormIsValid(false);
+    setDataSending(false);
+    // setLoading(false);
+  };
+
+    return (
+    <div className="card-body ">
+    <form>
+      <div className="row align-items-center">
+      <div className="inputgroup col-lg-5 mb-4">
+            <div className="row align-items-center">
+              <div className="col-lg-4 text-dark">
+              <label htmlFor="organisation" className="font-weight-bold"> Organisation </label>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-2">
-              <label>Tender Type</label>
-            </div>
-            <div className="col-10 mb-3">
-              <div className="row">
-                <div className="col-5 mr-5 ">
-                  <Select
-                    name="tenderType"
-                    id="tenderType"
-                    isSearchable="true"
-                    isClearable="true"
-                    options={tenderTypeList}
-                    onChange={inputHandlerForSelect}
-                    value={input.tenderType}
-                  ></Select>
-                </div>
-                <div className="col-6 ml-n5 mt-2">
-                  <span style={{ color: "red" }}>
-                    {inputValidation.nitDateErr}
+            <div className="col-lg-8">
+            <input
+                type="text"
+                className="form-control"
+                id="organisation"
+                placeholder="Enter Organisation Name"
+                name="organisation"
+                value={input.organisation}
+                onChange={inputHandler}                  
+              />
+              
+              {inputValidation.organisation && (
+                <div className="pt-1">
+                  <span className="text-danger font-weight-bold">
+                    Enter Valid Input..!
                   </span>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-2">
-              <label>Nit Date</label>
-            </div>
-            <div className="col-10 mb-3">
-              <div className="row">
-                <div className="col-5 mr-5 ">
-                  <input
-                    className="form-control "
-                    type="Date"
-                    id="city"
-                    name="city"
-                    onChange={inputHandler}
-                    value={input.city}
-                  />
-                </div>
-                <div className="col-6 ml-n5 mt-2">
-                  <span style={{ color: "red" }}>
-                    {inputValidation.tenderTypeErr}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="row text-center">
-            <div className="col-12">
-              {id ? (
-                <button className="btn btn-primary" disabled={dataSending}>
-                  {dataSending ? "Editing..." : "Edit"}
-                </button>
-              ) : (
-                <button className="btn btn-primary" disabled={dataSending}>
-                  {dataSending ? "Submitting..." : "Submit"}
-                </button>
               )}
             </div>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div className="inputgroup col-lg-1 mb-4"></div>
+
+        <div className="inputgroup col-lg-5 mb-4">
+            <div className="row align-items-center">
+              <div className="col-lg-4 text-dark">
+              <label htmlFor="customerName" className="font-weight-bold">
+              Customer Name
+              </label>
+            </div>
+            <div className="col-lg-8">
+            <input
+                type="text"
+                className="form-control"
+                id="customerName"
+                placeholder="Enter Customer Name"
+                name="customerName"
+                value={input.customerName}
+                onChange={inputHandler}                  
+              />
+              
+              {inputValidation.customerName && (
+                <div className="pt-1">
+                  <span className="text-danger font-weight-bold">
+                    Enter Valid Input..!
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+
+        <div className="inputgroup col-lg-5 mb-4">
+            <div className="row align-items-center">
+              <div className="col-lg-4 text-dark">
+                <label htmlFor="tenderType" className="font-weight-bold">
+                  Tender Type<span className="text-danger">&nbsp;*</span>
+                </label>
+              </div>
+              <div className="col-lg-8">
+                <Select
+                  name="tenderType"
+                  id="tenderType"
+                  isSearchable="true"
+                  isClearable="true"
+                  options={tenderTypeList}
+                  value={input.tenderType}
+                  onChange={inputHandlerForSelect}
+                  
+                ></Select>
+                {inputValidation.tenderType && (
+                  <div className="pt-1">
+                    <span className="text-danger font-weight-bold">
+                      Select Tender Type..!
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="inputgroup col-lg-1 mb-4"></div>
+
+          <div className="inputgroup col-lg-5 mb-4">
+            <div className="row align-items-center">
+              <div className="col-lg-4 text-dark font-weight-bold">
+                <label htmlFor="nitDate">
+                  NIT Date<span className="text-danger">&nbsp;*</span>
+                </label>
+              </div>
+              <div className="col-lg-8">
+                <input
+                  type="date"
+                  className="form-control"
+                  id="nitDate"
+                  name="nitDate"
+                  value={input.nitDate}
+                  onChange={inputHandler}
+                />
+                {inputValidation.nitDate && (
+                  <div className="pt-1">
+                    <span className="text-danger font-weight-bold">
+                      Select Valid Date..!
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div> 
+          <div className="inputgroup col-lg-6 mb-4"></div>
+          <div className="inputgroup col-lg-6 mb-4"></div>
+          <div className="inputgroup col-lg-12 mb-4 ml-3">
+            <div className="row align-items-center">
+              <div className="col-lg-10 text-right ">
+                <button
+                  className="btn btn-primary"
+                  disabled={!formIsValid}
+                  onClick={submitHandler}
+                  >
+                    {dataSending === true ? "Submitting...." : "Save & Countinue"}
+                {/*//   onClick={!id ? submitHandler : updateHandler}
+                // >
+                //   { !id ?
+                //         loading === true ? "Submitting...." : "Save & Countinue"
+                //         : loading === true ? "Updating...." : "Update"
+                // */}
+                </button>
+              </div>
+              <div className="col-lg-1 text-left">
+                <button className="btn btn-secondary" onClick={cancelHandler}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>       
+          </div></form></div>
   );
 };
 

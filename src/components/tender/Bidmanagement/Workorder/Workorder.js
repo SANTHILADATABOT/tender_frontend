@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-//import CommunicationFiles from './CommunicationFiles/CommunicationFiles';
+import CommunicationFiles from './CommunicationFiles/CommunicationFiles';
 import Mobilization from './MobilizationAdvance/Mobilization';
 import ProjetDetails from './ProjectDetails/ProjectDetails';
 //import LetterOfAcceptance from './LetterOfAcceptance/LetterOfAcceptance';
@@ -9,8 +9,8 @@ const Workorder = () => {
 
     return(
         <Fragment>
-            {/* <CommunicationFiles />
-            <LetterOfAcceptance /> */}
+            <CommunicationFiles />
+            {/* <LetterOfAcceptance /> */}
             {/* <WorkOrder /> */}
             <Mobilization />
             <ProjetDetails />

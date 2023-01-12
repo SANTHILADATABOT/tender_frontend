@@ -328,7 +328,6 @@ const BidCreation = () => {
     if(id){
       getBidCreationData();
     }
-
   }, []);
 
   const validateInputLength = (e) => {

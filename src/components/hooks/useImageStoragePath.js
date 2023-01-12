@@ -9,9 +9,10 @@ const useImageStoragePath = () => {
         woCompletionFile : baseUrl+'/uploads/competitor/woCompletionFile/',
         prebiddocs : baseUrl+'/uploads/BidManagement/prebidqueries/',   
         CorrigendumPublishdocs : baseUrl+'/uploads/BidManagement/CorrigendumPublish/',   
-        // agfile: baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/agreementDocument/',
-        // workorderfile : baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/workorderDocument/',//Bit Management Work Order form
-        // shofile : baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/siteHandOverDocumet/',
+        agfile: baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/agreementDocument/',//Bit Management Work Order form
+        workorderfile : baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/workorderDocument/',//Bit Management Work Order form
+        shofile : baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/siteHandOverDocumet/',//Bit Management Work Order form
+        commnunicationfile : baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/CommunicationFiles/',//Bit Management Work Order form
         
         // Uncomment when build App
         // qcFile : baseUrl+'/public/uploads/competitor/qc/',

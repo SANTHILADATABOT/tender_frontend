@@ -6,8 +6,8 @@ export const isNotEmpty = (value) => {
     value = value.toString()
   }
 
-
-  if (value === null) {
+  if (value === null || value === undefined ) {
+//  if (value === null) { Already existing code
     return false;
   }else if (value.trim() === "") {
     return false;
