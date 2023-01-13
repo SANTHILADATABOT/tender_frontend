@@ -14,6 +14,12 @@ const initialState = {
   tenderType: "",
 };
 
+const organisationList = [
+  {value :"Public Sector Unit", label :"Public Sector Unit"},
+  {value :"Private/Public Sector Company", label :"Private/Public Sector Company"},
+];
+
+
 const initialStateErr = {
   organisation: null,
   customerName: null,
@@ -106,28 +112,42 @@ const Tendercreation = () => {
   const postData = (data) => {
     axios.post(`${baseUrl}/api/tendercreation`, data).then((resp) => {
       if (resp.data.status === 200) {
+        localStorage.clear();
+        navigate("/");
         Swal.fire({
           icon: "success",
           title: "Tender",
           text:  resp.data.message,
           confirmButtonColor: "#5156ed",
         });
-        // setInput(initialState);
       navigate("/tender/bidmanagement/list/main/bidcreationmain/");
       } else if (resp.data.status === 400) {
         Swal.fire({
           icon: "error",
-          title: "City",
+          title: "Tender",
           text: resp.data.errors,
           confirmButtonColor: "#5156ed",
         });
        
       }
+      else {
+        Swal.fire({
+          icon: "error",
+          title: "Tender",
+          text: "Provided Credentials are Incorrect",
+          confirmButtonColor: "#5156ed",
+        }).then (()=>{
+          localStorage.clear();
+          navigate("/");
+        });
+        
+  
+      }
       setDataSending(false);
       setFormIsValid(false);
     });
   };
-
+  
   // const putData = (data, id) => {
   //   axios.put(`${baseUrl}/api/city/${id}`, data).then((res) => {
   //     if (res.data.status === 200) {

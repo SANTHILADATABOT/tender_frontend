@@ -45,7 +45,7 @@ const CommunicationFiles = () => {
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { commnunicationfile: filepath } = useImageStoragePath();
   const [dataSaved, setDataSaved] = useState(false);
-
+  const [pdfFile, setPdfFile]=useState("");
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -210,7 +210,14 @@ const CommunicationFiles = () => {
           ))
           
           
-          var imgUrl =filepath+response.data.CommunicationFiles['0'].comfile;
+          var imgUrl =filepath+response.data.CommunicationFiles['0'].comfile; 
+          let splited =imgUrl.split("/");
+          let splitedExt =splited[splited.length-1].split(".");
+          if(splitedExt==="pdf")
+          {
+            setPdfFile(imgUrl);
+          }
+
           showpreviewOnLoad(imgUrl,response.data.CommunicationFiles['0'].id);
           
           if(response.data.CommunicationFiles['0'].id)
@@ -224,7 +231,9 @@ const CommunicationFiles = () => {
   }, [id]);
 
   const showpreviewOnLoad =(filename, comid)=>
-  { setFile("");
+  {
+    setFile("");
+    console.log('filename :',filename);
     let data={fileName: filename, tokenid: localStorage.getItem("token")};
     axios({
       url: `${baseUrl}/api/download/files`,
@@ -233,7 +242,13 @@ const CommunicationFiles = () => {
       responseType: 'blob', // important
   }).then((response) => {
       if (response.status === 200) {
+        
+        if(response.data.type === "application/pdf")
+        {
+          setPdfFile(filename);
+        }
           setFile(response.data)
+          
       } else {
           alert("Unable to Process Now!")
       }
@@ -254,6 +269,9 @@ const CommunicationFiles = () => {
   ) {
     formIsValid = true;
   }
+
+
+  
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -287,12 +305,64 @@ const CommunicationFiles = () => {
 
     if (id && UploadDocId === null) {
       postData(formdata);
-    
     }
-  };
+  }
+
+  const updateHandler=(e) =>{
+    e.preventDefault();
+
+    setDataSending(true);
+
+    if (!formIsValid) {
+      setDataSending(false);
+      return;
+    }
+    const formdata = new FormData();
+
+    let data = {
+      date: dateValue,
+      refrenceno: refrence_noValue,
+      from: fromValue,
+      to: toValue,
+      subject: subjectValue,
+      medium: mediumValue.value,
+      medrefrenceno: med_refrence_noValue,
+      tokenid: localStorage.getItem("token"),
+      bidid: id,
+      file: file,
+      _method: "PUT",
+    };
+    
+    for (var key in data) {
+      formdata.append(key, data[key]);
+    }
+   axios
+      .post(`${baseUrl}/api/workorder/creation/communicationfiles/${id}`, data)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          setcomid(resp.data.id);
+          toastSuccess(resp.data.message);
+          // resetform();
+          setDataSaved(true);
+          // navigate("/tender/bidmanagement/list/main/workorder/" + id);
+        } else if (resp.data.status === 400) {
+          toastError(resp.data.message);
+        }
+        setDataSending(false);
+      })
+      .catch((err) => {
+        // console.log(err.message)
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+        setDataSending(false);
+      });
+  }
   return (
     <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>
-      <form onSubmit={submitHandler}>
+      <form >
         <div className="row align-items-center ">
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
@@ -516,7 +586,7 @@ const CommunicationFiles = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <UploadFiles file={file} />
+                <UploadFiles file={file} pdfFile={pdfFile!=="" ? pdfFile : undefined} />
               </div>
             </div>
           </div>
@@ -527,12 +597,14 @@ const CommunicationFiles = () => {
               <button
                 className="btn btn-primary"
                 disabled={(!formIsValid || dataSending)}
+                onClick={updateHandler}
               >
                 {dataSending ? "Updating..." : "Update"}
               </button>
             ) : (
               <button
                 className="btn btn-primary"
+                onClick={submitHandler}
                 disabled={(!formIsValid || dataSending )}
               >
                 {dataSending ? "Submitting..." : "Submit"}

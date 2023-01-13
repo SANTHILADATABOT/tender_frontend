@@ -187,7 +187,7 @@ const UploadDoc = () => {
     setFetchLoading(true)
     setisEditbtn(true)
     setUploadDocId(item.id)
-    
+
     axios({
       url: `${baseUrl}/api/download/BidDocs/${item.id}`,
       method: 'GET',

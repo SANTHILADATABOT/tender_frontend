@@ -1,19 +1,23 @@
 import { Fragment, useEffect, useState } from "react";
 
 const UploadFiles = (props) => {
-  const [preview, setPreview] = useState(undefined);
+  const [preview, setPreview] = useState();
+console.log("props:",props);
 
   useEffect(() => {
-    if (!props.file || props.file.type.split("/")[0] !== "image") {
-      setPreview(undefined);
-      return;
-    }
+    if (!props.file && (props.pdfFile !== "" || props.pdfFile !== undefined)) {
+      // setPreview(undefined);
+      setPreview(props.pdfFile);
 
+      // return;
+    }
+else{
     const objectUrl = URL.createObjectURL(props.file);
     setPreview(objectUrl);
 
     // free memory when ever this component is unmounted
     return () => URL.revokeObjectURL(objectUrl);
+}
   }, [props.file]);
 
   return (
@@ -33,18 +37,29 @@ const UploadFiles = (props) => {
                 </div>
               </div>
               <div className="col-md-2 d-flex align-items-center justify-content-center">
-                {preview && (
+                {preview &&  (
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={preview}
+                    src={props.pdfFile==="" ? preview : "asset/icons/pdf_logo.png"}
                     alt="No Image"
                     width="75px"
                     height="75px"
                     onClick={() => window.open(preview, "_blank")}
                     title="Click for Preview"
-                  />
-                )}
+                  />)
+              //   :
+              //   <img
+              //   className="rounded-circle pointer"
+              //   id="previewImg"
+              //   src="asset/icons/pdf_logo"
+              //   alt="No Image"
+              //   width="75px"
+              //   height="75px"
+              //   onClick={() => window.open(preview, "_blank")}
+              //   title="Click for Preview"
+              // />)
+              }
                 {/* <i className="fas fa-clipboard-list fa-2x " /> */}
               </div>
             </div>
