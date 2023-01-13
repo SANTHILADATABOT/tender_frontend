@@ -338,6 +338,7 @@ const BidCreation = () => {
   const unithandler = (e) => {
     setunitValue(e.target.value);
   };
+  
   const EMDhandler = (e) => {
     setEMDValue(e.target.value);
   };
@@ -856,7 +857,7 @@ const BidCreation = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center">
                 <div className="col-lg-4 text-dark font-weight-bold">
-                  <label htmlFor="unit">Customer Category:</label>
+                  <label htmlFor="unit">Unit :</label>
                 </div>
                 <div className="col-lg-8">
                   <div className="form-check form-check-inline mr-5">
