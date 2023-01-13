@@ -202,7 +202,6 @@ const TenderParticipation = () => {
                   {!isdatasending && "Edit"}
                 </button>
               )}
-            
             </div>
           </div>
         </form>

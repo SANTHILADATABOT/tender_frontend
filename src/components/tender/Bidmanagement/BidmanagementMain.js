@@ -6,6 +6,8 @@ import {  Outlet } from "react-router-dom";
 const BidmanagementMain = () => {
 
     const[bidManageMainId, setBidManagementMainId] = useState(0)
+
+    
     const toastSuccess = (text) => {
         toast.success( text , {
           position: toast.POSITION.TOP_CENTER

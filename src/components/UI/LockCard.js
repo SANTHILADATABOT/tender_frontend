@@ -4,7 +4,7 @@ const LockCard = (props) => {
 return (
     <div className={styles.divPreloader}>
         {props.locked && <div className={styles.loading}>
-          <img id="loading_image" className={styles.loading_image} src="/assets/img/lock.png" alt="Locked" width = "10%"/>
+          <img id="loading_image" className={`${styles.loading_image} ${styles.fitimage}`} src="/assets/img/lock.png" alt="Locked" />
         </div>}
         {props.children}
     </div>
