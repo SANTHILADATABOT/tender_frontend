@@ -11,7 +11,6 @@ import {
   isNotEmpty,
   isNotNull,
 } from "../../../CommonFunctions/CommonFunctions";
-import CommunicationFilesList from "./CommunicationFilesList";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
@@ -613,7 +612,7 @@ const CommunicationFiles = () => {
           </div>
         </div>
       </form>
-      <CommunicationFilesList />
+      
     </CollapseCard>
   );
 };
