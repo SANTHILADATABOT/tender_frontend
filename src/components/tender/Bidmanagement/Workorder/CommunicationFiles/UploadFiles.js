@@ -3,7 +3,7 @@ import { Tooltip } from 'react-tooltip'
 
 const UploadFiles = (props) => {
   const [preview, setPreview] = useState();
-console.log("props:",props);
+
 
   useEffect(() => {
     if (!props.file && (props.pdfFile !== "" || props.pdfFile !== undefined)) {

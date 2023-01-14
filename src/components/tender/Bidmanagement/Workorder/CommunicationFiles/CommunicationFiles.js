@@ -232,7 +232,7 @@ const CommunicationFiles = () => {
   const showpreviewOnLoad =(filename, comid)=>
   {
     setFile("");
-    console.log('filename :',filename);
+    // console.log('filename :',filename);
     let data={fileName: filename, tokenid: localStorage.getItem("token")};
     axios({
       url: `${baseUrl}/api/download/files`,
@@ -317,7 +317,7 @@ const CommunicationFiles = () => {
       return;
     }
     const formdata = new FormData();
-
+    console.log("File : ",file);
     let data = {
       date: dateValue,
       refrenceno: refrence_noValue,
@@ -325,18 +325,21 @@ const CommunicationFiles = () => {
       to: toValue,
       subject: subjectValue,
       medium: mediumValue.value,
-      medrefrenceno: med_refrence_noValue,
+      med_refrenceno: med_refrence_noValue,
       tokenid: localStorage.getItem("token"),
       bidid: id,
-      file: file,
       _method: "PUT",
     };
-    
+    if(file!=="")
+    {
+      data.file= file;
+    };
+  
     for (var key in data) {
       formdata.append(key, data[key]);
     }
    axios
-      .post(`${baseUrl}/api/workorder/creation/communicationfiles/${id}`, data)
+      .post(`${baseUrl}/api/workorder/creation/communicationfiles/${id}`, formdata)
       .then((resp) => {
         if (resp.data.status === 200) {
           setcomid(resp.data.id);
