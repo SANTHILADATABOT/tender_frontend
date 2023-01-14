@@ -4,6 +4,7 @@ import "./login.css";
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import AuthContext from '../../storeAuth/auth-context';
 import {useBaseUrl} from "../hooks/useBaseUrl";
+import OnlineStatus from "../OnlineStatus";
 
 const userNameReducer = (state, action) => {
   if (action.type === 'USER_INPUT') {
@@ -33,6 +34,7 @@ const userToken = localStorage.getItem('token');
 function Login() {
 
  const{ server1 : baseUrl } = useBaseUrl();
+ const [isDatasending, setdatasending] = useState(false);
  
   // useDocumentTitle("Login | Zigma tenders");
   const navigate = useNavigate();
@@ -82,6 +84,7 @@ function Login() {
 
   const  handleLogin = async (e) => {
     e.preventDefault();
+    setdatasending(true)
 
     const loginData = {
       user_id: userNameState.value,
@@ -129,16 +132,18 @@ function Login() {
           return
         }else if(data.logStatus === "error"){
           setError(data.msg)
+          setdatasending(false)
         }
       })
       .catch((err) => {
         alert(err.message);
+        setdatasending(false)
       });
 
     // dispatchUserName({ type: 'USER_INPUT_SUBMIT' })
     // dispatchPassword({ type: 'USER_INPUT_SUBMIT' })
 
-
+   
     
   }
 
@@ -146,6 +151,7 @@ function Login() {
 
   return (
     <Fragment>
+    <OnlineStatus/>
     {!userToken && <div className="bg-gradient-primary ">
       <div className="container">
         {/* Outer Row */}
@@ -212,9 +218,14 @@ function Login() {
                         <button
                           className="btn btn-primary btn-user btn-block"
                           onClick={handleLogin}
-                          disabled={!loginFormValid}
+                          disabled={!loginFormValid || isDatasending}
                         >
-                          Login
+                          
+                          {isDatasending && (
+                          <span className="spinner-border spinner-border-sm mr-2"></span>
+                          )}
+                          {isDatasending && "Logging in..."}
+                          {!isDatasending && "Login"}
                         </button>
                         <p className="pl-3 mt-3 text-danger text-center">{error}</p>
                       </form>

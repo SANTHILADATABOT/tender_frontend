@@ -1,10 +1,13 @@
-import { Fragment, useContext } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import Contentwrapper from "./Contentwrapper";
 import Pagewrapper from "./Pagewrapper";
 import Logout from "./Logout";
 import Sidebar from "./Sidebar";
 import AuthContext from "../storeAuth/auth-context";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useBaseUrl } from "./hooks/useBaseUrl";
+import OnlineStatus from "./OnlineStatus";
 
 
 
@@ -12,15 +15,67 @@ import { Navigate } from "react-router-dom";
 
 function Masterlayout() {
   const authCtx = useContext(AuthContext);
+
+  const { server1: baseUrl } = useBaseUrl();
+  const navigate = useNavigate(); 
+
+ 
+
+  const validateToken = () => {
+    if(localStorage.getItem('token')){
+      let data = {
+        tokenid : localStorage.getItem('token')
+      }
+
+      const formdata = new FormData();
+
+      for (var key in data) {
+        formdata.append(key, data[key]);
+      }
   
-  if(!localStorage.getItem('token')){
-    return <Navigate to="/" />
+      axios.post(`${baseUrl}/api/validtetoken`, formdata).then((resp) => {
+        if (resp.status === 200) {
+          if(!resp.data.isValid){
+            authCtx.logout()
+            window.history.replaceState({},"login", "/");
+            navigate('/')
+          }
+        }else{
+          authCtx.logout()
+          window.history.replaceState({},"login", "/");
+          navigate('/')
+        }
+      }).catch((err) => {
+        authCtx.logout()
+        window.history.replaceState({},"login", "/");
+        navigate(0)
+        // navigate('/');
+      });
+
+    }
   }
+  
+  useEffect(() => {
+
+    validateToken()
+    window.addEventListener('storage', validateToken)
+
+    return () => {
+      window.removeEventListener('storage', validateToken)
+    }
+  }, [])
+
+
+    if(!localStorage.getItem('token')){
+      return <Navigate to="/" />
+    }
 
 
    return (
   	<Fragment>
      {/* <!-- Page Wrapper --> */}
+      <OnlineStatus />
+
 	   <div id="wrapper">
   
         <Sidebar/>
