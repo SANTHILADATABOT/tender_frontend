@@ -39,7 +39,6 @@ const CommunicationFiles = () => {
   const [comid, setcomid] = useState(null);
   const [toastSuccess, toastError] = useOutletContext();
   const [mediumoption, setmediumoptions] = useState(initialOptions);
-
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { commnunicationfile: filepath } = useImageStoragePath();
@@ -208,7 +207,6 @@ const CommunicationFiles = () => {
             (x) => x.value === response.data.CommunicationFiles['0'].medium
           ))
           
-          
           var imgUrl =filepath+response.data.CommunicationFiles['0'].comfile; 
           let splited =imgUrl.split("/");
           let splitedExt =splited[splited.length-1].split(".");
@@ -218,7 +216,7 @@ const CommunicationFiles = () => {
           }
 
           showpreviewOnLoad(imgUrl,response.data.CommunicationFiles['0'].id);
-          
+
           if(response.data.CommunicationFiles['0'].id)
           { 
             setDataSaved(true);
@@ -247,14 +245,12 @@ const CommunicationFiles = () => {
           setPdfFile(filename);
         }
           setFile(response.data)
-          
       } else {
           alert("Unable to Process Now!")
       }
   });
   }
   
-
   let formIsValid = false;
   if (
     dateIsValid &&
@@ -268,9 +264,6 @@ const CommunicationFiles = () => {
   ) {
     formIsValid = true;
   }
-
-
-  
 
   const submitHandler = (e) => {
     e.preventDefault();

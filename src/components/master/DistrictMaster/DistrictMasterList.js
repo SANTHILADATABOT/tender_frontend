@@ -3,7 +3,7 @@ import axios from "axios";
 import { useState, useEffect, Fragment } from "react";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
-
+import { Loader } from 'rsuite';
 //For DataTable
 import "jquery/dist/jquery.min.js";
 import $ from "jquery";
@@ -22,6 +22,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { useNavigate } from "react-router-dom";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 window.JSZip = jsZip;
+
+
 
 const DistrictMasterList = () => {
   const [loading, setLoading] = useState(true);
@@ -123,9 +125,11 @@ const DistrictMasterList = () => {
 
   if (loading) {
     return (
-      <h4 className="text-success text-center">
-        Loading District Master List...!!
-      </h4>
+      <Fragment>
+   
+      <Loader size="lg" backdrop
+content="Fetching Data..." />
+</Fragment>
     );
   } else {
     var districtList_HTML = districtList.map((districtData, index) => {
