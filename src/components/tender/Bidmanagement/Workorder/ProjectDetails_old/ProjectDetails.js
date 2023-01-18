@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const ProjetDetails = () => {
+  const ProjetDetails = () => {
   const [dataSending, setDataSending] = useState(false);
   const { id } = useParams();
   const { server1: baseUrl } = useBaseUrl();
@@ -150,42 +150,12 @@ const ProjetDetails = () => {
     resetproducCompletion();
   };
 
-  const setProjectDetailsform = (response) => {
-    let data =  response.data.Projectdetails[0];
-    setproid(data.id);
-    setproPeriodValue(data.properiod);
-    setmobPeriodValue(data.mobPeriod);
-    setmonsoonPeriodValue(data.monsoonperiod);
-    setmonthDurationValue(data.monthduration);
-    setsupplyScapeValue(data.supplyscape);
-    setsupplyDateValue(data.supplydate);
-    seterectionStartValue(data.erectionstart);
-    setcommercialProducValue(data.commercialproduc);
-    settarCompletionValue(data.tarcompletion);
-    setproducCompletionValue(data.produccompletion);
-  };
-
-  const getProjectDetailsCreationData = async () => { 
-    let response = await axios.get(
-      `${baseUrl}/api/ProjectDetails/Creation/${id}`
-    );
-    if (response.status === 200) {
-      setProjectDetailsform(response);
-    }
-  };
-
-  useEffect(() => {
-    if (id) {
-      getProjectDetailsCreationData();
-    }
-  }, []);
-
-
   const postData = (data) => {
     axios
       .post(`${baseUrl}/api/ProjectDetails/Creation`, data)
       .then((resp) => {
         if (resp.data.status === 200) {
+          setproid(resp.data.id);
           toastSuccess(resp.data.message);
           resetform();
           navigate("/tender/bidmanagement/list/main/workorder/" + id);
@@ -203,12 +173,45 @@ const ProjetDetails = () => {
         setDataSending(false);
       });
   };
+ //check id already exist
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${baseUrl}/api/ProjectDetails/Creation/${id}`)
+        .then((response) => {
+          setproid(response.data.MobilizationAdvance[0].id);
+        });
+    }
+  }, [id, baseUrl]);
+
+  
+
+  useEffect(() => {
+    if (proid) {
+      axios
+        .get(`${baseUrl}/api/ProjectDetails/getProList/${proid}`)
+        .then((respon) => {
+          //console.log(respon.data.Projectdetails)
+          setproPeriodValue(respon.data.Projectdetails[0].properiod);
+          setmobPeriodValue(respon.data.Projectdetails[0].mobPeriod);
+          setmonsoonPeriodValue(respon.data.Projectdetails[0].monsoonperiod);
+          setmonthDurationValue(respon.data.Projectdetails[0].monthduration);
+          setsupplyScapeValue(respon.data.Projectdetails[0].supplyscape);
+          setsupplyDateValue(respon.data.Projectdetails[0].supplydate);
+          seterectionStartValue(respon.data.Projectdetails[0].erectionstart);
+          setcommercialProducValue(respon.data.Projectdetails[0].commercialproduc);
+          settarCompletionValue(respon.data.Projectdetails[0].tarcompletion);
+          setproducCompletionValue(respon.data.Projectdetails[0].produccompletion);
+        });
+    }
+  }, [proid, baseUrl]);
 
   const putData = (data) => {
     axios
       .put(`${baseUrl}/api/ProjectDetails/Creation/${proid}`, data)
       .then((res) => {
         if (res.data.status === 200) {
+          
           Swal.fire({
             icon: "success",
             title: "Workorder",
@@ -228,9 +231,12 @@ const ProjetDetails = () => {
       });
   };
 
+
   const submitHandler = (e) => {
     e.preventDefault();
+
     setDataSending(true);
+
     if (!formIsValid) {
       setDataSending(false);
       return;
@@ -248,7 +254,6 @@ const ProjetDetails = () => {
       tarCompletion: tarCompletionvalue,
       producCompletion: producCompletionvalue,
     };
-
     let data = {
       projectDetails,
       tokenid: localStorage.getItem("token"),

@@ -52,66 +52,8 @@ function Sidebar() {
           <span className="ml-1">Dashboard</span>
         </Link>
       </li>
-
-      {/* Divider */}
-      <hr className="sidebar-divider my-0" />
-      {/* Nav Item - Pages Collapse Menu */}
-      <li className="nav-item">
-        <Link
-          className="nav-link collapsed"
-          to="#"
-          data-toggle="collapse"
-          data-target="#collapseTenderMenu"
-          aria-expanded="true"
-          aria-controls="collapseTenderMenu"
-          id="tenderMenu"
-        >
-          {/*<i className="fas fa-fw fa-cog" />*/}
-          <i className="fa fa-gavel"></i>
-          <span className="font-weight-bold ml-1">Tenders</span>
-        </Link>
-        <div
-          id="collapseTenderMenu"
-          className="collapse"
-          aria-labelledby="headingTwo"
-          data-parent="#accordionSidebar"
-        >
-          <div className="bg-white py-2 collapse-inner rounded">
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-                isActive ? "active" : undefined}`}
-              to={`/${pathName}/tendercreation`}
-              onClick={() => hideSidebarElement("tenderMenu")}
-            >
-              Tender Creation
-            </NavLink>
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-                isActive ? "active" : undefined}`}
-              to={`/${pathName}/tendertracker`}
-              onClick={() => hideSidebarElement("tenderMenu")}
-            >
-              Tender Tracker
-            </NavLink>
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-                isActive ? "active" : undefined}`}
-              to={`/${pathName}/legacystatement`}
-              onClick={() => hideSidebarElement("tenderMenu")}
-            >
-              Legacy Statement
-            </NavLink>
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-                isActive ? "active" : undefined}`}
-              to={`/${pathName}/bidmanagement/list`}
-              onClick={() => hideSidebarElement("tenderMenu")}
-            >
-              Bid's Management
-            </NavLink>
-          </div>
-        </div>
-      </li>
+{/* $$$$ */}
+     
 
       {/* Divider */}
       <hr className="sidebar-divider my-0" />
@@ -236,6 +178,66 @@ function Sidebar() {
               onClick={() => hideSidebarElement("MasterMenu")}
             >
               Tender Type Master
+            </NavLink>
+          </div>
+        </div>
+      </li>
+
+       {/* Divider */}
+       <hr className="sidebar-divider my-0" />
+      {/* Nav Item - Pages Collapse Menu */}
+      <li className="nav-item">
+        <Link
+          className="nav-link collapsed"
+          to="#"
+          data-toggle="collapse"
+          data-target="#collapseTenderMenu"
+          aria-expanded="true"
+          aria-controls="collapseTenderMenu"
+          id="tenderMenu"
+        >
+          {/*<i className="fas fa-fw fa-cog" />*/}
+          <i className="fa fa-gavel"></i>
+          <span className="font-weight-bold ml-1">Tenders</span>
+        </Link>
+        <div
+          id="collapseTenderMenu"
+          className="collapse"
+          aria-labelledby="headingTwo"
+          data-parent="#accordionSidebar"
+        >
+          <div className="bg-white py-2 collapse-inner rounded">
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
+              to={`/${pathName}/tendercreation`}
+              onClick={() => hideSidebarElement("tenderMenu")}
+            >
+              Tender Creation
+            </NavLink>
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
+              to={`/${pathName}/tendertracker`}
+              onClick={() => hideSidebarElement("tenderMenu")}
+            >
+              Tender Tracker
+            </NavLink>
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
+              to={`/${pathName}/legacystatement`}
+              onClick={() => hideSidebarElement("tenderMenu")}
+            >
+              Legacy Statement
+            </NavLink>
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
+              to={`/${pathName}/bidmanagement/list`}
+              onClick={() => hideSidebarElement("tenderMenu")}
+            >
+              Bid's Management
             </NavLink>
           </div>
         </div>

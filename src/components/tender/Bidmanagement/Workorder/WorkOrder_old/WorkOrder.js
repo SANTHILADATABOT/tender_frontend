@@ -31,15 +31,22 @@ const WorkOrder = () => {
   const [toastSuccess, toastError] = useOutletContext();
   const [progress, setProgressCompleted] = useState(0);
   const navigate = useNavigate();
-  const [FetchLoading, setFetchLoading] = useState(false);
-  const { img: maxImageSize } = useAllowedUploadFileSize();
-  const { MIMEtype: doctype } = useAllowedMIMEDocType();
-
-
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
   };
+
+  const [agfilename , setagfilename] = useState();
+  const [shofilename , setshofilename] = useState();
+  const [wofilename , setwofilename] = useState();
+
+  const [FetchLoading, setFetchLoading] = useState(false);
+
+  const { img: maxImageSize } = useAllowedUploadFileSize();
+  const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  // const { wofile: wofilepath } = useImageStoragePath();
+  // const { agfile: agfilepath } = useImageStoragePath();
+  // const { shofile: shofilepath } = useImageStoragePath();
 
   const onDragLeave = () => {
     wrapperRef.current.classList.remove("dragover");
@@ -271,6 +278,9 @@ const WorkOrder = () => {
     setOrderDateValue(data.orderdate)
     setAgreeDateValue(data.agreedate)
     SiteHandOverDateValue(data.sitehandoverdate)
+    setagfilename(data.agfile)
+    setshofilename(data.shofile)
+    setwofilename(data.wofile)
   };
   
   //work order image data 
@@ -288,7 +298,6 @@ const WorkOrder = () => {
       getWorkOrderimageData();
     }
   }, []);
-  
 
   const setWorkOrderImage = (response) =>{
     //  response.data.name = wofilename;

@@ -112,15 +112,14 @@ const Tendercreation = () => {
   const postData = (data) => {
     axios.post(`${baseUrl}/api/tendercreation`, data).then((resp) => {
       if (resp.data.status === 200) {
-        localStorage.clear();
-        navigate("/");
         Swal.fire({
           icon: "success",
           title: "Tender",
           text:  resp.data.message,
           confirmButtonColor: "#5156ed",
         });
-      navigate("/tender/bidmanagement/list/main/bidcreationmain/");
+        
+      navigate(`/tender/bidmanagement/list`);
       } else if (resp.data.status === 400) {
         Swal.fire({
           icon: "error",
@@ -140,8 +139,6 @@ const Tendercreation = () => {
           localStorage.clear();
           navigate("/");
         });
-        
-  
       }
       setDataSending(false);
       setFormIsValid(false);
@@ -173,12 +170,12 @@ const Tendercreation = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     setDataSending(true); 
-    if(input.customerName!=="" && input.nitDate!=="" && input.organisation!=="" && (input.tenderType.value!=="" | input.tenderType.value!==undefined))
+    if(input.customerName!=="" && input.nitDate!=="" && input.organisation.value!=="" && (input.tenderType.value!=="" | input.tenderType.value!==undefined))
     {
       setDataSending(false);
     
       const data = {
-        organisation: input.organisation,
+        organisation: input.organisation.value,
         customername: input.customerName,
         nitdate: input.nitDate,
         tendertype: input.tenderType.value,
@@ -219,20 +216,20 @@ const Tendercreation = () => {
               <label htmlFor="organisation" className="font-weight-bold"> Organisation </label>
             </div>
             <div className="col-lg-8">
-            <input
-                type="text"
-                className="form-control"
-                id="organisation"
-                placeholder="Enter Organisation Name"
-                name="organisation"
-                value={input.organisation}
-                onChange={inputHandler}                  
-              />
+            <Select
+                  name="organisation"
+                  id="organisation"
+                  isSearchable="true"
+                  isClearable="true"
+                  options={organisationList}
+                  value={input.organisation}
+                  onChange={inputHandlerForSelect}
+                ></Select>
               
               {inputValidation.organisation && (
                 <div className="pt-1">
                   <span className="text-danger font-weight-bold">
-                    Enter Valid Input..!
+                    Select Valid Type..!
                   </span>
                 </div>
               )}
@@ -338,12 +335,7 @@ const Tendercreation = () => {
                   onClick={submitHandler}
                   >
                     {dataSending === true ? "Submitting...." : "Save & Countinue"}
-                {/*//   onClick={!id ? submitHandler : updateHandler}
-                // >
-                //   { !id ?
-                //         loading === true ? "Submitting...." : "Save & Countinue"
-                //         : loading === true ? "Updating...." : "Update"
-                // */}
+               
                 </button>
               </div>
               <div className="col-lg-1 text-left">

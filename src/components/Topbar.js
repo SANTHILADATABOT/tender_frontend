@@ -71,7 +71,7 @@ function Topbar() {
             aria-haspopup="true"
             aria-expanded="false"
           >
-            <i className="fas fa-bell fa-fw" />
+            {/* <i className="fas fa-bell fa-fw" /> */}
             {/* Counter - Alerts */}
             <span className="badge badge-danger badge-counter"></span>
             {/* <span className="badge badge-danger badge-counter">3+</span> */}

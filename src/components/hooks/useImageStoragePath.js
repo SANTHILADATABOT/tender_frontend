@@ -13,6 +13,7 @@ const useImageStoragePath = () => {
         workorderfile : baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/workorderDocument/',//Bit Management Work Order form
         shofile : baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/siteHandOverDocumet/',//Bit Management Work Order form
         commnunicationfile : baseUrl+'/uploads/BidManagement/WorkOrder/CommunicationFiles/',//Bit Management Work Order form
+        letterofacceptence : baseUrl+'/uploads/BidManagement/WorkOrder/LetterOfAcceptence/Document/',//Bit Management Work Order form
         
         // Uncomment when build App
         // qcFile : baseUrl+'/public/uploads/competitor/qc/',

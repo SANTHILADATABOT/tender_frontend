@@ -73,7 +73,7 @@ const errorUpdate = () =>{
       });
 }
 
-console.log("status", status);
+
   return (
     <div className="formContent">
       {!bidManageMainId && (

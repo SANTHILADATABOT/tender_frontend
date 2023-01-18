@@ -15,9 +15,10 @@ const Mobilization = () => {
   const [dataSending, setDataSending] = useState(false);
   const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
-  // const myRef = useRef(null);
+  const myRef = useRef(null);
   const [mobId, setmobId] = useState(0);
-  const [toastSuccess, toastError] = useOutletContext();
+  const [toastSuccess, toastError] =
+    useOutletContext();
 
   const {
     value: mobAdvancevalue,
@@ -100,21 +101,23 @@ const Mobilization = () => {
     resetdateMobAdv();
     resetvalidUpto();
   };
-
   const postData = (data) => {
     axios
       .post(`${baseUrl}/api/mobilization/creation`, data)
       .then((resp) => {
         if (resp.data.status === 200) {
+          setmobId(resp.data.id);
           toastSuccess(resp.data.message);
           resetform();
           navigate("/tender/bidmanagement/list/main/workorder/" + id);
+          // myRef.current.scrollIntoView({ behavior: "smooth" });
         } else if (resp.data.status === 400) {
           toastError(resp.data.message);
         }
         setDataSending(false);
       })
       .catch((err) => {
+        // console.log(err.message)
         Swal.fire({
           icon: "error",
           title: "Oops...",
@@ -124,37 +127,39 @@ const Mobilization = () => {
       });
   };
 
-  var setMobilizationForm = (response) => {
-    let data = response.data.MobilizationAdvance[0];
-    // console.log(data)
-    setmobId(data.id);
-    setmobAdvanceValue(data.mobadvance);
-    setbankNameValue(data.bankname);
-    setbankBranchValue(data.bankbranch);
-    setmobAdvModeValue(data.mobadvmode);
-    setdateMobAdvValue(data.datemobadv);
-    setvalidUptoValue(data.validupto);
-  };
-
-  const getMobilizatonCreationData = async () => {
-    let response = await axios.get(
-      `${baseUrl}/api/mobilization/creation/${id}`
-    );
-    if (response.status === 200) {
-      setMobilizationForm(response);
-    }
-  };
   useEffect(() => {
     if (id) {
-      getMobilizatonCreationData();
+      axios
+        .get(`${baseUrl}/api/mobilization/creation/${id}`)
+        .then((response) => {
+          setmobId(response.data.MobilizationAdvance[0].id);
+        });
     }
-  }, []);
+  }, [id, baseUrl]);
+    
+  
+  useEffect(() => {
+    if (mobId) {
+      axios
+        .get(`${baseUrl}/api/moilization/getMobList/${mobId}`)
+        .then((respon) => {
+          //console.log(respon.data.Mobilization);
+          setmobAdvanceValue(respon.data.Mobilization[0].mobadvance);
+          setbankNameValue(respon.data.Mobilization[0].bankname);
+          setbankBranchValue(respon.data.Mobilization[0].bankbranch);
+          setmobAdvModeValue(respon.data.Mobilization[0].mobadvmode);
+          setdateMobAdvValue(respon.data.Mobilization[0].datemobadv);
+          setvalidUptoValue(respon.data.Mobilization[0].validupto);
+        });
+    }
+  }, [mobId, baseUrl]);
 
   const putData = (data) => {
     axios
       .put(`${baseUrl}/api/mobilization/creation/${mobId}`, data)
       .then((res) => {
         if (res.data.status === 200) {
+          // console.log(res.data.id)
           Swal.fire({
             icon: "success",
             title: "Workorder",
@@ -162,12 +167,12 @@ const Mobilization = () => {
             confirmButtonColor: "#5156ed",
           });
           setDataSending(false);
+          // navigate("/tender/bidmanagement/list/main/workorder/");
         } else if (res.data.status === 400) {
           Swal.fire({
             icon: "error",
             title: "",
-            text:"unable to save",  
-            // text: res.data.message,
+            text: res.data.message,
             confirmButtonColor: "#5156ed",
           });
           setDataSending(false);
@@ -199,7 +204,7 @@ const Mobilization = () => {
       tokenid: localStorage.getItem("token"),
       bidid: id,
     };
-
+  
     if (mobId === 0) {
       postData(data);
     } else if (mobId > 0) {
@@ -378,39 +383,6 @@ const Mobilization = () => {
                 {dataSending ? "Submitting..." : "Submit"}
               </button>
             )}
-
-            {/* {!id && (
-                <button
-                  className={
-                    !formIsValid
-                      ? "btn btn-outline-primary float-right rounded-pill"
-                      : "btn btn-primary float-right rounded-pill"
-                  }
-                  disabled={!formIsValid || dataSending}
-                >
-                  {dataSending && (
-                    <span className="spinner-border spinner-border-sm mr-2"></span>
-                  )}
-                  {dataSending && "Saving..."}
-                  {!dataSending && "Save & Continue"}
-                </button>
-              )}
-              {id && (
-                <button
-                  className={
-                    !formIsValid
-                      ? "btn btn-outline-primary float-right rounded-pill"
-                      : "btn btn-primary float-right rounded-pill"
-                  }
-                  disabled={!formIsValid || dataSending}
-                >
-                  {dataSending && (
-                    <span className="spinner-border spinner-border-sm mr-2"></span>
-                  )}
-                  {dataSending && "Updating..."}
-                  {!dataSending && "Edit & Continue"}
-                </button>
-              )} */}
           </div>
         </div>
       </form>

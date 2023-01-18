@@ -37,13 +37,14 @@ else{
                   </div>
                 </div>
               </div>
+              
               <div className="col-md-2 d-flex align-items-center justify-content-center">
                 {preview &&  (
                   
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={props.pdfFile==="" ? preview : "assets/icons/pdf_logo.png"}
+                    src={(props.pdfFile==="" || props.pdfFile===undefined) ? preview : "assets/icons/pdf_logo.png"}
                     alt="No Image"
                     width="75px"
                     height="75px"

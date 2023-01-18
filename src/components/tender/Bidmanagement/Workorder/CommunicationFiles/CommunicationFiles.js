@@ -58,7 +58,7 @@ const CommunicationFiles = () => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-
+  
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",

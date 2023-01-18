@@ -1048,7 +1048,7 @@ const CompetitorCompanyWorkOrderForm = () => {
             <div className="row align-items-center">
               <div className="col-lg-3 text-dark font-weight-bold pt-1">
                 <label htmlFor="qualityCompleted">
-                  Quality Completed
+                  Quantity Completed
                   <span className="text-danger h6 font-weight-bold">
                     &nbsp;*
                   </span>
@@ -1059,7 +1059,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                   type="text"
                   className="form-control"
                   id="qualityCompleted"
-                  placeholder="Enter Quality Completed"
+                  placeholder="Enter Quantity Completed"
                   name="qualityCompleted"
                   value={competitorWOInput.qualityCompleted}
                   onChange={textInputHandler}
