@@ -1,49 +1,41 @@
-import React, { useState, useRef, useEffect, Fragment } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import CollapseCard from "../../../../UI/CollapseCard";
 import Select from "react-select";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
-import Swal from "sweetalert2";
-import UploadFiles from "../CommunicationFiles/UploadFiles";
 import useInputValidation from "../../../../hooks/useInputValidation";
+import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
+import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 import {
   isNotEmpty,
   isNotNull,
 } from "../../../CommonFunctions/CommonFunctions";
-import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
-import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
-import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
+import axios from "axios";
+import Swal from "sweetalert2";
+import LetterAcceptanceDoc from "./LetterAcceptanceDocsupload";
 
-const CommunicationFiles = () => {
-  const initialOptions = {
-    options: [],
-  };
-
-  const options = [
-    { value: "By Postal", label: "By Postal" },
-    { value: "Courier", label: "Courier"},
-    { value: "Parcel Service", label: "Parcel Service" },
-    { value: "In hand Delivery", label: "In hand Delivery" },
-  ];
-
+const LetterOfAcceptance = () => {
   const { id } = useParams();
   const [dataSending, setDataSending] = useState(false);
   const { server1: baseUrl } = useBaseUrl();
-  const wrapperRef = useRef(null);
-  const [dragover, setdragover] = useState(false);
-  const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const myRef = useRef(null);
-  const [UploadDocId, setUploadDocId] = useState(null);
-  const [comid, setcomid] = useState(null);
+  const [dragover, setdragover] = useState(false);
+  const wrapperRef = useRef(null);
+  const [file, setFile] = useState(null);
+  const [lettacpId, setlettacpId] = useState(0);
+  const [progress, setProgressCompleted] = useState(0);
   const [toastSuccess, toastError] = useOutletContext();
-  const [mediumoption, setmediumoptions] = useState(initialOptions);
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
-  const { commnunicationfile: filepath } = useImageStoragePath();
-  const [dataSaved, setDataSaved] = useState(false);
-  const [pdfFile, setPdfFile]=useState("");
+  const [FetchLoading, setFetchLoading] = useState(false);
+
+  const options = [
+    { value: "Hand", label: "Hand" },
+    { value: "Courier", label: "Courier" },
+    { value: "vanilla", label: "Vanilla" },
+  ];
+
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -58,7 +50,6 @@ const CommunicationFiles = () => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-  
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
@@ -83,27 +74,27 @@ const CommunicationFiles = () => {
   };
 
   const {
-    value: dateValue,
-    isValid: dateIsValid,
-    hasError: dateHasError,
-    valueChangeHandler: dateChangeHandler,
-    inputBlurHandler: dateBlurHandler,
-    setInputValue: setdateValue,
-    reset: resetdate,
+    value: Datevalue,
+    isValid: DateIsValid,
+    hasError: DateHasError,
+    valueChangeHandler: DateChangeHandler,
+    inputBlurHandler: DateBlurHandler,
+    setInputValue: setDateValue,
+    reset: resetDate,
   } = useInputValidation(isNotEmpty);
 
   const {
-    value: refrence_noValue,
-    isValid: refrence_noIsValid,
-    hasError: refrence_noHasError,
-    valueChangeHandler: refrence_noChangeHandler,
-    inputBlurHandler: refrence_noBlurHandler,
-    setInputValue: setrefrence_noValue,
-    reset: resetrefrence_no,
+    value: refrenceNovalue,
+    isValid: refrenceNoIsValid,
+    hasError: refrenceNoHasError,
+    valueChangeHandler: refrenceNoChangeHandler,
+    inputBlurHandler: refrenceNoBlurHandler,
+    setInputValue: setrefrenceNoValue,
+    reset: resetrefrenceNo,
   } = useInputValidation(isNotEmpty);
 
   const {
-    value: fromValue,
+    value: fromvalue,
     isValid: fromIsValid,
     hasError: fromHasError,
     valueChangeHandler: fromChangeHandler,
@@ -113,65 +104,63 @@ const CommunicationFiles = () => {
   } = useInputValidation(isNotEmpty);
 
   const {
-    value: toValue,
-    isValid: toIsValid,
-    hasError: toHasError,
-    valueChangeHandler: toChangeHandler,
-    inputBlurHandler: toBlurHandler,
-    setInputValue: settoValue,
-    reset: resetto,
-  } = useInputValidation(isNotEmpty);
-
-  const {
-    value: subjectValue,
-    isValid: subjectIsValid,
-    hasError: subjectHasError,
-    valueChangeHandler: subjectChangeHandler,
-    inputBlurHandler: subjectBlurHandler,
-    setInputValue: setsubjectValue,
-    reset: resetsubject,
-  } = useInputValidation(isNotEmpty);
-
-  const {
-    value: mediumValue,
+    value: mediumvalue,
     isValid: mediumIsValid,
     hasError: mediumHasError,
-    valueChangeHandlerForReactSelect: mediumChangeHandler,
+    valueChangeHandler: mediumChangeHandler,
     inputBlurHandler: mediumBlurHandler,
-    setInputValue: setmedium,
+    setInputValue: setmediumValue,
     reset: resetmedium,
-  } = useInputValidation(isNotNull);
-
-  const {
-    value: med_refrence_noValue,
-    isValid: med_refrence_noIsValid,
-    hasError: med_refrence_noHasError,
-    valueChangeHandler: med_refrence_noChangeHandler,
-    inputBlurHandler: med_refrence_noBlurHandler,
-    setInputValue: setmed_refrence_noValue,
-    reset: resetmed_refrence_no,
   } = useInputValidation(isNotEmpty);
 
-  const resetform = () => {
-    resetrefrence_no();
-    resetdate();
-    resetfrom();
-    resetto();
-    resetsubject();
-    resetmedium();
-    resetmed_refrence_no();
-    setFile(null);
+  const {
+    value: medRefrenceNovalue,
+    isValid: medRefrenceNoIsValid,
+    hasError: medRefrenceNoHasError,
+    valueChangeHandler: medRefrenceNoChangeHandler,
+    inputBlurHandler: medRefrenceNoBlurHandler,
+    setInputValue: setmedRefrenceNoValue,
+    reset: resetmedRefrenceNo,
+  } = useInputValidation(isNotEmpty);
+
+  const {
+    value: mediumSelectvalue,
+    isValid: mediumSelectIsValid,
+    hasError: mediumSelectHasError,
+    valueChangeHandlerForReactSelect: mediumSelectChangeHandler,
+    inputBlurHandler: mediumSelectBlurHandler,
+    setInputValue: mediumSelectValue,
+    reset: resetmediumSelect,
+  } = useInputValidation(isNotNull);
+
+  let formIsValid = false;
+
+  if (
+    DateIsValid &&
+    refrenceNoIsValid &&
+    fromIsValid &&
+    mediumIsValid &&
+    medRefrenceNoIsValid &&
+    mediumSelectIsValid
+  ) {
+    formIsValid = true;
+  }
+
+  var config = {
+    onUploadProgress: function (progressEvent) {
+      var percentCompleted = Math.round(
+        (progressEvent.loaded * 100) / progressEvent.total
+      );
+      setProgressCompleted(percentCompleted);
+    },
   };
 
   const postData = (data) => {
     axios
-      .post(`${baseUrl}/api/workorder/creation/communicationfiles`, data)
+      .post(`${baseUrl}/api/letteracceptance/creation`, data, config)
       .then((resp) => {
         if (resp.data.status === 200) {
-          setcomid(resp.data.id);
           toastSuccess(resp.data.message);
-          // resetform();
-          setDataSaved(true);
           navigate("/tender/bidmanagement/list/main/workorder/" + id);
         } else if (resp.data.status === 400) {
           toastError(resp.data.message);
@@ -179,7 +168,6 @@ const CommunicationFiles = () => {
         setDataSending(false);
       })
       .catch((err) => {
-        // console.log(err.message)
         Swal.fire({
           icon: "error",
           title: "Oops...",
@@ -189,81 +177,90 @@ const CommunicationFiles = () => {
       });
   };
 
+  var setletterofacceptanceForm = (response) => {
+    let data = response.data.letterofaccepttance[0];
+    // console.log(data)
+    if (data !== undefined) {
+      setlettacpId(data.id);
+      setDateValue(data.date);
+      setrefrenceNoValue(data.refrence_no);
+      setfromValue(data.from);
+      setmediumValue(data.medium);
+      setmedRefrenceNoValue(data.med_refrence_no);
+      mediumSelectValue(options.find((x) => x.value === data.medium_select));
+    }
+  };
+
+  //work order image data
+  var getletterofacceptanceData = async () => {
+    let response = await axios.get(
+      `${baseUrl}/api/letteracceptance/creation/${id}`
+    );
+    if (response.status === 200) {
+      setletterofacceptanceForm(response);
+    }
+  };
+
   useEffect(() => {
     if (id) {
-      axios
-        .get(`${baseUrl}/api/workorder/creation/communicationfiles/${id}`)
-        .then((response) => {
-
-          if(response.data.CommunicationFiles.length>0)
-          {
-          setdateValue(response.data.CommunicationFiles['0'].date);
-          setrefrence_noValue(response.data.CommunicationFiles['0'].refrenceno);
-          setfromValue(response.data.CommunicationFiles['0'].from);
-          settoValue(response.data.CommunicationFiles['0'].to);
-          setsubjectValue(response.data.CommunicationFiles['0'].subject);
-          setmed_refrence_noValue(response.data.CommunicationFiles['0'].med_refrenceno);
-          setmedium(options.find(
-            (x) => x.value === response.data.CommunicationFiles['0'].medium
-          ))
-          
-          var imgUrl =filepath+response.data.CommunicationFiles['0'].comfile; 
-          let splited =imgUrl.split("/");
-          let splitedExt =splited[splited.length-1].split(".");
-          if(splitedExt==="pdf")
-          {
-            setPdfFile(imgUrl);
-          }
-
-          showpreviewOnLoad(imgUrl,response.data.CommunicationFiles['0'].id);
-
-          if(response.data.CommunicationFiles['0'].id)
-          { 
-            setDataSaved(true);
-            setDataSending(false);
-          }
-        }
-        });
+      getletterofacceptanceData();
     }
-  }, [id]);
+  }, []);
 
-  const showpreviewOnLoad =(filename, comid)=>
-  {
-    setFile("");
-    // console.log('filename :',filename);
-    let data={fileName: filename, tokenid: localStorage.getItem("token")};
-    axios({
-      url: `${baseUrl}/api/download/files`,
-      data:data,
-      method: 'POST',
-      responseType: 'blob', // important
-  }).then((response) => {
+  const setWorkOrderImage = (response) => {
+    //  response.data.name = wofilename;
+    setFile(response.data);
+  };
+
+  var getWorkOrderImage = async () => {
+    if(lettacpId){
+    await axios({
+      url: `${baseUrl}/api/download/letterofacceptance/workorderimage/${id}`,
+      method: "GET",
+      responseType: "blob", // important
+    }).then((response) => {
       if (response.status === 200) {
-        
-        if(response.data.type === "application/pdf")
-        {
-          setPdfFile(filename);
-        }
-          setFile(response.data)
+        setWorkOrderImage(response);
       } else {
-          alert("Unable to Process Now!")
+        alert("Unable to Process Now!");
       }
-  });
+      setFetchLoading(false);
+    });
   }
-  
-  let formIsValid = false;
-  if (
-    dateIsValid &&
-    refrence_noIsValid &&
-    fromIsValid &&
-    toIsValid &&
-    subjectIsValid &&
-    med_refrence_noIsValid &&
-    mediumIsValid &&
-    file !== null
-  ) {
-    formIsValid = true;
-  }
+  };
+
+  useEffect(() => {
+    if (id) {
+      getWorkOrderImage();
+    }
+  }, [lettacpId]);
+
+  const putData = (data, lettacpId) => {
+    axios
+      .post(
+        `${baseUrl}/api/letteracceptance/creation/update/${lettacpId}`,
+        data,
+        config
+      )
+      .then((ressp) => {
+        if (ressp.data.status === 200) {
+          toastSuccess(ressp.data.message);
+        } else if (ressp.data.status === 400) {
+          toastError(ressp.data.message);
+        } else {
+          toastError("Unable to update");
+        }
+        setDataSending(false);
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+        setDataSending(false);
+      });
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -274,90 +271,40 @@ const CommunicationFiles = () => {
       setDataSending(false);
       return;
     }
-    // console.log("Submitted!");
 
     const formdata = new FormData();
 
     let data = {
-      date: dateValue,
-      refrenceno: refrence_noValue,
-      from: fromValue,
-      to: toValue,
-      subject: subjectValue,
-      medium: mediumValue.value,
-      medrefrenceno: med_refrence_noValue,
+      Date: Datevalue,
+      refrenceNo: refrenceNovalue,
+      from: fromvalue,
+      medium: mediumvalue,
+      medRefrenceNo: medRefrenceNovalue,
+      mediumSelect: mediumSelectvalue.value,
       tokenid: localStorage.getItem("token"),
       bidid: id,
-      file: file,
+      wofile: file,
     };
-    
+
+    if (file instanceof Blob) {
+      data.wofile = new File([file], file.name);
+    }
+
     for (var key in data) {
       formdata.append(key, data[key]);
     }
 
-    if (id && UploadDocId === null) {
+    if (lettacpId === 0) {
+      // console.log(data);
       postData(formdata);
+    } else if (lettacpId > 0) {
+      putData(formdata, lettacpId);
     }
-  }
+  };
 
-  const updateHandler=(e) =>{
-    e.preventDefault();
-
-    setDataSending(true);
-
-    if (!formIsValid) {
-      setDataSending(false);
-      return;
-    }
-    const formdata = new FormData();
-    console.log("File : ",file);
-    let data = {
-      date: dateValue,
-      refrenceno: refrence_noValue,
-      from: fromValue,
-      to: toValue,
-      subject: subjectValue,
-      medium: mediumValue.value,
-      med_refrenceno: med_refrence_noValue,
-      tokenid: localStorage.getItem("token"),
-      bidid: id,
-      _method: "PUT",
-    };
-    if(file!=="")
-    {
-      data.file= file;
-    };
-  
-    for (var key in data) {
-      formdata.append(key, data[key]);
-    }
-   axios
-      .post(`${baseUrl}/api/workorder/creation/communicationfiles/${id}`, formdata)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          setcomid(resp.data.id);
-          toastSuccess(resp.data.message);
-          // resetform();
-          setDataSaved(true);
-          // navigate("/tender/bidmanagement/list/main/workorder/" + id);
-        } else if (resp.data.status === 400) {
-          toastError(resp.data.message);
-        }
-        setDataSending(false);
-      })
-      .catch((err) => {
-        // console.log(err.message)
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
-        });
-        setDataSending(false);
-      });
-  }
   return (
-    <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>
-      <form >
+    <CollapseCard id={"LetterOfAcceptance"} title={"Letter Of Acceptance"}>
+      <form onSubmit={submitHandler}>
         <div className="row align-items-center ">
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
@@ -367,17 +314,17 @@ const CommunicationFiles = () => {
               <div className="col-lg-8">
                 <input
                   type="date"
-                  name="date"
-                  id="date"
+                  name="Date"
+                  id="Date"
                   className="form-control"
-                  value={dateValue}
-                  onChange={dateChangeHandler}
-                  onBlur={dateBlurHandler}
+                  value={Datevalue}
+                  onChange={DateChangeHandler}
+                  onBlur={DateBlurHandler}
                 />
-                {dateHasError && (
+                {DateHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                      Enter Valid Date..!
+                      Date is invalid
                     </span>
                   </div>
                 )}
@@ -392,17 +339,17 @@ const CommunicationFiles = () => {
               <div className="col-lg-8">
                 <input
                   type="text"
-                  name="refrence_no"
-                  id="refrence_no"
+                  name="refrenceNo"
+                  id="refrenceNo"
                   className="form-control"
-                  value={refrence_noValue}
-                  onChange={refrence_noChangeHandler}
-                  onBlur={refrence_noBlurHandler}
+                  value={refrenceNovalue}
+                  onChange={refrenceNoChangeHandler}
+                  onBlur={refrenceNoBlurHandler}
                 />
-                {refrence_noHasError && (
+                {refrenceNoHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                      Enter Valid Refrence No..!
+                      refrenceNo is invalid
                     </span>
                   </div>
                 )}
@@ -420,14 +367,14 @@ const CommunicationFiles = () => {
                   name="from"
                   id="from"
                   className="form-control"
-                  value={fromValue}
+                  value={fromvalue}
                   onChange={fromChangeHandler}
                   onBlur={fromBlurHandler}
                 />
                 {fromHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                      Enter Valid From Value..!
+                      from is invalid
                     </span>
                   </div>
                 )}
@@ -437,119 +384,88 @@ const CommunicationFiles = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="to">To</label>
+                <label htmlFor="to">Medium</label>
+              </div>
+              <div className="col-lg-8 ">
+              <div className="d-flex justify-content-between">
+                  <div className="col-lg-6">
+                  <input
+                    type="text"
+                    name="medium"
+                    id="medium"
+                    className="form-control"
+                    value={mediumvalue}
+                    onChange={mediumChangeHandler}
+                    onBlur={mediumBlurHandler}
+                  />
+                  </div>
+                  <div className="col-lg-6 ml-2">
+                  <Select
+                    name="mediumSelect"
+                    id="mediumSelect"
+                    options={options}
+                    isSearchable="true"
+                    isClearable="true"
+                    value={mediumSelectvalue}
+                    onChange={(selectedOptions) => {
+                      mediumSelectChangeHandler(selectedOptions);
+                      // getcustno(selectedOptions);
+                    }}
+                    onBlur={mediumSelectBlurHandler}
+                  ></Select>
+                  </div>
+                </div>
+                <div className="d-flex justify-content-between">
+                  {mediumHasError && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-normal">
+                        medium is invalid
+                      </span>
+                    </div>
+                  )}
+                  {mediumSelectHasError && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-normal">
+                        mediumSelect is invalid
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="inputgroup col-lg-6 mb-4">
+            <div className="row align-items-center font-weight-bold">
+              <div className="col-lg-4 text-dark">
+                <label>Med.Refrence No</label>
               </div>
               <div className="col-lg-8">
                 <input
                   type="text"
-                  name="to"
-                  id="to"
+                  name="medRefrenceNo"
+                  id="medRefrenceNo"
                   className="form-control"
-                  value={toValue}
-                  onChange={toChangeHandler}
-                  onBlur={toBlurHandler}
+                  value={medRefrenceNovalue}
+                  onChange={medRefrenceNoChangeHandler}
+                  onBlur={medRefrenceNoBlurHandler}
                 />
-                {toHasError && (
+                {medRefrenceNoHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                      Enter Valid To Value..!
+                      medRefrenceNo is invalid
                     </span>
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4 ">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark mt-n5">
-                <label htmlFor="subject">Subject</label>
-              </div>
-              <div className="col-lg-8 ">
-                <textarea
-                  name="subject"
-                  id="subject"
-                  className="form-control"
-                  maxLength="255"
-                  rows="4"
-                  cols="60"
-                  value={subjectValue}
-                  onChange={subjectChangeHandler}
-                  onBlur={subjectBlurHandler}
-                ></textarea>
-                {subjectHasError && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-normal">
-                      Enter Valid Subject..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6">
-            <div className="inputgroup col-lg-12">
-              <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
-                  <label>Medium</label>
-                </div>
-                <div className="col-lg-8 font-weight-normal">
-                  <Select
-                    name="medium"
-                    id="medium"
-                    options={options}
-                    isSearchable="true"
-                    isClearable="true"
-                    value={mediumValue}
-                    onChange={(selectedOptions) => {
-                      mediumChangeHandler(selectedOptions);
-                      // getcustno(selectedOptions);
-                    }}
-                    onBlur={mediumBlurHandler}
-                  ></Select>
-                  {mediumHasError ? (
-                    <div className="pt-1">
-                      <span className="text-danger font-weight-normal">
-                        Enter Valid Medium..!
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="mb-4"></div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="inputgroup col-lg-12 mb-4">
-              <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
-                  <label>Med.Refrence No</label>
-                </div>
-                <div className="col-lg-8">
-                  <input
-                    type="text"
-                    name="med_refrence_no"
-                    id="med_refrence_no"
-                    className="form-control"
-                    value={med_refrence_noValue}
-                    onChange={med_refrence_noChangeHandler}
-                    onBlur={med_refrence_noBlurHandler}
-                  />
-                  {med_refrence_noHasError ? (
-                    <div className="pt-1">
-                      <span className="text-danger font-weight-normal">
-                        Enter Valid Med.Refrence No..!
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="mb-4"></div>
-                  )}
-                </div>
               </div>
             </div>
           </div>
           <div className="inputgroup col-lg-6 mb-4">
+            <div className="row align-items-center font-weight-bold"></div>
+          </div>
+          <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label>Document Upload</label>
+                <label>Work Order Document Upload</label>
               </div>
               <div className="col-lg-8">
                 <div
@@ -576,40 +492,42 @@ const CommunicationFiles = () => {
               </div>
             </div>
           </div>
-
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">Upload File</div>
+              <div className="col-lg-4 text-dark">
+                <label>upload Doc Preview</label>
+              </div>
               <div className="col-lg-8">
-                <UploadFiles file={file} pdfFile={pdfFile!=="" ? pdfFile : undefined} />
+                <LetterAcceptanceDoc file={file} />
               </div>
             </div>
           </div>
         </div>
+
         <div className="row text-center">
           <div className="col-12">
-            {dataSaved ? (
+            {lettacpId ? (
               <button
                 className="btn btn-primary"
-                disabled={(!formIsValid || dataSending)}
-                onClick={updateHandler}
+                disabled={!formIsValid || dataSending}
               >
-                {dataSending ? "Updating..." : "Update"}
+                {dataSending && progress + "% Uploaded"}
+                {!dataSending && "Edit"}
               </button>
             ) : (
               <button
                 className="btn btn-primary"
-                onClick={submitHandler}
-                disabled={(!formIsValid || dataSending )}
+                disabled={!formIsValid || dataSending}
               >
-                {dataSending ? "Submitting..." : "Submit"}
+                {dataSending && progress + "% Uploaded"}
+                {!dataSending && "Submit"}
               </button>
             )}
           </div>
         </div>
       </form>
-      
     </CollapseCard>
   );
 };
-export default CommunicationFiles;
+
+export default LetterOfAcceptance;

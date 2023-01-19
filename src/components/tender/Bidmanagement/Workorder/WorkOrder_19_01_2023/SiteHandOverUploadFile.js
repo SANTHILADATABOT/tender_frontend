@@ -1,22 +1,46 @@
 import { Fragment, useEffect, useState } from "react";
 import { ImageConfig } from "../../Config";
+// import axios from "axios";
+// import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 
-const WorkOrderUploadFile = (props) => {
+const SiteHandOverUploadFile = (props) => {
   const [preview, setPreview] = useState(undefined);
-
+  // const { server1: baseUrl } = useBaseUrl();
+  // const [shofileame, setshofilename] = useState();
 
   useEffect(() => {
-    if (!props.file || (props.file.type.split("/")[0] !== "image" && props.file.type.split("/")[0] !== "application")){
+    if (!props.file || props.file.type.split("/")[0] !== "image") {
       setPreview(undefined);
       return;
     }
-      const objectUrl = URL.createObjectURL(props.file);
-      setPreview(objectUrl);
-  
-      // free memory when ever this component is unmounted
-      return () => URL.revokeObjectURL(objectUrl);
-    
+
+    const objectUrl = URL.createObjectURL(props.file);
+    setPreview(objectUrl);
+
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
   }, [props.file]);
+
+  // const setWorkOrdershoimage = (response) => {
+  //   let data = response.data.doc[0];
+  //   setshofilename(data.shofile);
+  // };
+
+  // //work order image data
+  // const getWorkOrdershoimagemname = async () => {
+  //   let response = await axios.get(
+  //     `${baseUrl}/api/workorder/creation/Workorder/getimagename/${props.id}`
+  //   );
+  //   if (response.status === 200) {
+  //     setWorkOrdershoimage(response);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (props.id) {
+  //     getWorkOrdershoimagemname();
+  //   }
+  // }, []);
 
   return (
     <Fragment>
@@ -28,13 +52,22 @@ const WorkOrderUploadFile = (props) => {
                 <div className="font-weight-bold text-info text-uppercase mb-1">
                   {props.docName}
                 </div>
+                {/* {props.file.name ? (
+                  <p className="text-truncate" title={props.file.name}>
+                    {props.file.name}
+                  </p>
+                ) : (
+                  <p>{shofileame}</p>
+                )} */}
+                <p className="text-truncate" title={props.file.name}>
+                  {props.file.name}
+                </p>
                 <div className="row no-gutters align-items-center ">
                   <div className="col-auto">
                     <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                     
                       <p className="text-truncate" title={props.file.name}>
-                          {props.file.name}
-                        </p>
+                        {props.file.name}
+                      </p>
                       <p>({props.file.size / 1000} KB)</p>
                     </div>
                   </div>
@@ -45,7 +78,7 @@ const WorkOrderUploadFile = (props) => {
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={(props.file==="" || props.file.type.split("/")[0] !== "application") ? preview : ImageConfig["pdf"]}
+                    src={preview}
                     alt="No Image"
                     width="75px"
                     height="75px"
@@ -53,6 +86,7 @@ const WorkOrderUploadFile = (props) => {
                     title="Click for Preview"
                   />
                 )}
+
                 {!preview && (
                   <img
                     src={
@@ -62,7 +96,6 @@ const WorkOrderUploadFile = (props) => {
                     alt=""
                     width="75px"
                     height="75px"
-                    onClick={() => window.open(preview, "_blank")}
                   />
                 )}
                 {/* <i className="fas fa-clipboard-list fa-2x " /> */}
@@ -75,4 +108,4 @@ const WorkOrderUploadFile = (props) => {
   );
 };
 
-export default WorkOrderUploadFile;
+export default SiteHandOverUploadFile;

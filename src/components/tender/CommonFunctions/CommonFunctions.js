@@ -5,7 +5,6 @@ export const isNotEmpty = (value) => {
   if (typeof value === 'number'){
     value = value.toString()
   }
-
   if (value === null || value === undefined ) {
 //  if (value === null) { Already existing code
     return false;

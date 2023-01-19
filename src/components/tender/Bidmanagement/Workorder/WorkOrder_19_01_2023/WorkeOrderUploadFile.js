@@ -6,16 +6,16 @@ const WorkOrderUploadFile = (props) => {
 
 
   useEffect(() => {
-    if (!props.file || (props.file.type.split("/")[0] !== "image" && props.file.type.split("/")[0] !== "application")){
+    if (!props.file || props.file.type.split("/")[0] !== "image") {
       setPreview(undefined);
-      return;
-    }
+
+    }else{
       const objectUrl = URL.createObjectURL(props.file);
       setPreview(objectUrl);
   
       // free memory when ever this component is unmounted
       return () => URL.revokeObjectURL(objectUrl);
-    
+    }
   }, [props.file]);
 
   return (
@@ -45,7 +45,7 @@ const WorkOrderUploadFile = (props) => {
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={(props.file==="" || props.file.type.split("/")[0] !== "application") ? preview : ImageConfig["pdf"]}
+                    src={preview}
                     alt="No Image"
                     width="75px"
                     height="75px"

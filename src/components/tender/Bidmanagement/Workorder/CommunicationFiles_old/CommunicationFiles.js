@@ -13,16 +13,12 @@ import {
 } from "../../../CommonFunctions/CommonFunctions";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
-import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
+import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 
 const CommunicationFiles = () => {
-  const initialOptions = {
-    options: [],
-  };
-
   const options = [
     { value: "By Postal", label: "By Postal" },
-    { value: "Courier", label: "Courier"},
+    { value: "Courier", label: "Courier" },
     { value: "Parcel Service", label: "Parcel Service" },
     { value: "In hand Delivery", label: "In hand Delivery" },
   ];
@@ -38,12 +34,12 @@ const CommunicationFiles = () => {
   const [UploadDocId, setUploadDocId] = useState(null);
   const [comid, setcomid] = useState(null);
   const [toastSuccess, toastError] = useOutletContext();
-  const [mediumoption, setmediumoptions] = useState(initialOptions);
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { commnunicationfile: filepath } = useImageStoragePath();
   const [dataSaved, setDataSaved] = useState(false);
-  const [pdfFile, setPdfFile]=useState("");
+  const [pdfFile, setPdfFile] = useState("");
+
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -58,7 +54,7 @@ const CommunicationFiles = () => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-  
+
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
@@ -194,63 +190,68 @@ const CommunicationFiles = () => {
       axios
         .get(`${baseUrl}/api/workorder/creation/communicationfiles/${id}`)
         .then((response) => {
+          if (response.data.CommunicationFiles.length > 0) {
+            setdateValue(response.data.CommunicationFiles["0"].date);
+            setrefrence_noValue(
+              response.data.CommunicationFiles["0"].refrenceno
+            );
+            setfromValue(response.data.CommunicationFiles["0"].from);
+            settoValue(response.data.CommunicationFiles["0"].to);
+            setsubjectValue(response.data.CommunicationFiles["0"].subject);
+            setmed_refrence_noValue(
+              response.data.CommunicationFiles["0"].med_refrenceno
+            );
+            setmedium(
+              options.find(
+                (x) => x.value === response.data.CommunicationFiles["0"].medium
+              )
+            );
 
-          if(response.data.CommunicationFiles.length>0)
-          {
-          setdateValue(response.data.CommunicationFiles['0'].date);
-          setrefrence_noValue(response.data.CommunicationFiles['0'].refrenceno);
-          setfromValue(response.data.CommunicationFiles['0'].from);
-          settoValue(response.data.CommunicationFiles['0'].to);
-          setsubjectValue(response.data.CommunicationFiles['0'].subject);
-          setmed_refrence_noValue(response.data.CommunicationFiles['0'].med_refrenceno);
-          setmedium(options.find(
-            (x) => x.value === response.data.CommunicationFiles['0'].medium
-          ))
-          
-          var imgUrl =filepath+response.data.CommunicationFiles['0'].comfile; 
-          let splited =imgUrl.split("/");
-          let splitedExt =splited[splited.length-1].split(".");
-          if(splitedExt==="pdf")
-          {
-            setPdfFile(imgUrl);
+            var imgUrl =
+              filepath + response.data.CommunicationFiles["0"].comfile;
+            let splited = imgUrl.split("/");
+            let splitedExt = splited[splited.length - 1].split(".");
+            if (splitedExt === "pdf") {
+              setPdfFile(imgUrl);
+              console.log("imgUrl :", imgUrl);
+              // showpreviewOnLoad(imgUrl,response.data.CommunicationFiles['0'].id);
+              setPdfFile(imgUrl);
+            }
+            // else{
+            //   // setFile(response.)
+            // }
+
+            if (response.data.CommunicationFiles["0"].id) {
+              setDataSaved(true);
+              setDataSending(false);
+            }
           }
-
-          showpreviewOnLoad(imgUrl,response.data.CommunicationFiles['0'].id);
-
-          if(response.data.CommunicationFiles['0'].id)
-          { 
-            setDataSaved(true);
-            setDataSending(false);
-          }
-        }
         });
     }
   }, [id]);
 
-  const showpreviewOnLoad =(filename, comid)=>
-  {
+  const showpreviewOnLoad = (filename, comid) => {
     setFile("");
-    // console.log('filename :',filename);
-    let data={fileName: filename, tokenid: localStorage.getItem("token")};
+    console.log("filename :", filename);
+    let data = { fileName: filename, tokenid: localStorage.getItem("token") };
     axios({
       url: `${baseUrl}/api/download/files`,
-      data:data,
-      method: 'POST',
-      responseType: 'blob', // important
-  }).then((response) => {
+      data: data,
+      method: "POST",
+      responseType: "blob", // important
+    }).then((response) => {
       if (response.status === 200) {
-        
-        if(response.data.type === "application/pdf")
-        {
+        if (response.data.type === "application/pdf") {
           setPdfFile(filename);
-        }
-          setFile(response.data)
+        } 
+          setFile(response.data);
+        
       } else {
-          alert("Unable to Process Now!")
+        alert("Unable to Process Now!");
       }
-  });
-  }
-  
+    });
+  };
+
   let formIsValid = false;
   if (
     dateIsValid &&
@@ -290,7 +291,7 @@ const CommunicationFiles = () => {
       bidid: id,
       file: file,
     };
-    
+
     for (var key in data) {
       formdata.append(key, data[key]);
     }
@@ -298,9 +299,9 @@ const CommunicationFiles = () => {
     if (id && UploadDocId === null) {
       postData(formdata);
     }
-  }
+  };
 
-  const updateHandler=(e) =>{
+  const updateHandler = (e) => {
     e.preventDefault();
 
     setDataSending(true);
@@ -310,7 +311,7 @@ const CommunicationFiles = () => {
       return;
     }
     const formdata = new FormData();
-    console.log("File : ",file);
+
     let data = {
       date: dateValue,
       refrenceno: refrence_noValue,
@@ -323,16 +324,20 @@ const CommunicationFiles = () => {
       bidid: id,
       _method: "PUT",
     };
-    if(file!=="")
-    {
-      data.file= file;
-    };
-  
+
+    if (file !== "") {
+      data.file = file;
+    }
+
     for (var key in data) {
       formdata.append(key, data[key]);
     }
-   axios
-      .post(`${baseUrl}/api/workorder/creation/communicationfiles/${id}`, formdata)
+
+    axios
+      .post(
+        `${baseUrl}/api/workorder/creation/communicationfiles/${id}`,
+        formdata
+      )
       .then((resp) => {
         if (resp.data.status === 200) {
           setcomid(resp.data.id);
@@ -354,10 +359,10 @@ const CommunicationFiles = () => {
         });
         setDataSending(false);
       });
-  }
+  };
   return (
     <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>
-      <form >
+      <form>
         <div className="row align-items-center ">
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
@@ -576,12 +581,14 @@ const CommunicationFiles = () => {
               </div>
             </div>
           </div>
-
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <UploadFiles file={file} pdfFile={pdfFile!=="" ? pdfFile : undefined} />
+                <UploadFiles
+                  file={file}
+                  pdfFile={pdfFile !== "" ? pdfFile : undefined}
+                />
               </div>
             </div>
           </div>
@@ -591,7 +598,7 @@ const CommunicationFiles = () => {
             {dataSaved ? (
               <button
                 className="btn btn-primary"
-                disabled={(!formIsValid || dataSending)}
+                disabled={!formIsValid || dataSending}
                 onClick={updateHandler}
               >
                 {dataSending ? "Updating..." : "Update"}
@@ -600,7 +607,7 @@ const CommunicationFiles = () => {
               <button
                 className="btn btn-primary"
                 onClick={submitHandler}
-                disabled={(!formIsValid || dataSending )}
+                disabled={!formIsValid || dataSending}
               >
                 {dataSending ? "Submitting..." : "Submit"}
               </button>
@@ -608,7 +615,6 @@ const CommunicationFiles = () => {
           </div>
         </div>
       </form>
-      
     </CollapseCard>
   );
 };

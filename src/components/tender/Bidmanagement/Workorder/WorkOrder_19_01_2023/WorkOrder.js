@@ -34,6 +34,8 @@ const WorkOrder = () => {
   const [FetchLoading, setFetchLoading] = useState(false);
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
+
+
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -204,8 +206,7 @@ const WorkOrder = () => {
     reset: resetSiteHandOverDate,
   } = useInputValidation(isNotEmpty);
 
-  //const resetform = () =>
-  //  {
+  //const resetform = () => {
   //   resetorderQuantity();
   //   resetPricePerUnit();
   //   resetLoaDate();
@@ -215,7 +216,7 @@ const WorkOrder = () => {
   //   setFile();
   //   setFile1();
   //   setFile2();
-  //};
+  // };
 
   let formIsValid = false;
 
@@ -262,19 +263,17 @@ const WorkOrder = () => {
   };
 
   var setWorkOrderForm = (response) => {
-    let data = response.data.WorkOrder[0];
-    if (data !== undefined) {
-      setworkid(data.id);
-      setorderQuantityValue(data.orderquantity);
-      setPricePerUnitValue(data.priceperunit);
-      setLoaDateValue(data.loadate);
-      setOrderDateValue(data.orderdate);
-      setAgreeDateValue(data.agreedate);
-      SiteHandOverDateValue(data.sitehandoverdate);
-    }
+    let data = response.data.WorkOrder[0]
+    setworkid(data.id)
+    setorderQuantityValue(data.orderquantity)
+    setPricePerUnitValue(data.priceperunit)
+    setLoaDateValue(data.loadate)
+    setOrderDateValue(data.orderdate)
+    setAgreeDateValue(data.agreedate)
+    SiteHandOverDateValue(data.sitehandoverdate)
   };
-
-  //work order image data
+  
+  //work order image data 
   var getWorkOrderimageData = async () => {
     let response = await axios.get(
       `${baseUrl}/api/workorder/creation/Workorder/${id}`
@@ -282,133 +281,116 @@ const WorkOrder = () => {
     if (response.status === 200) {
       setWorkOrderForm(response);
     }
-  };
+  }; 
 
   useEffect(() => {
     if (id) {
       getWorkOrderimageData();
     }
   }, []);
+  
 
-
-  const setWorkOrderImage = (response) => {
-    //response.data.name = wofilename;
+  const setWorkOrderImage = (response) =>{
+    //  response.data.name = wofilename;
     setFile(response.data);
-  };
+  }
 
-  var getWorkOrderImage = async () => {
-    if(workid) {
-      await axios({
-        url: `${baseUrl}/api/download/workorderimage/${id}`,
-        method: "GET",
-        responseType: "blob", //important
-      }).then((response) => {
-        if (response.status === 200) {
-          setWorkOrderImage(response);
-        } else {
-          alert("Unable to Process Now!");
-        }
-        setFetchLoading(false);
-      }); 
-    }
-  };
-
-  // useEffect(() => {
-  //   if (id) {
-  //     getWorkOrderImage();
-  //   }
-  // }, [workid]);
-
-
-  //agreement image data
-
-  const getWorkOrderImageData = async () => {
-    if(workid) {
-      await axios({
-        url: `${baseUrl}/api/download/agreementimage/${id}`,
-        method: "GET",
-        responseType: "blob", // important
-      }).then((response) => {
-        if (response.status === 200) {
-          setAgreementImage(response);
-        } else {
-          alert("Unable to Process Now!");
-        }
-        setFetchLoading(false);
-      });
-    }
-  };
-
-  // useEffect(() => {
-  //   if (id) {
-  //     getWorkOrderImageData();
-  //   }
-  // }, [workid]);
-
-  const setAgreementImage = (response) => {
-    //response.data.name = agfilename;
-    setFile1(response.data);
-  };
-
-  // sitehandover image
-
-  const setSitehandoverImage = (response) => {
-    //response.data.name = shofilename;
-    setFile2(response.data);
-  };
-
-  const getsitehandoverImageData = async () => {
-    if(workid) {
-      await axios({
-        url: `${baseUrl}/api/download/sitehandoverimage/${id}`,
-        method: "GET",
-        responseType: "blob", // important
-      }).then((response) => {
-        if (response.status === 200) {
-          setSitehandoverImage(response);
-        } else {
-          alert("Unable to Process Now!");
-        }
-        setFetchLoading(false);
-      });
-    }
-  };
+  const getWorkOrderImage = async () => {
+    await axios({
+      url: `${baseUrl}/api/download/workorderimage/${id}`,
+      method: 'GET',
+      responseType: 'blob', // important
+    }).then((response) => {
+      if (response.status === 200) {
+        setWorkOrderImage(response)
+      } else {
+        alert("Unable to Process Now!")
+      }
+      setFetchLoading(false)
+    });
+  }
 
   useEffect(() => {
     if (id) {
-      getsitehandoverImageData();
       getWorkOrderImage();
+    }
+  }, []);
+
+  //agreement image data 
+  const setAgreementImage = (response) =>{
+    //response.data.name = agfilename;
+    setFile1(response.data);
+  }
+
+  const getWorkOrderImageData = async () => {
+    await axios({
+      url: `${baseUrl}/api/download/agreementimage/${id}`,
+      method: 'GET',
+      responseType: 'blob', // important
+    }).then((response) => {
+      if (response.status === 200) {
+        setAgreementImage(response)
+      } else {
+        alert("Unable to Process Now!")
+      }
+      setFetchLoading(false)
+    });
+  }
+
+  useEffect(() => {
+    if (id) {
       getWorkOrderImageData();
     }
-  }, [workid]);
+  }, []);
+// sitehandover image
 
-  const putData = (data, workid) => {
-    axios
-      .post(
-        `${baseUrl}/api/workorder/creation/Workorder/update/${workid}`,
-        data,
-        config
-      )
-      .then((ressp) => {
-        if (ressp.data.status === 200) {
-          toastSuccess(ressp.data.message);
-        } else if (ressp.data.status === 400) {
-          toastError(ressp.data.message);
-        } else {
-          toastError("Unable to update");
-        }
-        setDataSending(false);
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
-        });
-        setDataSending(false);
-      });
-  };
+const setSitehandoverImage = (response) =>{ 
+  //response.data.name = shofilename;
+  setFile2(response.data);
+}
 
+const getsitehandoverImageData = async () => {
+  await axios({
+    url: `${baseUrl}/api/download/sitehandoverimage/${id}`,
+    method: 'GET',
+    responseType: 'blob', // important
+  }).then((response) => {
+    if (response.status === 200) {
+      setSitehandoverImage(response)
+    } else {
+      alert("Unable to Process Now!")
+    }
+    setFetchLoading(false)
+  });
+}
+
+useEffect(() => {
+  if (id) {
+    getsitehandoverImageData();
+  }
+}, []);
+
+
+const putData = (data,workid ) => {
+  axios.post(`${baseUrl}/api/workorder/creation/Workorder/update/${workid}`, data, config).then((ressp) => {
+    if (ressp.data.status === 200){
+      toastSuccess(ressp.data.message)
+    } else if (ressp.data.status === 400) {
+      toastError(ressp.data.message)
+    }
+    else {
+      toastError("Unable to update")
+    }
+    setDataSending(false)
+  }).catch((err) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Something went wrong!',
+    })
+    setDataSending(false)
+  });
+}
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -433,7 +415,7 @@ const WorkOrder = () => {
       agfile: file1,
       shofile: file2,
     };
-
+  
     if (file instanceof Blob) {
       data.wofile = new File([file], file.name);
     }
@@ -449,14 +431,13 @@ const WorkOrder = () => {
     for (var key in data) {
       formdata.append(key, data[key]);
     }
-
-    if (workid === null) {
+  
+    if ( workid === null) {
       postData(formdata);
     } else if (workid !== null) {
-      putData(formdata, workid);
+      putData(formdata,workid);
     }
   };
-
 
   return (
     <CollapseCard id={"WorkOrder"} title={"Work Order"}>
@@ -652,7 +633,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <WorkOrderUploadFile file={file} id={id} workid={workid}/>
+                <WorkOrderUploadFile file={file} id={id}/>
               </div>
             </div>
           </div>
@@ -690,7 +671,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <AgreemaneUploadFile file={file1} id={id} workid={workid}/>
+                <AgreemaneUploadFile file={file1} id={id}/>
               </div>
             </div>
           </div>
@@ -728,7 +709,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <SiteHandOverUploadFile file={file2} id={id} workid={workid}/>
+                <SiteHandOverUploadFile file={file2} id={id}/>
               </div>
             </div>
           </div>
@@ -758,4 +739,5 @@ const WorkOrder = () => {
     </CollapseCard>
   );
 };
+
 export default WorkOrder;

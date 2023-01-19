@@ -3,16 +3,14 @@ import { Tooltip } from 'react-tooltip'
 
 const UploadFiles = (props) => {
   const [preview, setPreview] = useState();
-
-
+console.log("props",props);
   useEffect(() => {
-    if (!props.file && (props.pdfFile !== "" || props.pdfFile !== undefined)) {
+    if (!props.file && ( props.pdfFile !== undefined) && props.pdfFile) {
       // setPreview(undefined);
       setPreview(props.pdfFile);
-
       // return;
     }
-else{
+else if(props.file){
     const objectUrl = URL.createObjectURL(props.file);
     setPreview(objectUrl);
 
@@ -22,8 +20,10 @@ else{
   }, [props.file]);
 
   return (
-    <Fragment>
-      {props.file && (
+    <Fragment> 
+      {/* {(props.file | props.pdfFile)  && (
+         */}
+         {preview && (
         <div className="card border-left-info shadow py-2 w-100 my-4">
           <div className="card-body">
             <div className="row no-gutters align-items-center">
@@ -44,7 +44,7 @@ else{
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={(props.pdfFile==="" || props.pdfFile===undefined) ? preview : "assets/icons/pdf_logo.png"}
+                    src={(props.pdfFile==="" && props.file!=="") ? preview : "assets/icons/pdf_logo.png"}
                     alt="No Image"
                     width="75px"
                     height="75px"

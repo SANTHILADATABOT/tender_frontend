@@ -1,15 +1,17 @@
 import { Fragment, useEffect, useState } from "react";
 import { ImageConfig } from "../../Config";
-import axios from "axios";
-import { useBaseUrl } from "../../../../hooks/useBaseUrl";
+// import axios from "axios";
+// import { useBaseUrl } from "../../../../hooks/useBaseUrl";
+// import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
 
 const WorkOrderUploadFile = (props) => {
   const [preview, setPreview] = useState(undefined);
   // const { server1: baseUrl } = useBaseUrl();
-  // const [agfileame, setagfilename] = useState();
+  // const [agFileName, setagfilename] = useState();
+  // const { workorderfile: agfilename } = useImageStoragePath();
 
   useEffect(() => {
-    if (!props.file || props.file.type.split("/")[0] !== "image") {
+    if (!props.file || (props.file.type.split("/")[0] !== "image" && props.file.type.split("/")[0] !== "application")) {
       setPreview(undefined);
       return;
     }
@@ -26,8 +28,8 @@ const WorkOrderUploadFile = (props) => {
   //   setagfilename(data.agfile);
   // };
 
-  // //work order image data
-  // const getWorkOrderagimagemname = async () => {
+  //work order image data
+  // const getWorkOrderagimagename = async () => {
   //   let response = await axios.get(
   //     `${baseUrl}/api/workorder/creation/Workorder/getimagename/${props.id}`
   //   );
@@ -38,9 +40,9 @@ const WorkOrderUploadFile = (props) => {
 
   // useEffect(() => {
   //   if (props.id) {
-  //     getWorkOrderagimagemname();
+  //     getWorkOrderagimagename();
   //   }
-  // }, []);
+  // }, [props.workid]);
 
   return (
     <Fragment>
@@ -76,7 +78,7 @@ const WorkOrderUploadFile = (props) => {
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={preview}
+                    src={(props.file==="" || props.file.type.split("/")[0] !== "application") ? preview : ImageConfig["pdf"]}
                     alt="No Image"
                     width="75px"
                     height="75px"
@@ -85,7 +87,7 @@ const WorkOrderUploadFile = (props) => {
                   />
                 )}
 
-                {!preview && (
+                {/* {!preview && (
                   <img
                     src={
                       ImageConfig[props.file.type.split("/")[1]] ||
@@ -94,8 +96,9 @@ const WorkOrderUploadFile = (props) => {
                     alt=""
                     width="75px"
                     height="75px"
+                    onClick={() => window.open(agFileName+agfilename, "_blank")}
                   />
-                )}
+                )} */}
                 {/* <i className="fas fa-clipboard-list fa-2x " /> */}
               </div>
             </div>
