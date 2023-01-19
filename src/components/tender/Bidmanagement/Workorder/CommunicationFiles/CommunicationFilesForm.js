@@ -1,7 +1,7 @@
 import { usePageTitle } from "../../../../hooks/usePageTitle";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
-import { useState, useEffect, useRef ,Fragment} from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
@@ -27,14 +27,13 @@ const CommunicationFilesForm = () => {
     commId: "",
     date: "",
     refrence_no: "",
-    from:"",
-    to:"",
+    from: "",
+    to: "",
     subject: "",
-    medium:"",
-    med_refrence_no:"",
+    medium: "",
+    med_refrence_no: "",
     fileName: "",
   };
-  
 
   const [input, setInput] = useState(initialValue);
   const [formIsValid, setFormIsValid] = useState(false);
@@ -52,10 +51,9 @@ const CommunicationFilesForm = () => {
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { commnunicationfile: filePath } = useImageStoragePath();
-    //  const navigate = useNavigate();
-  const [hasError, setHasError]=useState(initialValue);
+  //  const navigate = useNavigate();
+  const [hasError, setHasError] = useState(initialValue);
   useEffect(() => {
-    
     getCompFilesList();
   }, []);
 
@@ -114,28 +112,22 @@ const CommunicationFilesForm = () => {
       });
     }
   }, [file]);
-  
 
   //check Form is Valid or not
   useEffect(() => {
-    if (
-      input.date !== "" &&
-      (file !== "") | (previewForEdit !== "")
-    ) {
+    if (input.date !== "" && (file !== "") | (previewForEdit !== "")) {
       setFormIsValid(true);
     } else {
       setFormIsValid(false);
     }
   }, [input, file, previewForEdit]);
 
-
   const getCompFilesList = () => {
     axios
       .get(`${baseUrl}/api/competitordetails/commFilesList/${id}`)
       .then((resp) => {
-
         let list = [...resp.data.comm];
-        
+        console.log("list", list);
         let listarr = list.map((item, index) => ({
           ...item,
 
@@ -156,7 +148,6 @@ const CommunicationFilesForm = () => {
   };
 
   const getImageUrl = (s) => {
-   
     var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)/;
 
     var result = s.match(pattern);
@@ -172,20 +163,31 @@ const CommunicationFilesForm = () => {
 
   const onEdit = (data) => {
     setFile("");
-    var imgUrl = getImageUrl(data.filepath);
-
+    var imgUrl = getImageUrl(data.comfile);
+    console.log("Data", data);
     setFormIsValid(true);
     setInput({
-      qcId: data.id,
-      compNo: data.compNo,
+      ...input,
+      commId: data.id,
       date: data.date,
-      remark: data.remark,
+      refrence_no: data.refrenceno,
+      from: data.from,
+      to: data.to,
+      subject: data.subject,
+      med_refrence_no: data.med_refrenceno,
+    });
+
+    setInput((prev) => {
+      return {
+        ...prev,
+        medium: options.find((x) => x.value === data.medium),
+      };
     });
   };
 
   const onPreview = (data) => {
     var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
-    var img_url = data.filepath.match(pattern);
+    var img_url = data.comfile.match(pattern);
     window.open(filePath + img_url, "_blank");
   };
 
@@ -261,16 +263,16 @@ const CommunicationFilesForm = () => {
       setHasError({ ...hasError, [action.name]: false });
     }
   };
-// console.log("Input",input);
+  // console.log("Input",input);
 
-const resetForm = ()=>{
-  setLoading(false);
-  setIsBtnClicked(false);
-  setInput(initialValue);
-  getCompFilesList();
-  setFile("");
-  setPreviewObjURL("");
-}
+  const resetForm = () => {
+    setLoading(false);
+    setIsBtnClicked(false);
+    setInput(initialValue);
+    getCompFilesList();
+    setFile("");
+    setPreviewObjURL("");
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -278,35 +280,43 @@ const resetForm = ()=>{
     setIsBtnClicked(true);
 
     let tokenId = localStorage.getItem("token");
-    if(input.date !=="" && id !=="" && 
-      input.refrence_no !=="" && 
-      input.from !=="" &&  input.to !=="" && 
-      input.subject !=="" && input.medium.value !=="" && 
-      input.med_refrence_no !=="" && tokenId !=="" && 
-      file !=="")
-      {
-        const datatosend = {
-          date: input.date,
-          refrenceno: input.refrence_no,
-          from: input.from,
-          to: input.to,
-          subject: input.subject,
-          medium: input.medium.value,
-          medrefrenceno: input.med_refrence_no,
-          tokenid: tokenId,
-          bidid: id,
-          file: file,
-          tokenId: tokenId,
-        };
+    if (
+      input.date !== "" &&
+      id !== "" &&
+      input.refrence_no !== "" &&
+      input.from !== "" &&
+      input.to !== "" &&
+      input.subject !== "" &&
+      input.medium.value !== "" &&
+      input.med_refrence_no !== "" &&
+      tokenId !== "" &&
+      file !== ""
+    ) {
+      const datatosend = {
+        date: input.date,
+        refrenceno: input.refrence_no,
+        from: input.from,
+        to: input.to,
+        subject: input.subject,
+        medium: input.medium.value,
+        medrefrenceno: input.med_refrence_no,
+        tokenid: tokenId,
+        bidid: id,
+        file: file,
+        tokenId: tokenId,
+      };
 
-    const formdata = new FormData();
+      const formdata = new FormData();
 
-    for (var key in datatosend) {
-      formdata.append(key, datatosend[key]);
-    }
-   
+      for (var key in datatosend) {
+        formdata.append(key, datatosend[key]);
+      }
+
       axios
-        .post(`${baseUrl}/api/workorder/creation/communicationfiles/${id}`, formdata)
+        .post(
+          `${baseUrl}/api/workorder/creation/communicationfiles/${id}`,
+          formdata
+        )
         .then((resp) => {
           if (resp.data.status === 200) {
             Swal.fire({
@@ -326,7 +336,7 @@ const resetForm = ()=>{
           } else if (resp.data.status === 404) {
             Swal.fire({
               icon: "error",
-              title: "Competitor Quality Certificate",
+              title: "Communication Files",
               text: resp.data.message,
               confirmButtonColor: "#5156ed",
             }).then(function () {
@@ -338,7 +348,7 @@ const resetForm = ()=>{
     } else {
       Swal.fire({
         icon: "error",
-        title: "Competitor Quality Certificate",
+        title: "Communication Files",
         text: "You are tring to submit empty values",
         confirmButtonColor: "#5156ed",
       }).then(function () {
@@ -355,41 +365,52 @@ const resetForm = ()=>{
     let tokenId = localStorage.getItem("token");
 
     if (
-      id !== null &&
-      // input.compNo !== null &&
-      input.date !== null //&&
-      // input.qcId
+      input.date !== "" &&
+      id !== "" &&
+      input.refrence_no !== "" &&
+      input.from !== "" &&
+      input.to !== "" &&
+      input.subject !== "" &&
+      input.medium.value !== "" &&
+      input.med_refrence_no !== "" &&
+      tokenId !== "" &&
+      file !== ""
     ) {
       //When Image is not changed on update
       if (previewForEdit !== "" && file === "") {
         const datatosend = {
-          // compId: compid,
-          // compNo: input.compNo,
-          // remark: input.remark,
-           date: input.date,
+          date: input.date,
+          refrenceno: input.refrence_no,
+          from: input.from,
+          to: input.to,
+          subject: input.subject,
+          medium: input.medium.value,
+          medrefrenceno: input.med_refrence_no,
+          tokenid: tokenId,
+          bidid: id,
           tokenId: tokenId,
         };
 
         axios
           .patch(
-            `${baseUrl}/api/competitorqcertificate/${input.qcId}`,
+            `${baseUrl}/api/workorder/creation/communicationfiles/${input.id}`,
             datatosend
           )
           .then((resp) => {
             if (resp.data.status === 200) {
               Swal.fire({
                 icon: "success",
-                title: "Competitor Quality Certificate",
+                title: "Communication Files",
                 text: resp.data.message,
                 timer: 2000,
               }).then(function () {
-                setInput({
-                  ...input,
-                  qcId: null,
-                  remark: "",
-                  date: "",
-                  fileName: "",
-                });
+                // setInput({
+                //   ...input,
+                //   qcId: null,
+                //   remark: "",
+                //   date: "",
+                //   fileName: "",
+                // });
                 resetForm();
                 // getCompFilesList();
                 // setIsBtnClicked(false);
@@ -401,7 +422,7 @@ const resetForm = ()=>{
             } else if (resp.data.status === 404) {
               Swal.fire({
                 icon: "error",
-                title: "Competitor Qualiy Certificate",
+                title: "Communication Files",
                 text: resp.data.errors,
                 confirmButtonColor: "#5156ed",
               }).then(function () {
@@ -411,7 +432,7 @@ const resetForm = ()=>{
             } else {
               Swal.fire({
                 icon: "error",
-                title: "Competitor Qualiy Certificate",
+                title: "Communication Files",
                 text: "Something went wrong!",
                 confirmButtonColor: "#5156ed",
               }).then(function () {
@@ -443,7 +464,7 @@ const resetForm = ()=>{
 
         axios
           .post(
-            `${baseUrl}/api/competitorqcertificate/${input.qcId}`,
+            `${baseUrl}/api/workorder/creation/communicationfiles/${input.id}`,
             formdata,
             config
           )
@@ -451,7 +472,7 @@ const resetForm = ()=>{
             if (resp.data.status === 200) {
               Swal.fire({
                 icon: "success",
-                title: "Competitor Quality Certificate",
+                title: "Communication Files",
                 text: resp.data.message,
                 timer: 2000,
               }).then(function () {
@@ -472,7 +493,7 @@ const resetForm = ()=>{
             } else if (resp.data.status === 404) {
               Swal.fire({
                 icon: "error",
-                title: "Competitor Qualiy Certificate",
+                title: "Communication Files",
                 text: resp.data.errors,
                 confirmButtonColor: "#5156ed",
               }).then(function () {
@@ -482,7 +503,7 @@ const resetForm = ()=>{
             } else {
               Swal.fire({
                 icon: "error",
-                title: "Competitor Qualiy Certificate",
+                title: "Communication Files",
                 text: "Something went wrong!",
                 confirmButtonColor: "#5156ed",
               }).then(function () {
@@ -494,7 +515,7 @@ const resetForm = ()=>{
       } else {
         Swal.fire({
           icon: "error",
-          title: "Competitor Qualiy Certificate",
+          title: "Communication Files",
           text: "Upload Documnet!",
           confirmButtonColor: "#5156ed",
         }).then(function () {
@@ -505,7 +526,7 @@ const resetForm = ()=>{
     } else {
       Swal.fire({
         icon: "error",
-        title: "Competitor Qualiy Certificate",
+        title: "Communication Files",
         text: "Something went wrong!",
         confirmButtonColor: "#5156ed",
       }).then(function () {
@@ -522,189 +543,192 @@ const resetForm = ()=>{
 
   return (
     <Fragment>
-    <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>
-    <form>
-        <div className="row align-items-center ">
-          <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="date">Date</label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="date"
-                  name="date"
-                  id="date"
-                  className="form-control"
-                  value={input.date}
-                  onChange={textInputHandler}
-                />
-                {hasError.date && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-normal">
-                      Enter Valid Date..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="refrence_no" className="ml-3">Refrence No</label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  name="refrence_no"
-                  id="refrence_no"
-                  className="form-control"
-                  value={input.refrence_no}
-                  onChange={textInputHandler}
-                 
-                />
-                {hasError.refrence_no && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-normal">
-                      Enter Valid Refrence No..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="from">From</label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  name="from"
-                  id="from"
-                  className="form-control"
-                  value={input.from}
-                  onChange={textInputHandler}
-                />
-                {hasError.from && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-normal">
-                      Enter Valid From Value..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="to" className="ml-3">To</label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  name="to"
-                  id="to"
-                  className="form-control"
-                  value={input.to}
-                  onChange={textInputHandler}
-                  // onBlur={toBlurHandler}
-                />
-                {hasError.to && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-normal">
-                      Enter Valid To Value..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4 ">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark mt-n5">
-                <label htmlFor="subject">Subject</label>
-              </div>
-              <div className="col-lg-8 ">
-                <textarea
-                  name="subject"
-                  id="subject"
-                  className="form-control"
-                  maxLength="255"
-                  rows="4"
-                  cols="60"
-                  value={input.subject}
-                  onChange={textInputHandler}
-                ></textarea>
-                {hasError.subject && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-normal">
-                      Enter Valid Subject..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6">
-            <div className="inputgroup col-lg-12">
+      <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>
+        <form>
+          <div className="row align-items-center ">
+            <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label>Medium</label>
+                  <label htmlFor="date">Date</label>
                 </div>
-                <div className="col-lg-8 font-weight-normal">
-                  <Select
-                    name="medium"
-                    id="medium"
-                    options={options}
-                    isSearchable="true"
-                    isClearable="true"
-                    value={input.medium}
-                    onChange={selectInputHandler}
-                  ></Select>
-                  {hasError.medium ? (
+                <div className="col-lg-8">
+                  <input
+                    type="date"
+                    name="date"
+                    id="date"
+                    className="form-control"
+                    value={input.date}
+                    onChange={textInputHandler}
+                  />
+                  {hasError.date && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
-                        Enter Valid Medium..!
+                        Enter Valid Date..!
                       </span>
                     </div>
-                  ) : (
-                    <div className="mb-4"></div>
                   )}
                 </div>
               </div>
             </div>
-            <div className="inputgroup col-lg-12 mb-4">
+            <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label>Med.Refrence No</label>
+                  <label htmlFor="refrence_no" className="ml-3">
+                    Refrence No
+                  </label>
                 </div>
                 <div className="col-lg-8">
                   <input
                     type="text"
-                    name="med_refrence_no"
-                    id="med_refrence_no"
+                    name="refrence_no"
+                    id="refrence_no"
                     className="form-control"
-                    value={input.med_refrence_no}
+                    value={input.refrence_no}
                     onChange={textInputHandler}
                   />
-                  {hasError.med_refrence_no ? (
+                  {hasError.refrence_no && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
-                        Enter Valid Med.Refrence No..!
+                        Enter Valid Refrence No..!
                       </span>
                     </div>
-                  ) : (
-                    <div className="mb-4"></div>
                   )}
                 </div>
               </div>
             </div>
-          </div>
-          {/* <div className="inputgroup col-lg-6 mb-4">
+            <div className="inputgroup col-lg-6 mb-4">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="from">From</label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    name="from"
+                    id="from"
+                    className="form-control"
+                    value={input.from}
+                    onChange={textInputHandler}
+                  />
+                  {hasError.from && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-normal">
+                        Enter Valid From Value..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="inputgroup col-lg-6 mb-4">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="to" className="ml-3">
+                    To
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    name="to"
+                    id="to"
+                    className="form-control"
+                    value={input.to}
+                    onChange={textInputHandler}
+                    // onBlur={toBlurHandler}
+                  />
+                  {hasError.to && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-normal">
+                        Enter Valid To Value..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="inputgroup col-lg-6 mb-4 ">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark mt-n5">
+                  <label htmlFor="subject">Subject</label>
+                </div>
+                <div className="col-lg-8 ">
+                  <textarea
+                    name="subject"
+                    id="subject"
+                    className="form-control"
+                    maxLength="255"
+                    rows="4"
+                    cols="60"
+                    value={input.subject}
+                    onChange={textInputHandler}
+                  ></textarea>
+                  {hasError.subject && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-normal">
+                        Enter Valid Subject..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="inputgroup col-lg-6">
+              <div className="inputgroup col-lg-12">
+                <div className="row align-items-center font-weight-bold">
+                  <div className="col-lg-4 text-dark">
+                    <label>Medium</label>
+                  </div>
+                  <div className="col-lg-8 font-weight-normal">
+                    <Select
+                      name="medium"
+                      id="medium"
+                      options={options}
+                      isSearchable="true"
+                      isClearable="true"
+                      value={input.medium}
+                      onChange={selectInputHandler}
+                    ></Select>
+                    {hasError.medium ? (
+                      <div className="pt-1">
+                        <span className="text-danger font-weight-normal">
+                          Enter Valid Medium..!
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="mb-4"></div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="inputgroup col-lg-12 mb-4">
+                <div className="row align-items-center font-weight-bold">
+                  <div className="col-lg-4 text-dark">
+                    <label>Med.Refrence No</label>
+                  </div>
+                  <div className="col-lg-8">
+                    <input
+                      type="text"
+                      name="med_refrence_no"
+                      id="med_refrence_no"
+                      className="form-control"
+                      value={input.med_refrence_no}
+                      onChange={textInputHandler}
+                    />
+                    {hasError.med_refrence_no ? (
+                      <div className="pt-1">
+                        <span className="text-danger font-weight-normal">
+                          Enter Valid Med.Refrence No..!
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="mb-4"></div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
                 <label>Document Upload</label>
@@ -735,7 +759,7 @@ const resetForm = ()=>{
             </div>
           </div> */}
 
-          {/* <div className="inputgroup col-lg-6 mb-4">
+            {/* <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
@@ -743,103 +767,105 @@ const resetForm = ()=>{
               </div>
             </div>
           </div> */}
-          <div className="inputgroup col-lg-6 mb-4 ">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold pt-1">
-                <label htmlFor="cerName"> File Upload</label>
-              </div>
-              <div className="col-lg-8">
-                <div
-                  className="dashed border-primary height_of_dropbox boderradius__dropbox d-flex flex-column align-items-center justify-content-center  drop-file-input bg-gray-200"
-                  ref={wrapperRef}
-                  onDragEnter={onDragEnter}
-                  onDragLeave={onDragLeave}
-                  onDrop={onDrop}
-                >
-                  <p className="display-4 mb-0">
-                    <i className="fas fa-cloud-upload-alt text-primary "></i>
-                  </p>
-                  {!dragover && (
-                    <p className="mt-0">Drag & Drop an document or Click</p>
-                  )}
-                  {dragover && <p className="mt-0">Drop the document</p>}
-                  <input
-                    type="file"
-                    value=""
-                    className="h-100 w-100 position-absolute top-50 start-50 pointer "
-                    onChange={onFileDrop}
-                  />
+            <div className="inputgroup col-lg-6 mb-4 ">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold pt-1">
+                  <label htmlFor="cerName"> File Upload</label>
+                </div>
+                <div className="col-lg-8">
+                  <div
+                    className="dashed border-primary height_of_dropbox boderradius__dropbox d-flex flex-column align-items-center justify-content-center  drop-file-input bg-gray-200"
+                    ref={wrapperRef}
+                    onDragEnter={onDragEnter}
+                    onDragLeave={onDragLeave}
+                    onDrop={onDrop}
+                  >
+                    <p className="display-4 mb-0">
+                      <i className="fas fa-cloud-upload-alt text-primary "></i>
+                    </p>
+                    {!dragover && (
+                      <p className="mt-0">Drag & Drop an document or Click</p>
+                    )}
+                    {dragover && <p className="mt-0">Drop the document</p>}
+                    <input
+                      type="file"
+                      value=""
+                      className="h-100 w-100 position-absolute top-50 start-50 pointer "
+                      onChange={onFileDrop}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="inputgroup col-lg-6 mb-4 ">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold pt-1">
-                <label htmlFor="remark" className="ml-3">Preview</label>
-              </div>
-              <div className="col-lg-8">
-                {/* <img src={previewObjURL} /> */}
-                {file && (
-                  <div className="card border-left-info shadow py-2 w-100 my-4">
-                    <div className="card-body">
-                      <div className="row no-gutters align-items-center">
-                        <div className="col-md-9">
-                          <div className="font-weight-bold text-info text-uppercase mb-1">
-                            {input.date}
-                          </div>
+            <div className="inputgroup col-lg-6 mb-4 ">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold pt-1">
+                  <label htmlFor="remark" className="ml-3">
+                    Preview
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  {/* <img src={previewObjURL} /> */}
+                  {file && (
+                    <div className="card border-left-info shadow py-2 w-100 my-4">
+                      <div className="card-body">
+                        <div className="row no-gutters align-items-center">
+                          <div className="col-md-9">
+                            <div className="font-weight-bold text-info text-uppercase mb-1">
+                              {input.date}
+                            </div>
 
-                          <div className="row no-gutters align-items-center ">
-                            <div className="col-auto">
-                              <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                <p className="text-truncate">{file.name}</p>
-                                <p>({file.size / 1000} KB)</p>
+                            <div className="row no-gutters align-items-center ">
+                              <div className="col-auto">
+                                <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
+                                  <p className="text-truncate">{file.name}</p>
+                                  <p>({file.size / 1000} KB)</p>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewObjURL && (
-                            <img
-                              className="rounded-circle pointer"
-                              id="previewImg"
-                              src={previewObjURL}
-                              alt="No Image"
-                              width="75px"
-                              height="75px"
-                              onClick={() =>
-                                window.open(previewObjURL, "_blank")
-                              }
-                              title="Click for Preview"
-                            />
-                          )}
-                          &nbsp;&nbsp;&nbsp;
-                          {previewObjURL !== null && (
-                            <span
-                              className="fa fa-close text-danger h4 closebtn"
-                              onClick={removeImgHandler}
-                            >
-                              &nbsp;
-                            </span>
-                          )}
+                          <div className="col-md-3 d-flex align-items-center justify-content-center">
+                            {previewObjURL && (
+                              <img
+                                className="rounded-circle pointer"
+                                id="previewImg"
+                                src={previewObjURL}
+                                alt="No Image"
+                                width="75px"
+                                height="75px"
+                                onClick={() =>
+                                  window.open(previewObjURL, "_blank")
+                                }
+                                title="Click for Preview"
+                              />
+                            )}
+                            &nbsp;&nbsp;&nbsp;
+                            {previewObjURL !== null && (
+                              <span
+                                className="fa fa-close text-danger h4 closebtn"
+                                onClick={removeImgHandler}
+                              >
+                                &nbsp;
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {/* for edit */}
+                  )}
+                  {/* for edit */}
 
-                {file === "" && previewForEdit !== "" && (
-                  <div className="card border-left-info shadow py-2 w-100 my-4">
-                    <div className="card-body">
-                      <div className="row no-gutters align-items-center">
-                        <div className="col-md-9">
-                          <div className="font-weight-bold text-info text-uppercase mb-1">
-                            {/* {competitorQCInput.cerName} */}
-                          </div>
+                  {file === "" && previewForEdit !== "" && (
+                    <div className="card border-left-info shadow py-2 w-100 my-4">
+                      <div className="card-body">
+                        <div className="row no-gutters align-items-center">
+                          <div className="col-md-9">
+                            <div className="font-weight-bold text-info text-uppercase mb-1">
+                              {/* {competitorQCInput.cerName} */}
+                            </div>
 
-                          {/* <div className="row no-gutters align-items-center ">
+                            {/* <div className="row no-gutters align-items-center ">
                                 <div className="col-auto">
                                     <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
                                         <p className="text-truncate">
@@ -849,77 +875,73 @@ const resetForm = ()=>{
                                     </div>
                                 </div>
                             </div> */}
-                        </div>
-                        <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewForEdit !== "" && (
-                            <img
-                              className="rounded-circle pointer"
-                              id="previewImg"
-                              src={previewForEdit}
-                              alt="No Image"
-                              width="75px"
-                              height="75px"
-                              onClick={() =>
-                                window.open(previewForEdit, "_blank")
-                              }
-                              title="Click for Preview"
-                            />
-                          )}
-                          &nbsp;&nbsp;&nbsp;
-                          {previewForEdit !== "" && (
-                            <span
-                              className="fa fa-close text-danger h4 closebtn"
-                              onClick={removeImgHandler}
-                            >
-                              &nbsp;
-                            </span>
-                          )}
+                          </div>
+                          <div className="col-md-3 d-flex align-items-center justify-content-center">
+                            {previewForEdit !== "" && (
+                              <img
+                                className="rounded-circle pointer"
+                                id="previewImg"
+                                src={previewForEdit}
+                                alt="No Image"
+                                width="75px"
+                                height="75px"
+                                onClick={() =>
+                                  window.open(previewForEdit, "_blank")
+                                }
+                                title="Click for Preview"
+                              />
+                            )}
+                            &nbsp;&nbsp;&nbsp;
+                            {previewForEdit !== "" && (
+                              <span
+                                className="fa fa-close text-danger h4 closebtn"
+                                onClick={removeImgHandler}
+                              >
+                                &nbsp;
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* {hasError.remark && (
+                  {/* {hasError.remark && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
                       Enter Valid Amount..!
                     </span>
                   </div>
                 )} */}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="row text-center">
-          <div className="col-12">
-            
-               <button
-               className="btn btn-primary"
-               disabled={!formIsValid || isBtnClicked === true}
-               onClick={
-                 !input.commId ? submitHandler : updateHandler
-               }
-             >
-               {!input.commId
-                 ? loading === true
-                   ? "Adding...."
-                   : "Add"
-                 : loading === true
-                 ? "Updating...."
-                 : "Update"}
-             </button>
-           
+          <div className="row text-center">
+            <div className="col-12">
+              <button
+                className="btn btn-primary"
+                disabled={!formIsValid || isBtnClicked === true}
+                onClick={!input.commId ? submitHandler : updateHandler}
+              >
+                {!input.commId
+                  ? loading === true
+                    ? "Adding...."
+                    : "Add"
+                  : loading === true
+                  ? "Updating...."
+                  : "Update"}
+              </button>
+            </div>
           </div>
-        </div>
-      </form>
-      <CommunicationFilesList
-    commFilesSubList={commFilesList}
-    onEdit={onEdit}
-    onDelete={onDelete}
-    onPreview={onPreview}
-  />
-    </CollapseCard>
+        </form>
+        <CommunicationFilesList
+          commFilesSubList={commFilesList}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onPreview={onPreview}
+        />
+      </CollapseCard>
     </Fragment>
   );
 };
