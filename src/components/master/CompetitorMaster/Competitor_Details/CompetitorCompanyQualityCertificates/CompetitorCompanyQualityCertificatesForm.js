@@ -37,6 +37,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { qcFile: filePath } = useImageStoragePath();
+  const [isPdfFile, setIsPdfFile ] = useState(false);
   // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
   // const navigate = useNavigate();
 
@@ -60,6 +61,11 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
     if (newFile) {
+      var splited = newFile.name.split(".");
+      if(splited[1]==="pdf")
+      {setIsPdfFile(true);}
+      else{setIsPdfFile(false);}
+
       setFile(newFile);
       setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
       if (previewForEdit) {
@@ -181,12 +187,29 @@ const CompetitorCompanyQualityCertificatesForm = () => {
       cerName: data.cerName,
       remark: data.remark,
     });
+    var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+    var img_url = data.filepath.match(pattern);
+    var splited = img_url[0].split(".");
+    if(splited[1]==="pdf")
+    {
+      setIsPdfFile(true);
+    }
+    else{
+      setIsPdfFile(false);
+    }
   };
 
   const onPreview = (data) => {
     var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     var img_url = data.filepath.match(pattern);
+    if(img_url[0])
+    {
+    var splited = img_url[0].split(".");
+    if(splited[1]==="pdf")
+    {setIsPdfFile(true);}
+    else{setIsPdfFile(false);}
     window.open(filePath + img_url, "_blank");
+    }
   };
 
   const onDelete = (data) => {
@@ -606,7 +629,8 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
-                              src={previewObjURL}
+                              // src={previewObjURL}
+                              src={!isPdfFile ? previewObjURL : "assets/icons/pdf_logo.png"}
                               alt="No Image"
                               width="75px"
                               height="75px"
@@ -657,7 +681,8 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                             <img
                               className="rounded-circle pointer"
                               id="previewImg"
-                              src={previewForEdit}
+                              // src={previewForEdit}
+                              src={!isPdfFile ? previewForEdit :"assets/icons/pdf_logo.png"}
                               alt="No Image"
                               width="75px"
                               height="75px"

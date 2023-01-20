@@ -51,6 +51,8 @@ const CommunicationFilesForm = () => {
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { commnunicationfile: filePath } = useImageStoragePath();
+  const [isPdfFile, setIsPdfFile ] = useState(false);
+  
   //  const navigate = useNavigate();
   const [hasError, setHasError] = useState(initialValue);
   useEffect(() => {
@@ -71,7 +73,14 @@ const CommunicationFilesForm = () => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
+    if(e.target.files[0]){
+    var splited = newFile.name.split(".");
+    if(splited[1]==="pdf")
+    {setIsPdfFile(true);}
+    else{setIsPdfFile(false);}
+    }
     if (newFile) {
+     
       setFile(newFile);
       setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
       if (previewForEdit) {
@@ -127,14 +136,14 @@ const CommunicationFilesForm = () => {
       .get(`${baseUrl}/api/competitordetails/commFilesList/${id}`)
       .then((resp) => {
         let list = [...resp.data.comm];
-        console.log("list", list);
         let listarr = list.map((item, index) => ({
           ...item,
 
           comfile:
             item.filetype === "pdf"
               ? `<embed src="${filePath}` +
-                item.filepath +
+                item.comfile
+                +
                 `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" title="Pdf"/><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="commImg" style="cursor:pointer" title="PDF"></img>`
               : `<img src="${filePath}` +
                 item.comfile +
@@ -152,7 +161,6 @@ const CommunicationFilesForm = () => {
 
     var result = s.match(pattern);
     var img_url = filePath + result; //filePath is a state value, which indicates server storage location
-    // console.log("img Url  ", img_url);
 
     if (!(img_url === null || !img_url === undefined)) {
       setPreviewForEdit(img_url);
@@ -163,8 +171,8 @@ const CommunicationFilesForm = () => {
 
   const onEdit = (data) => {
     setFile("");
+    
     var imgUrl = getImageUrl(data.comfile);
-    console.log("Data", data);
     setFormIsValid(true);
     setInput({
       ...input,
@@ -176,6 +184,17 @@ const CommunicationFilesForm = () => {
       subject: data.subject,
       med_refrence_no: data.med_refrenceno,
     });
+    
+    var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+    var img_url = data.comfile.match(pattern);
+    var splited = img_url[0].split(".");
+    if(splited[1]==="pdf")
+    {
+      setIsPdfFile(true);
+    }
+    else{
+      setIsPdfFile(false);
+    }
 
     setInput((prev) => {
       return {
@@ -186,12 +205,21 @@ const CommunicationFilesForm = () => {
   };
 
   const onPreview = (data) => {
+    
     var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     var img_url = data.comfile.match(pattern);
+    if(img_url[0])
+    {
+    var splited = img_url[0].split(".");
+    if(splited[1]==="pdf")
+    {setIsPdfFile(true);}
+    else{setIsPdfFile(false);}
     window.open(filePath + img_url, "_blank");
+    }
   };
 
   const onDelete = (data) => {
+    console.log("Data", data);
     Swal.fire({
       text: `Are You sure, to delete ?`,
       icon: "warning",
@@ -203,13 +231,13 @@ const CommunicationFilesForm = () => {
     }).then((willDelete) => {
       if (willDelete.isConfirmed) {
         axios
-          .delete(`${baseUrl}/api/competitorqcertificate/${data.id}`)
-          .then((resp) => {
+          .delete(`${baseUrl}/api/workorder/creation/communicationfiles/${data.id}`)
+          .then((resp) => { 
             if (resp.data.status === 200) {
               Swal.fire({
                 //success msg
                 icon: "success",
-                title: "Quality Certificate",
+                title: "Communication Files",
                 text: `removed!`,
                 timer: 2000,
                 showConfirmButton: false,
@@ -263,7 +291,7 @@ const CommunicationFilesForm = () => {
       setHasError({ ...hasError, [action.name]: false });
     }
   };
-  // console.log("Input",input);
+  
 
   const resetForm = () => {
     setLoading(false);
@@ -326,12 +354,7 @@ const CommunicationFilesForm = () => {
               timer: 2000,
             }).then(function () {
               resetForm();
-              // setLoading(false);
-              // setIsBtnClicked(false);
-              // setInput(initialValue);
-              // getCompFilesList();
-              // setFile("");
-              // setPreviewObjURL("");
+             
             });
           } else if (resp.data.status === 404) {
             Swal.fire({
@@ -357,13 +380,13 @@ const CommunicationFilesForm = () => {
       });
     }
   };
-
+  
   const updateHandler = (e) => {
     e.preventDefault();
     setLoading(true);
     setIsBtnClicked(true);
     let tokenId = localStorage.getItem("token");
-
+   
     if (
       input.date !== "" &&
       id !== "" &&
@@ -373,8 +396,7 @@ const CommunicationFilesForm = () => {
       input.subject !== "" &&
       input.medium.value !== "" &&
       input.med_refrence_no !== "" &&
-      tokenId !== "" &&
-      file !== ""
+      tokenId !== ""
     ) {
       //When Image is not changed on update
       if (previewForEdit !== "" && file === "") {
@@ -385,15 +407,14 @@ const CommunicationFilesForm = () => {
           to: input.to,
           subject: input.subject,
           medium: input.medium.value,
-          medrefrenceno: input.med_refrence_no,
+          med_refrenceno: input.med_refrence_no,
           tokenid: tokenId,
           bidid: id,
-          tokenId: tokenId,
         };
 
         axios
           .patch(
-            `${baseUrl}/api/workorder/creation/communicationfiles/${input.id}`,
+            `${baseUrl}/api/workorder/creation/communicationfiles/${input.commId}`,
             datatosend
           )
           .then((resp) => {
@@ -404,19 +425,7 @@ const CommunicationFilesForm = () => {
                 text: resp.data.message,
                 timer: 2000,
               }).then(function () {
-                // setInput({
-                //   ...input,
-                //   qcId: null,
-                //   remark: "",
-                //   date: "",
-                //   fileName: "",
-                // });
                 resetForm();
-                // getCompFilesList();
-                // setIsBtnClicked(false);
-                // setLoading(false);
-                // setFile("");
-                // setPreviewObjURL("");
                 setPreviewForEdit("");
               });
             } else if (resp.data.status === 404) {
@@ -440,31 +449,33 @@ const CommunicationFilesForm = () => {
                 setIsBtnClicked(false);
               });
             }
-            console.log("input", input);
           });
       }
       //When Image is changed/reuploaded on update
       else if (previewForEdit === "" && file !== "") {
         const datatosend = {
-          //qcId:input.qcId,
-          // compId: compid,
-          // compNo: input.compNo,
-          // remark: input.remark,
+
           date: input.date,
+          refrenceno: input.refrence_no,
+          from: input.from,
+          to: input.to,
+          subject: input.subject,
+          medium: input.medium.value,
+          med_refrenceno: input.med_refrence_no,
+          tokenid: tokenId,
+          bidid: id,
           file: file,
-          tokenId: tokenId,
           _method: "PUT",
         };
 
         const formdata = new FormData();
-
         for (var key in datatosend) {
           formdata.append(key, datatosend[key]);
         }
-
+        console.log("Input", input);
         axios
           .post(
-            `${baseUrl}/api/workorder/creation/communicationfiles/${input.id}`,
+            `${baseUrl}/api/workorder/creation/communicationfiles/${input.commId}`,
             formdata,
             config
           )
@@ -476,18 +487,7 @@ const CommunicationFilesForm = () => {
                 text: resp.data.message,
                 timer: 2000,
               }).then(function () {
-                setInput({
-                  ...input,
-                  qcId: null,
-                  remark: "",
-                  date: "",
-                  fileName: "",
-                });
-                getCompFilesList();
-                setIsBtnClicked(false);
-                setLoading(false);
-                setFile("");
-                setPreviewObjURL("");
+                resetForm();
                 setPreviewForEdit("");
               });
             } else if (resp.data.status === 404) {
@@ -540,6 +540,7 @@ const CommunicationFilesForm = () => {
     setPreviewObjURL("");
     setPreviewForEdit("");
   };
+
 
   return (
     <Fragment>
@@ -830,7 +831,7 @@ const CommunicationFilesForm = () => {
                               <img
                                 className="rounded-circle pointer"
                                 id="previewImg"
-                                src={previewObjURL}
+                                src={!isPdfFile ? previewObjURL : "assets/icons/pdf_logo.png"}
                                 alt="No Image"
                                 width="75px"
                                 height="75px"
@@ -881,7 +882,7 @@ const CommunicationFilesForm = () => {
                               <img
                                 className="rounded-circle pointer"
                                 id="previewImg"
-                                src={previewForEdit}
+                                src={!isPdfFile ? previewForEdit :"assets/icons/pdf_logo.png"}
                                 alt="No Image"
                                 width="75px"
                                 height="75px"
