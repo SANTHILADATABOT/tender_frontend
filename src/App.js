@@ -66,9 +66,9 @@ function App() {
             <Route path="bidmanagement">
               <Route path="list" element={<Bidmanagement />} />
               <Route path="list/main" element={<BidmanagementMain />}>
-                <Route path="bidcreationmain" element={<BidCreationMain />} />
+                <Route path="bidcreationmain/:tenderid" element={<BidCreationMain />} />
                 <Route
-                  path="bidcreationmain/:id"
+                  path="bidcreationmain/:tenderid/:id"
                   element={<BidCreationMain />}
                 />
                 <Route path="bidsubmission" element={<BidSubmission />} />

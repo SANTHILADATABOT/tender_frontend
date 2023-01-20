@@ -55,11 +55,11 @@ function Bidmanagement(props) {
   }
 
   const generateListArray = async (response) =>{
-    let list = [...response.data.bidcreationList];
+    let list = [...response.data.tenderCreationList];
     let listarr = list.map((item, index, arr)=> ({
       ...item,
-      NITdate:FormattedDate(item.NITdate),
-      submissiondate:FormattedDate(item.submissiondate),
+      NITdate:FormattedDate(item.nitdate),
+      submissiondate:(item.submissiondate) ? FormattedDate(item.submissiondate) : '',
       status:'<span class="font-weight-bold text-primary">New Tender</span>',
       current_stage:`<span class="font-weight-bold text-warning">Stage</span>`,
       action:`
@@ -142,12 +142,12 @@ function Bidmanagement(props) {
                     </div>
                   </div>
                   <div className="col-lg-5  d-flex align-items-end flex-column">
-                    <Link to="main/bidcreationmain"  /*onClick={createCustomer}*/ className="rounded-pill btn btn-primary btn-icon-split">
+                    {/* <Link to="main/bidcreationmain" className="rounded-pill btn btn-primary btn-icon-split">
                       <span className="icon text-white-50">
                         <i className="fas fa-plus-circle" />
                       </span>
                       <span className="text">New</span>
-                    </Link>
+                    </Link> */}
                   </div>
                 </div>
 
