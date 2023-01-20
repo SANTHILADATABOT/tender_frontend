@@ -862,14 +862,14 @@ const BidCreation = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="quality">Quality of Legacy Waste :</label>
+                  <label htmlFor="quality">Quantity of Legacy Waste :</label>
                 </div>
                 <div className="col-lg-8">
                   <input
                     type="text"
                     className="form-control"
                     id="quality"
-                    placeholder="Enter Quality of Legacy Waste"
+                    placeholder="Enter Quantity of Legacy Waste"
                     name="quality"
                     value={qualityValue}
                     onChange={qualityChangeHandler}
@@ -878,7 +878,7 @@ const BidCreation = () => {
                   {qualityHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
-                        Quality of Legacy Waste is Invalid.
+                        Quantity of Legacy Waste is Invalid.
                       </span>
                     </div>
                   )}
@@ -1200,8 +1200,8 @@ const BidCreation = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center">
                 <div className="col-lg-4 text-dark font-weight-bold">
-                  <label htmlFor="EMD">Customer Category:</label>
-             disabled   </div>
+                  <label htmlFor="EMD">EMD Exemption:</label>
+              </div>
                 <div className="col-lg-8">
                   <div className="form-check form-check-inline mr-5">
                     <label

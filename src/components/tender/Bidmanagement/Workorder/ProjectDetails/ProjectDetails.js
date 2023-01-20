@@ -152,6 +152,8 @@ const ProjetDetails = () => {
 
   const setProjectDetailsform = (response) => {
     let data =  response.data.Projectdetails[0];
+    if(data)
+    {
     setproid(data.id);
     setproPeriodValue(data.properiod);
     setmobPeriodValue(data.mobPeriod);
@@ -163,6 +165,7 @@ const ProjetDetails = () => {
     setcommercialProducValue(data.commercialproduc);
     settarCompletionValue(data.tarcompletion);
     setproducCompletionValue(data.produccompletion);
+    }
   };
 
   const getProjectDetailsCreationData = async () => { 

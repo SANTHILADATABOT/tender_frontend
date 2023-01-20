@@ -126,7 +126,8 @@ const Mobilization = () => {
 
   var setMobilizationForm = (response) => {
     let data = response.data.MobilizationAdvance[0];
-    // console.log(data)
+    if(data)
+    {
     setmobId(data.id);
     setmobAdvanceValue(data.mobadvance);
     setbankNameValue(data.bankname);
@@ -134,6 +135,7 @@ const Mobilization = () => {
     setmobAdvModeValue(data.mobadvmode);
     setdateMobAdvValue(data.datemobadv);
     setvalidUptoValue(data.validupto);
+    }
   };
 
   const getMobilizatonCreationData = async () => {
