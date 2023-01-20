@@ -19,6 +19,19 @@ const initialOptions = {
   isLoading: false,
 };
 
+const modeOptions = [
+  { value: 'Online', label: 'Online' },
+  { value: 'BG/DD', label: 'BG/DD' },
+  { value: 'DD/RTGS', label: 'DD/RTGS' },
+
+];
+
+const projectperiodOptions = [
+  { value: 'Day', label: 'Day' },
+  { value: 'Month', label: 'Month' },
+  { value: 'Year', label: 'Year' },
+]
+
 const BidCreation = () => {
   const [loading, setLoading] = useState(false);
   const [isdatasending, setdatasending] = useState(false);
@@ -181,11 +194,11 @@ const BidCreation = () => {
     value: projectperioddate2Value,
     isValid: projectperioddate2IsValid,
     hasError: projectperioddate2HasError,
-    valueChangeHandler: projectperioddate2ChangeHandler,
+    valueChangeHandlerForReactSelect:  projectperioddate2ChangeHandler,
     inputBlurHandler: projectperioddate2BlurHandler,
     setInputValue: setprojectperioddate2Value,
     reset: resetprojectperioddate2,
-  } = useInputValidation(isNotEmpty);
+  } = useInputValidation(isNotNull);
 
   const {
     value: estprojectvalueValue,
@@ -221,11 +234,11 @@ const BidCreation = () => {
     value: emdmodeValue,
     isValid: emdmodeIsValid,
     hasError: emdmodeHasError,
-    valueChangeHandler: emdmodeChangeHandler,
+    valueChangeHandlerForReactSelect: emdmodeChangeHandler,
     inputBlurHandler: emdmodeBlurHandler,
     setInputValue: setemdmodeValue,
     reset: resetemdmode,
-  } = useInputValidation(isNotEmpty);
+  } = useInputValidation(isNotNull);
 
   const {
     value: emdamtValue,
@@ -301,11 +314,19 @@ const BidCreation = () => {
     setsubmissiondateValue(data.submissiondate)
     setqualityValue(data.quality)
     setprojectperioddate1Value(data.projectperioddate1)
-    setprojectperioddate2Value(data.projectperioddate2)
+    // setprojectperioddate2Value(data.projectperioddate2)
+
+    setprojectperioddate2Value(projectperiodOptions.find(
+      (x) => x.value === data.projectperioddate2
+    ))
     setestprojectvalueValue(data.estprojectvalue)
     settenderfeevalueValue(data.tenderfeevalue)
     setpriceperunitValue(data.priceperunit)
-    setemdmodeValue(data.emdmode)
+    // setemdmodeValue(data.emdmode)
+    setemdmodeValue(modeOptions.find(
+      (x) => x.value === data.emdmode
+    ))
+
     setemdamtValue(data.emdamt)
     setdumpsiterValue(data.dumpsiter)
     setlocationValue(data.location)
@@ -474,11 +495,11 @@ const BidCreation = () => {
       unit: unitValue,
       tenderevalutionsysytem: tenderevalutionsysytemValue,
       projectperioddate1: projectperioddate1Value,
-      projectperioddate2: projectperioddate2Value,
+      projectperioddate2: projectperioddate2Value.value,
       estprojectvalue: estprojectvalueValue,
       tenderfeevalue: tenderfeevalueValue,
       priceperunit: priceperunitValue,
-      emdmode: emdmodeValue,
+      emdmode: emdmodeValue.value,
       emdamt: emdamtValue,
       dumpsiter: dumpsiterValue,
       prebiddate: prebiddateValue,
@@ -866,7 +887,7 @@ const BidCreation = () => {
                 </div>
                 <div className="col-lg-8">
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     id="quality"
                     placeholder="Enter Quantity of Legacy Waste"
@@ -973,24 +994,24 @@ const BidCreation = () => {
               </div>
             </div>
             <div className="inputgroup col-lg-6 mb-4">
-              <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark  font-weight-bold">
                   <label htmlFor="projectperiod">Project Period :</label>
                 </div>
                 <div className="col-lg-8 ">
                   <div className="col-lg-12 d-flex justify-content-between p-0">
                     <input
-                      type="date"
+                      type="number"
                       className="form-control col-md-6"
                       id="projectperioddate1"
-                      placeholder="Enter Date"
+                      placeholder="Enter Days"
                       name="projectperioddate1"
                       value={projectperioddate1Value}
                       onChange={projectperioddate1ChangeHandler}
                       onBlur={projectperioddate1BlurHandler}
                     />
-                    &nbsp;
-                    <input
+                  &nbsp;
+                    {/* <input
                       type="date"
                       className="form-control col-md-6"
                       id="projectperioddate2"
@@ -999,14 +1020,27 @@ const BidCreation = () => {
                       value={projectperioddate2Value}
                       onChange={projectperioddate2ChangeHandler}
                       onBlur={projectperioddate2BlurHandler}
-                    />
+                    /> */}
+                     <Select
+                      name="projectperioddate2"
+                      id="projectperioddate2"
+                      className="col-md-6 p-0"
+                      isSearchable="true"
+                      isClearable="true"
+                      options={projectperiodOptions}
+                      onChange={(selectedOptions) => {
+                        projectperioddate2ChangeHandler(selectedOptions);
+                      }}
+                      onBlur={projectperioddate2BlurHandler}
+                      value={projectperioddate2Value}
+                    ></Select>
                   </div>
 
                   {(projectperioddate1HasError ||
                     projectperioddate2HasError) && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
-                        projectperiod is required.
+                        Project period (both fields) is required .
                       </span>
                     </div>
                   )}
@@ -1094,12 +1128,12 @@ const BidCreation = () => {
               </div>
             </div>
             <div className="inputgroup col-lg-6 mb-4">
-              <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
-                  <label htmlFor="emdmode">EMD Mode :</label>
+              <div className="row align-items-center ">
+                <div className="col-lg-4 text-dark font-weight-bold">
+                  <label htmlFor="emdmode ">EMD Mode :</label>
                 </div>
                 <div className="col-lg-8">
-                  <input
+                  {/* <input
                     type="text"
                     className="form-control"
                     id="emdmode"
@@ -1108,7 +1142,19 @@ const BidCreation = () => {
                     value={emdmodeValue}
                     onChange={emdmodeChangeHandler}
                     onBlur={emdmodeBlurHandler}
-                  />
+                  /> */}
+                   <Select
+                      name="emdmode"
+                      id="emdmode"
+                      isSearchable="true"
+                      isClearable="true"
+                      options={modeOptions}
+                      onChange={(selectedOptions) => {
+                        emdmodeChangeHandler(selectedOptions);
+                      }}
+                      onBlur={emdmodeBlurHandler}
+                      value={emdmodeValue}
+                  ></Select>
                   {emdmodeHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
