@@ -133,7 +133,7 @@ const BidManagementList = (props) => {
                                 <th scope="col">#</th>
                                 <th scope="col">NIT Date</th>
                                 <th scope="col">Customer Name</th>
-                                <th scope="col">Quality of Legacy Waste</th>
+                                <th scope="col">Quantity of Legacy Waste</th>
                                 <th scope="col">Unit</th>
                                 <th scope="col">Submission Date</th>
                                 <th scope="col">Status</th>
