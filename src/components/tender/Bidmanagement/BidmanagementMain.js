@@ -1,11 +1,50 @@
-import { Fragment, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Fragment, useEffect, useState } from "react";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import {  Outlet } from "react-router-dom";
+import axios from "axios";
+import { useBaseUrl } from "../../hooks/useBaseUrl";
 
 const BidmanagementMain = () => {
 
     const[bidManageMainId, setBidManagementMainId] = useState(0)
+    const[tendercreationid, setTenderCreationId] =  useState(null)
+
+    const { id, tenderid } = useParams();
+    const { server1: baseUrl } = useBaseUrl();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      if(id){
+        if(tenderid){
+          setTenderCreationId(tenderid)
+        }
+        
+        axios.get(`${baseUrl}/api/bidcreation/creation/${id}`).then((resp) => {
+          if(resp.data.bidcreationdata){
+            setTenderCreationId(resp.data.bidcreationdata.tendercreation)
+          }else{
+            navigate('/tender/bidmanagement/list')
+          }
+        })
+      }else{
+        if(tenderid){
+          setTenderCreationId(tenderid)
+        }
+      }
+
+
+    }, [id])
+
+    useEffect(() => {
+      if(id){
+        axios.get(`${baseUrl}/api/bidcreation/creation/${id}`).then((resp) => {
+          if(!resp.data.bidcreationdata){
+            navigate('/tender/bidmanagement/list')
+          }
+        })
+      }
+    },[])
 
     
     const toastSuccess = (text) => {
@@ -34,7 +73,7 @@ const BidmanagementMain = () => {
                             className="nav-link"
                             id="bidcreationmain-tab"
                             data-toggle="tab"
-                            to={(bidManageMainId===0) ? "bidcreationmain" : `bidcreationmain/${bidManageMainId}`}
+                            to={(bidManageMainId===0) ? `bidcreationmain/${tendercreationid}` : `bidcreationmain/${tendercreationid}/${bidManageMainId}`}
                             role="tab"
                             aria-controls="bidcreationmain"
                             aria-selected="true"

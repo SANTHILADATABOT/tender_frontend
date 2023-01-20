@@ -30,7 +30,7 @@ const BidCreation = () => {
   const [EMDValue, setEMDValue] = useState("nonexempted");
   const [tenderevalutionsysytemValue, settenderevalutionsysytemValue] = useState("QCBS");
   const [formId, setFormId] = useState(0);
-  const { id } = useParams();
+  const { id, tenderid } = useParams();
 
   const myRef = useRef(null)    
 
@@ -317,8 +317,28 @@ const BidCreation = () => {
   const getBidCreationData = async () => {
     let response = await axios.get(`${baseUrl}/api/bidcreation/creation/${id}`);
     if(response.status === 200){
+      if(response.data.bidcreationdata)
       setDatatoBidCreationForm(response);
+      else
+      navigate('/tender/bidmanagement/list')
     }
+  }
+
+  const getTenderCreationData = () => {
+    axios.get(`${baseUrl}/api/tendercreation/${tenderid}`).then((resp) => {
+      if(resp.data.tender){
+        // navigate('/tender/bidmanagement/list')
+        // console.log(resp.data.tender)
+        let data =resp.data.tender;
+        setNITdateValue(data.nitdate)
+        setcustomernameValue(data.nameOfCustomer)
+        let ulbvalue = {
+          value : data.customername,
+          label : data.nameOfCustomer,
+        }
+        setulb(ulbvalue)
+      }
+    })
   }
 
   useEffect(() => {
@@ -327,6 +347,10 @@ const BidCreation = () => {
 
     if(id){
       getBidCreationData();
+    }
+
+    if(!id && tenderid){
+      getTenderCreationData()
     }
   }, []);
 
@@ -351,10 +375,11 @@ const BidCreation = () => {
     axios.post(`${baseUrl}/api/bidcreation/creation`, data).then((resp) => {
       if (resp.data.status === 200) {
         setBidManagementMainId(resp.data.id)
+        setFormId(resp.data.id)
         toastSuccess(resp.data.message)
         // resetall()
-        window.history.replaceState({},"Bid Creation", "/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
-        navigate("/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
+        window.history.replaceState({},"Bid Creation", `/tender/bidmanagement/list/main/bidcreationmain/${tenderid}/`+resp.data.id);
+        navigate(`/tender/bidmanagement/list/main/bidcreationmain/${tenderid}/`+resp.data.id);
         myRef.current.scrollIntoView({ behavior: 'smooth' })    
        
 
@@ -465,6 +490,7 @@ const BidCreation = () => {
       bidcreationData: bidcreationData,
       tokenid: localStorage.getItem("token"),
       form_id: formId,
+      tenderid: tenderid,
     };
 
   
@@ -562,6 +588,8 @@ const BidCreation = () => {
                     value={customernameValue}
                     onChange={customernameChangeHandler}
                     onBlur={customernameBlurHandler}
+                    disabled={true} 
+                    
                   />
                   {customernameHasError && (
                     <div className="pt-1">
@@ -698,6 +726,7 @@ const BidCreation = () => {
                     onBlur={stateBlurHandler}
                     value={stateValue}
                     isLoading={StateOptions.isLoading}
+                    
                   ></Select>
                   {stateHasError && (
                     <div className="pt-1">
@@ -728,6 +757,7 @@ const BidCreation = () => {
                     onBlur={ulbBlurHandler}
                     value={ulbValue}
                     isLoading={ulbOptions.isLoading}
+                    isDisabled={true} 
                   ></Select>
                   {ulbHasError && (
                     <div className="pt-1">
@@ -791,6 +821,7 @@ const BidCreation = () => {
                     value={NITdateValue}
                     onChange={NITdateChangeHandler}
                     onBlur={NITdateBlurHandler}
+                    disabled={true}
                   />
                   {NITdateHasError && (
                     <div className="pt-1">
@@ -1170,7 +1201,7 @@ const BidCreation = () => {
               <div className="row align-items-center">
                 <div className="col-lg-4 text-dark font-weight-bold">
                   <label htmlFor="EMD">Customer Category:</label>
-                </div>
+             disabled   </div>
                 <div className="col-lg-8">
                   <div className="form-check form-check-inline mr-5">
                     <label
@@ -1245,7 +1276,7 @@ const BidCreation = () => {
               </div>
             </div>
             <div className="col-lg-12">
-              {!id && (
+              {(!id) && (
                 <button
                   className={
                     !formIsValid

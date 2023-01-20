@@ -27,6 +27,11 @@ const initialStateErr = {
   tenderType: null,
 };
 
+const initialOptions = {
+  options: [],
+  isLoading: false,
+};
+
 const Tendercreation = () => {
   usePageTitle("Tender Creation");
   // const { id } = useParams();
@@ -37,6 +42,7 @@ const Tendercreation = () => {
   const [dataSending, setDataSending] = useState(false);
   const [input, setInput] = useState(initialState);
   const [inputValidation, setInputValidation] = useState(initialStateErr);
+  const [ulbOptions, setulbOptions] = useState(initialOptions);
   // const [organisationList, setOrganisationList] = useState();
   // const [customerNameList, setCustomerNameList] = useState();
   const [tenderTypeList, setTenderTypeList] = useState({
@@ -54,6 +60,7 @@ const Tendercreation = () => {
     // getOrganisationList();
     // getCustomerNameList();
     getTenderTypeList();
+    getulbListOptions();
   }, []);
 
   // const getOrganisationList = () => {
@@ -71,6 +78,18 @@ const Tendercreation = () => {
     axios.get(`${baseUrl}/api/tendertype/list`).then((resp) => {
       setTenderTypeList(resp.data.tendertypeList);
     });
+  };
+  const getulbData = async (savedulb) => {
+    let response = await axios.get(`${baseUrl}/api/ulb-list/${savedulb}`);
+    return { options: response.data.ulbList, isLoading: false };
+  };      
+
+  const getulbListOptions = async (savedulb = null) => {
+    setulbOptions((c) => {
+      return { ...c, isLoading: true };
+    });
+    let ulbList = await getulbData(savedulb);
+    setulbOptions(ulbList);
   };
 
   const inputHandler = (e) => {
@@ -170,13 +189,13 @@ const Tendercreation = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     setDataSending(true); 
-    if(input.customerName!=="" && input.nitDate!=="" && input.organisation.value!=="" && (input.tenderType.value!=="" | input.tenderType.value!==undefined))
+    if(input.customerName.value!=="" && input.nitDate!=="" && input.organisation.value!=="" && (input.tenderType.value!=="" | input.tenderType.value!==undefined))
     {
       setDataSending(false);
     
       const data = {
         organisation: input.organisation.value,
-        customername: input.customerName,
+        customername: input.customerName.value,
         nitdate: input.nitDate,
         tendertype: input.tenderType.value,
         tokenId:tokenId
@@ -246,16 +265,15 @@ const Tendercreation = () => {
               </label>
             </div>
             <div className="col-lg-8">
-            <input
-                type="text"
-                className="form-control"
-                id="customerName"
-                placeholder="Enter Customer Name"
+              <Select
                 name="customerName"
+                id="customerName"
+                isSearchable="true"
+                isClearable="true"
+                options={ulbOptions.options}
                 value={input.customerName}
-                onChange={inputHandler}                  
-              />
-              
+                onChange={inputHandlerForSelect}
+              ></Select>
               {inputValidation.customerName && (
                 <div className="pt-1">
                   <span className="text-danger font-weight-bold">

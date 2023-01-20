@@ -42,7 +42,7 @@ const BidManagementList = (props) => {
             columns: [
                 { data: 'sl_no' },
                 { data: 'NITdate' },
-                { data: 'customername' },
+                { data: 'customer_name' },
                 { data: 'quality' },
                 { data: 'unit' },
                 { data: 'submissiondate' },
@@ -60,8 +60,14 @@ const BidManagementList = (props) => {
     
         $('#dataTable tbody').on('click', 'tr .fa-edit', function () {
           let rowdata =table.row($(this).closest('tr')).data();
-       
-          navigate(`${location.pathname}/main/bidcreationmain/${rowdata.id}`)
+          
+          if(rowdata.bidid !== null){
+            navigate(`${location.pathname}/main/bidcreationmain/${rowdata.tenderid}/${rowdata.bidid}`)
+          }
+          
+          if(rowdata.bidid === null){
+            navigate(`${location.pathname}/main/bidcreationmain/${rowdata.tenderid}`)
+          }
           // props.onEdit(rowdata)
         });
     
@@ -85,7 +91,7 @@ const BidManagementList = (props) => {
 
       const deleteList = async (data) => {
         Swal.fire({
-          text: `Are You sure, to delete records of ${data.customername}?`,
+          text: `Are You sure, to delete records of '${data.customer_name}'?`,
           icon: "warning",
           showCancelButton: true,
           confirmButtonText: 'Yes, delete it!',
@@ -94,7 +100,7 @@ const BidManagementList = (props) => {
           cancelButtonColor: '#fc5157'
       }).then(async (willDelete) => {
         if(willDelete.isConfirmed){
-          let response =  await axios.delete(`${baseUrl}/api/bidcreation/creation/${data.id}`);
+          let response =  await axios.delete(`${baseUrl}/api/bidcreation/creation/${data.tenderid}`);
           if(response.data.status === 200){
             props.getlist()
             toast.success( response.data.message , {
