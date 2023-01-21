@@ -44,7 +44,7 @@ const BidCreation = () => {
   const [tenderevalutionsysytemValue, settenderevalutionsysytemValue] = useState("QCBS");
   const [formId, setFormId] = useState(0);
   const { id, tenderid } = useParams();
-
+  const [lastId, setLastId]=useState("");
   const myRef = useRef(null)    
 
   const navigate = useNavigate();
@@ -59,6 +59,8 @@ const BidCreation = () => {
     setInputValue: setbidnoValue,
     reset: resetbidno,
   } = useInputValidation(isNotEmpty);
+
+
 
   const {
     value: customernameValue,
@@ -269,6 +271,45 @@ const BidCreation = () => {
     setInputValue: setlocationValue,
     reset: resetlocation,
   } = useInputValidation(isNotEmpty);
+
+  const setBidNo = (statecode, lastId)=>{
+
+
+  };
+  const getLastCustomerId = () =>{
+    axios.get(`${baseUrl}/api/bidcreation/creation/getlastbidno`).then((resp) => {
+      if(resp.data.lastbidno.id>0)
+      {
+      setLastId(resp.data.lastbidno.id);
+      }
+    });
+  }
+
+  useEffect(()=>{
+  let statecode="";
+  getLastCustomerId();
+  
+  console.log("(stateValue!=='' && stateValue!==undefined" , (stateValue!=="" && stateValue!==undefined));
+  console.log("(lastId!=='' && lastId!==undefined)" , (lastId!=="" && lastId!==undefined));
+  if((stateValue!=="" && stateValue!==undefined)  && (lastId!=="" && lastId!==undefined)){
+  
+    axios.get(`${baseUrl}/api/customercreation/getcustno/${stateValue.value}`).then((resp)=>{
+      // statecode=resp.
+      console.log("State", resp);
+    });
+  
+    
+  
+  
+    setBidNo();
+  
+  
+  }
+  },[stateValue,lastId]);
+
+
+
+
 
   const getStateData = async (savedState) => {
     let response = await axios.get(`${baseUrl}/api/state-list/${savedState}`);

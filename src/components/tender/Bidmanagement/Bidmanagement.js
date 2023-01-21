@@ -55,11 +55,13 @@ function Bidmanagement(props) {
   }
 
   const generateListArray = async (response) =>{
+
     let list = [...response.data.tenderCreationList];
+    console.log("list ",list );
     let listarr = list.map((item, index, arr)=> ({
       ...item,
       NITdate:FormattedDate(item.nitdate),
-      quality: item.quality.toLocaleString('en-IN'),
+      quality: item.quality!==null ? item.quality.toLocaleString('en-IN'): "--",
       submissiondate:(item.submissiondate) ? FormattedDate(item.submissiondate) : '',
       status:'<span class="font-weight-bold text-primary">New Tender</span>',
       current_stage:`<span class="font-weight-bold text-warning">Stage</span>`,
