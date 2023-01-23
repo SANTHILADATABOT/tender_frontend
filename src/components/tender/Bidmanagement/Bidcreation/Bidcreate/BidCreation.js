@@ -13,24 +13,22 @@ import UploadDoc from "./UploadDoc";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 
-
 const initialOptions = {
   options: [],
   isLoading: false,
 };
 
 const modeOptions = [
-  { value: 'Online', label: 'Online' },
-  { value: 'BG/DD', label: 'BG/DD' },
-  { value: 'DD/RTGS', label: 'DD/RTGS' },
-
+  { value: "Online", label: "Online" },
+  { value: "BG/DD", label: "BG/DD" },
+  { value: "DD/RTGS", label: "DD/RTGS" },
 ];
 
 const projectperiodOptions = [
-  { value: 'Day', label: 'Day' },
-  { value: 'Month', label: 'Month' },
-  { value: 'Year', label: 'Year' },
-]
+  { value: "Day", label: "Day" },
+  { value: "Month", label: "Month" },
+  { value: "Year", label: "Year" },
+];
 
 const BidCreation = () => {
   const [loading, setLoading] = useState(false);
@@ -41,14 +39,16 @@ const BidCreation = () => {
   const [TenderDescriptionlen, setTenderDescriptionlen] = useState(255);
   const [unitValue, setunitValue] = useState("Cu.M");
   const [EMDValue, setEMDValue] = useState("nonexempted");
-  const [tenderevalutionsysytemValue, settenderevalutionsysytemValue] = useState("QCBS");
+  const [tenderevalutionsysytemValue, settenderevalutionsysytemValue] =
+    useState("QCBS");
   const [formId, setFormId] = useState(0);
   const { id, tenderid } = useParams();
-  const [lastId, setLastId]=useState("");
-  const myRef = useRef(null)    
+  const [lastId, setLastId] = useState("");
+  const myRef = useRef(null);
 
   const navigate = useNavigate();
-  const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId ] = useOutletContext();
+  const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
+    useOutletContext();
 
   const {
     value: bidnoValue,
@@ -59,8 +59,6 @@ const BidCreation = () => {
     setInputValue: setbidnoValue,
     reset: resetbidno,
   } = useInputValidation(isNotEmpty);
-
-
 
   const {
     value: customernameValue,
@@ -196,7 +194,7 @@ const BidCreation = () => {
     value: projectperioddate2Value,
     isValid: projectperioddate2IsValid,
     hasError: projectperioddate2HasError,
-    valueChangeHandlerForReactSelect:  projectperioddate2ChangeHandler,
+    valueChangeHandlerForReactSelect: projectperioddate2ChangeHandler,
     inputBlurHandler: projectperioddate2BlurHandler,
     setInputValue: setprojectperioddate2Value,
     reset: resetprojectperioddate2,
@@ -272,44 +270,79 @@ const BidCreation = () => {
     reset: resetlocation,
   } = useInputValidation(isNotEmpty);
 
-  const setBidNo = (statecode, lastId)=>{
+  const setBidNo = (statecode, lastId, year, month) => {
+    let newSqNo = "";
+    console.log("statecode, lastId, year, month",statecode, lastId, year, month);
+    if(lastId!=="000")
+    {
+    var sq_no = parseInt(lastId.substring(9, 12)) + 1;    
+    if (sq_no < 10) {
+      newSqNo = "00" + sq_no;
+    }
+    if (sq_no < 100 && sq_no > 9) {
+      newSqNo = "0" + sq_no;
+    }
+    if (sq_no < 1000 && sq_no > 99) {
+      newSqNo = sq_no;
+    }
+  
+    //  if(sq_no<10000 && sq_no>999){
 
-
+    //  }
+  }
+  else if(lastId==="000"){
+    newSqNo="001";
+  }
+    let newBidNo = "BID" + statecode + year + month + newSqNo;
+    setbidnoValue(newBidNo);
   };
-  const getLastCustomerId = () =>{
-    axios.get(`${baseUrl}/api/bidcreation/creation/getlastbidno`).then((resp) => {
-      if(resp.data.lastbidno.id>0)
-      {
-      setLastId(resp.data.lastbidno.id);
+  const getLastCustomerId = () => {
+    axios
+      .get(`${baseUrl}/api/bidcreation/creation/getlastbidno`)
+      .then((resp) => {
+        console.log("resp",resp.data.lastbidno);
+        if(resp.data.lastbidno===null)
+        {
+          console.log("resp is null")
+          setLastId("000");
+        }
+        else if (resp.data.lastbidno.bidno) {
+
+          setLastId(resp.data.lastbidno.bidno);
+        }
+      });
+  };
+
+  useEffect(() => {
+    if (!id) {
+      let statecode = "";
+      getLastCustomerId();
+      if (
+        stateValue !== "" &&
+        stateValue !== null &&
+        stateValue !== undefined &&
+        lastId !== "" &&
+        lastId !== undefined
+      ) {
+        var now = new Date();
+        var currentYear = now.getFullYear() % 1000;
+        var currentMonth =
+          (now.getMonth() + 1 < 10 ? "0" : "") + (now.getMonth() + 1);
+        axios
+          .get(
+            `${baseUrl}/api/customercreation/getstatecode/${stateValue.value}`
+          )
+          .then((resp) => {
+            statecode = resp.data.state_code;
+            if (lastId && statecode) {
+              setBidNo(statecode, lastId, currentYear, currentMonth);
+            } else {
+              setbidnoValue("BID" + currentYear + currentMonth);
+            }
+          });
       }
-    });
-  }
-
-  useEffect(()=>{
-  let statecode="";
-  getLastCustomerId();
-  
-  console.log("(stateValue!=='' && stateValue!==undefined" , (stateValue!=="" && stateValue!==undefined));
-  console.log("(lastId!=='' && lastId!==undefined)" , (lastId!=="" && lastId!==undefined));
-  if((stateValue!=="" && stateValue!==undefined)  && (lastId!=="" && lastId!==undefined)){
-  
-    axios.get(`${baseUrl}/api/customercreation/getcustno/${stateValue.value}`).then((resp)=>{
-      // statecode=resp.
-      console.log("State", resp);
-    });
-  
-    
-  
-  
-    setBidNo();
-  
-  
-  }
-  },[stateValue,lastId]);
-
-
-
-
+    }
+  }, [stateValue, lastId]);
 
   const getStateData = async (savedState) => {
     let response = await axios.get(`${baseUrl}/api/state-list/${savedState}`);
@@ -327,7 +360,7 @@ const BidCreation = () => {
   const getulbData = async (savedulb) => {
     let response = await axios.get(`${baseUrl}/api/ulb-list/${savedulb}`);
     return { options: response.data.ulbList, isLoading: false };
-  };      
+  };
 
   const getulbListOptions = async (savedulb = null) => {
     setulbOptions((c) => {
@@ -337,82 +370,77 @@ const BidCreation = () => {
     setulbOptions(ulbList);
   };
 
-  const setDatatoBidCreationForm = (response) =>{
-
-    let data = response.data.bidcreationdata
-    setFormId(data.id)
-    setbidnoValue(data.bidno)
-    setcustomernameValue(data.customername)
-    setbidcallValue(data.bidcall)
-    settenderidValue(data.tenderid)
-    settenderinvtauthValue(data.tenderinvtauth)
-    settenderrefValue(data.tenderref)
-    setState(data.state)
-    setulb(data.ulb)
-    setTenderDescriptionValue(data.TenderDescription)
-    setNITdateValue(data.NITdate)
-    setprebiddateValue(data.prebiddate)
-    setsubmissiondateValue(data.submissiondate)
-    setqualityValue(data.quality)
-    setprojectperioddate1Value(data.projectperioddate1)
+  const setDatatoBidCreationForm = (response) => {
+    let data = response.data.bidcreationdata;
+    setFormId(data.id);
+    setbidnoValue(data.bidno);
+    setcustomernameValue(data.customername);
+    setbidcallValue(data.bidcall);
+    settenderidValue(data.tenderid);
+    settenderinvtauthValue(data.tenderinvtauth);
+    settenderrefValue(data.tenderref);
+    setState(data.state);
+    setulb(data.ulb);
+    setTenderDescriptionValue(data.TenderDescription);
+    setNITdateValue(data.NITdate);
+    setprebiddateValue(data.prebiddate);
+    setsubmissiondateValue(data.submissiondate);
+    setqualityValue(data.quality);
+    setprojectperioddate1Value(data.projectperioddate1);
     // setprojectperioddate2Value(data.projectperioddate2)
 
-    setprojectperioddate2Value(projectperiodOptions.find(
-      (x) => x.value === data.projectperioddate2
-    ))
-    setestprojectvalueValue(data.estprojectvalue)
-    settenderfeevalueValue(data.tenderfeevalue)
-    setpriceperunitValue(data.priceperunit)
+    setprojectperioddate2Value(
+      projectperiodOptions.find((x) => x.value === data.projectperioddate2)
+    );
+    setestprojectvalueValue(data.estprojectvalue);
+    settenderfeevalueValue(data.tenderfeevalue);
+    setpriceperunitValue(data.priceperunit);
     // setemdmodeValue(data.emdmode)
-    setemdmodeValue(modeOptions.find(
-      (x) => x.value === data.emdmode
-    ))
+    setemdmodeValue(modeOptions.find((x) => x.value === data.emdmode));
 
-    setemdamtValue(data.emdamt)
-    setdumpsiterValue(data.dumpsiter)
-    setlocationValue(data.location)
-    setunitValue(data.unit)
-    setEMDValue(data.EMD)
-    settenderevalutionsysytemValue(data.tenderevalutionsysytem)
-  }
+    setemdamtValue(data.emdamt);
+    setdumpsiterValue(data.dumpsiter);
+    setlocationValue(data.location);
+    setunitValue(data.unit);
+    setEMDValue(data.EMD);
+    settenderevalutionsysytemValue(data.tenderevalutionsysytem);
+  };
 
   const getBidCreationData = async () => {
     let response = await axios.get(`${baseUrl}/api/bidcreation/creation/${id}`);
-    if(response.status === 200){
-      if(response.data.bidcreationdata)
-      setDatatoBidCreationForm(response);
-      else
-      navigate('/tender/bidmanagement/list')
+    if (response.status === 200) {
+      if (response.data.bidcreationdata) setDatatoBidCreationForm(response);
+      else navigate("/tender/bidmanagement/list");
     }
-  }
+  };
 
   const getTenderCreationData = () => {
     axios.get(`${baseUrl}/api/tendercreation/${tenderid}`).then((resp) => {
-      if(resp.data.tender){
+      if (resp.data.tender) {
         // navigate('/tender/bidmanagement/list')
         // console.log(resp.data.tender)
-        let data =resp.data.tender;
-        setNITdateValue(data.nitdate)
-        setcustomernameValue(data.nameOfCustomer)
+        let data = resp.data.tender;
+        setNITdateValue(data.nitdate);
+        setcustomernameValue(data.nameOfCustomer);
         let ulbvalue = {
-          value : data.customername,
-          label : data.nameOfCustomer,
-        }
-        setulb(ulbvalue)
+          value: data.customername,
+          label: data.nameOfCustomer,
+        };
+        setulb(ulbvalue);
       }
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     getStateListOptions();
     getulbListOptions();
 
-    if(id){
+    if (id) {
       getBidCreationData();
     }
 
-    if(!id && tenderid){
-      getTenderCreationData()
+    if (!id && tenderid) {
+      getTenderCreationData();
     }
   }, []);
 
@@ -424,7 +452,7 @@ const BidCreation = () => {
   const unithandler = (e) => {
     setunitValue(e.target.value);
   };
-  
+
   const EMDhandler = (e) => {
     setEMDValue(e.target.value);
   };
@@ -432,54 +460,61 @@ const BidCreation = () => {
     settenderevalutionsysytemValue(e.target.value);
   };
 
-
   const postData = (data) => {
-    axios.post(`${baseUrl}/api/bidcreation/creation`, data).then((resp) => {
-      if (resp.data.status === 200) {
-        setBidManagementMainId(resp.data.id)
-        setFormId(resp.data.id)
-        toastSuccess(resp.data.message)
-        // resetall()
-        window.history.replaceState({},"Bid Creation", `/tender/bidmanagement/list/main/bidcreationmain/${tenderid}/`+resp.data.id);
-        navigate(`/tender/bidmanagement/list/main/bidcreationmain/${tenderid}/`+resp.data.id);
-        myRef.current.scrollIntoView({ behavior: 'smooth' })    
-       
-
-      } else if (resp.data.status === 400) {
-        toastError(resp.data.message)
-      }
-      setdatasending(false)
-    }).catch((err) => {
-
+    axios
+      .post(`${baseUrl}/api/bidcreation/creation`, data)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          setBidManagementMainId(resp.data.id);
+          setFormId(resp.data.id);
+          toastSuccess(resp.data.message);
+          // resetall()
+          window.history.replaceState(
+            {},
+            "Bid Creation",
+            `/tender/bidmanagement/list/main/bidcreationmain/${tenderid}/` +
+              resp.data.id
+          );
+          navigate(
+            `/tender/bidmanagement/list/main/bidcreationmain/${tenderid}/` +
+              resp.data.id
+          );
+          myRef.current.scrollIntoView({ behavior: "smooth" });
+        } else if (resp.data.status === 400) {
+          toastError(resp.data.message);
+        }
+        setdatasending(false);
+      })
+      .catch((err) => {
         Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong!',
-          })
-          setdatasending(false)
-    });
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+        setdatasending(false);
+      });
   };
 
-
   const putData = (data) => {
-    axios.put(`${baseUrl}/api/bidcreation/creation/${id}`, data).then((resp) =>{
-  
-      if (resp.data.status === 200) {
-        toastSuccess(resp.data.message)
-      }else {
-        toastError("Something went wrong!")
-      }
-      setdatasending(false)
-    }).catch((err) => {
-      
-      Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Something went wrong!',
-        })
-        setdatasending(false)
-    });
-  }
+    axios
+      .put(`${baseUrl}/api/bidcreation/creation/${id}`, data)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          toastSuccess(resp.data.message);
+        } else {
+          toastError("Something went wrong!");
+        }
+        setdatasending(false);
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+        setdatasending(false);
+      });
+  };
   let formIsValid = false;
 
   if (
@@ -555,14 +590,11 @@ const BidCreation = () => {
       tenderid: tenderid,
     };
 
-  
-
-    if(formId === 0){
-        postData(data);
-    }else if(formId > 0){
-        putData(data)
+    if (formId === 0) {
+      postData(data);
+    } else if (formId > 0) {
+      putData(data);
     }
-
   };
 
   const cancelHandler = (e) => {
@@ -585,9 +617,6 @@ const BidCreation = () => {
       navigate("/tender/bidmanagement/list");
     }
   };
-
-  
-
 
   return (
     <CollapseCard id={"bidcreation"} title={"Bid Creation"}>
@@ -623,7 +652,7 @@ const BidCreation = () => {
                     value={bidnoValue}
                     onChange={bidnoChangeHandler}
                     onBlur={bidnoBlurHandler}
-                    disabled={false}
+                    disabled={true}
                   />
                   {bidnoHasError && (
                     <div className="pt-1">
@@ -650,8 +679,7 @@ const BidCreation = () => {
                     value={customernameValue}
                     onChange={customernameChangeHandler}
                     onBlur={customernameBlurHandler}
-                    disabled={true} 
-                    
+                    disabled={true}
                   />
                   {customernameHasError && (
                     <div className="pt-1">
@@ -788,7 +816,7 @@ const BidCreation = () => {
                     onBlur={stateBlurHandler}
                     value={stateValue}
                     isLoading={StateOptions.isLoading}
-                    
+                    isDisabled={ id ?true:false}
                   ></Select>
                   {stateHasError && (
                     <div className="pt-1">
@@ -819,7 +847,7 @@ const BidCreation = () => {
                     onBlur={ulbBlurHandler}
                     value={ulbValue}
                     isLoading={ulbOptions.isLoading}
-                    isDisabled={true} 
+                    isDisabled={true}
                   ></Select>
                   {ulbHasError && (
                     <div className="pt-1">
@@ -1051,7 +1079,7 @@ const BidCreation = () => {
                       onChange={projectperioddate1ChangeHandler}
                       onBlur={projectperioddate1BlurHandler}
                     />
-                  &nbsp;
+                    &nbsp;
                     {/* <input
                       type="date"
                       className="form-control col-md-6"
@@ -1062,7 +1090,7 @@ const BidCreation = () => {
                       onChange={projectperioddate2ChangeHandler}
                       onBlur={projectperioddate2BlurHandler}
                     /> */}
-                     <Select
+                    <Select
                       name="projectperioddate2"
                       id="projectperioddate2"
                       className="col-md-6 p-0"
@@ -1184,17 +1212,17 @@ const BidCreation = () => {
                     onChange={emdmodeChangeHandler}
                     onBlur={emdmodeBlurHandler}
                   /> */}
-                   <Select
-                      name="emdmode"
-                      id="emdmode"
-                      isSearchable="true"
-                      isClearable="true"
-                      options={modeOptions}
-                      onChange={(selectedOptions) => {
-                        emdmodeChangeHandler(selectedOptions);
-                      }}
-                      onBlur={emdmodeBlurHandler}
-                      value={emdmodeValue}
+                  <Select
+                    name="emdmode"
+                    id="emdmode"
+                    isSearchable="true"
+                    isClearable="true"
+                    options={modeOptions}
+                    onChange={(selectedOptions) => {
+                      emdmodeChangeHandler(selectedOptions);
+                    }}
+                    onBlur={emdmodeBlurHandler}
+                    value={emdmodeValue}
                   ></Select>
                   {emdmodeHasError && (
                     <div className="pt-1">
@@ -1288,7 +1316,7 @@ const BidCreation = () => {
               <div className="row align-items-center">
                 <div className="col-lg-4 text-dark font-weight-bold">
                   <label htmlFor="EMD">EMD Exemption:</label>
-              </div>
+                </div>
                 <div className="col-lg-8">
                   <div className="form-check form-check-inline mr-5">
                     <label
@@ -1363,7 +1391,7 @@ const BidCreation = () => {
               </div>
             </div>
             <div className="col-lg-12">
-              {(!id) && (
+              {!id && (
                 <button
                   className={
                     !formIsValid
@@ -1405,10 +1433,10 @@ const BidCreation = () => {
             </div>
           </div>
         </form>
-        <div ref={myRef} >
-        <UploadDoc />
-      </div>
+        <div ref={myRef}>
+          <UploadDoc />
         </div>
+      </div>
     </CollapseCard>
   );
 };
