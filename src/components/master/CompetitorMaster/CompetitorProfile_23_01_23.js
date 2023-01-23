@@ -334,10 +334,8 @@ useEffect(()=>{
         registrationType: resp.data.competitor.registrationType,
         companyType: resp.data.competitor.companyType,
         manpower: resp.data.competitor.manpower,
-        
       });
-      document.getElementById('dis').setAttribute('value', '2');
-      document.getElementById('dis').setAttribute('defaultValue', '');
+    
       setHasError({
         compNo: false,
         compName: false,
@@ -358,12 +356,10 @@ useEffect(()=>{
         manpower: false,
       });
       setFormIsValid(true);
-      
     });
  }
   
-useEffect(()=>{  
-  
+  useEffect(() => {
     if (
       hasError.compName !== null &&
       hasError.compName !== true &&
@@ -402,118 +398,18 @@ useEffect(()=>{
       JSON.stringify(competitorFormInput) !== JSON.stringify(intialValues)
     ) {
       setFormIsValid(true);
-     
     } else {
       setFormIsValid(false);
     }
-  },[hasError])
+  }, [hasError]);
 
 
   //Set Text Input Values
   const textInputHandler = (e) => {
-   
     setCompetitorFormInput({
       ...competitorFormInput,
       [e.target.name]: e.target.value,
     });
-
-
-    switch (e.target.name) {
-      case "pincode":
-        if (!/^[1-9][0-9]{5}$/.test(e.target.value)) {
-          setHasError({ ...hasError, pincode: true });
-        } else {
-          setHasError({ ...hasError, pincode: false });
-        }
-        break;
-
-      case "registerationYear":
-        if (e.target.value > today.getFullYear() | e.target.value < 1900 | isNaN(e.target.value)) {
-          setHasError({ ...hasError, registerationYear: true });
-        } else {
-          setHasError({ ...hasError, registerationYear: false });
-        }
-        break;
-      case "mobile":
-        if (
-          e.target.value.trim() === "" ||
-          e.target.value === null ||
-          !/^[6-9]{1}[0-9]{9}$/.test(
-            e.target.value
-          )
-        ) {
-          setHasError({ ...hasError, mobile: true });
-        } else {
-          setHasError({ ...hasError, mobile: false });
-        }
-        break;
-      case "email":
-        if (
-          e.target.value.trim() === "" ||
-          e.target.value === null ||
-          !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(e.target.value)
-        ) {
-          setHasError({ ...hasError, email: true });
-        } else {
-          setHasError({ ...hasError, email: false });
-        }
-        break;
-      case "gstNo":
-        if (
-          e.target.value.trim() === "" ||
-          e.target.value === null ||
-          !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(
-            e.target.value
-          )
-        ) {
-          setHasError({ ...hasError, gstNo: true });
-        } else {
-          setHasError({ ...hasError, gstNo: false });
-        }
-        break;
-      case "panNo":
-        if (
-          e.target.value.trim() === "" ||
-          e.target.value === null ||
-          !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(e.target.value)
-        ) {
-          setHasError({ ...hasError, panNo: true });
-        } else {
-          setHasError({ ...hasError, panNo: false });
-        }
-        break;
-      case "manpower":
-        if (
-          e.target.value.trim() === "" ||
-          e.target.value === null ||
-          !/^[0-9]{1,5}$/.test(e.target.value)
-        ) {
-          setHasError({ ...hasError, manpower: true });
-        } else {
-          setHasError({ ...hasError, manpower: false });
-        }
-        break;
-
-      default:
-        // setFormIsValid(true);
-        if (e.target.value.trim() === "" || e.target.value === null) {
-          setHasError({ ...hasError, [e.target.name]: true });
-        } else {
-          setHasError({ ...hasError, [e.target.name]: false });
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
   };
 
   //Set select Input Values
@@ -664,14 +560,10 @@ useEffect(()=>{
           title: "Competitor",
           text: res.data.message,
           confirmButtonColor: "#5156ed",
-          
         }).then(function () {
           setLoading(false);
           navigate(`/tender/master/competitorcreation/competitor/details/${res.data.inserted_id}`);
         });
-
-        document.getElementById('dis').setAttribute('value', '2');
-        document.getElementById('dis').setAttribute('defaultValue', '');
       } else if (res.data.status === 400) {
         Swal.fire({
           icon: "error",
@@ -772,7 +664,7 @@ else{
                   name="compNo"
                   value={competitorFormInput.compNo}
                   onChange={textInputHandler}
-                  // ////onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                   disabled={false}
                 />
               </div>
@@ -788,7 +680,6 @@ else{
                 </label>
               </div>
               <div className="col-lg-8">
-              <input type='hidden' id='dis' name='dis' defaultValue='1'/>
                 <input
                   type="text"
                   className="form-control"
@@ -797,7 +688,7 @@ else{
                   name="compName"
                   value={competitorFormInput.compName}
                   onChange={textInputHandler}
-                  ////onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.compName && (
                   <div className="pt-1">
@@ -827,7 +718,7 @@ else{
                   options={registrationTypeList}
                   value={competitorFormInput.registrationType}
                   onChange={selectInputHandler}
-                  ////onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 ></Select>
                 {hasError.registrationType && (
                   <div className="pt-1">
@@ -857,7 +748,7 @@ else{
                   name="registerationYear"
                   value={competitorFormInput.registerationYear}
                   onChange={textInputHandler}
-                  ////onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.registerationYear && (
                   <div className="pt-1">
@@ -886,7 +777,7 @@ else{
                   options={countryList}
                   value={competitorFormInput.country}
                   onChange={selectInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 ></Select>
                 {hasError.country && (
                   <div className="pt-1">
@@ -1004,7 +895,7 @@ else{
                   name="address"
                   value={competitorFormInput.address}
                   onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                   placeholder="#Door No, Street,
                    Area,
                    Landmark"
@@ -1036,7 +927,7 @@ else{
                   name="pincode"
                   value={competitorFormInput.pincode}
                   onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.pincode && (
                   <div className="pt-1">
@@ -1060,7 +951,7 @@ else{
                   name="panNo"
                   value={competitorFormInput.panNo}
                   onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.panNo && (
                   <div className="pt-1">
@@ -1089,7 +980,7 @@ else{
                   name="mobile"
                   value={competitorFormInput.mobile}
                   onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.mobile && (
                   <div className="pt-1">
@@ -1118,7 +1009,7 @@ else{
                   name="email"
                   value={competitorFormInput.email}
                   onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.email && (
                   <div className="pt-1">
@@ -1148,7 +1039,7 @@ else{
                   name="gstNo"
                   value={competitorFormInput.gstNo}
                   onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.gstNo && (
                   <div className="pt-1">
@@ -1178,7 +1069,7 @@ else{
                   name="directors"
                   value={competitorFormInput.directors}
                   onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.directors && (
                   <div className="pt-1">
@@ -1239,7 +1130,7 @@ else{
                   name="manpower"
                   value={competitorFormInput.manpower}
                   onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
+                  onBlur={onBlurSelectHandler}
                 />
                 {hasError.manpower && (
                   <div className="pt-1">

@@ -272,8 +272,13 @@ const BidCreation = () => {
 
   const setBidNo = (statecode, lastId, year, month) => {
     let newSqNo = "";
+    let prevYear=parseInt(lastId.substring(5, 7));
     console.log("statecode, lastId, year, month",statecode, lastId, year, month);
-    if(lastId!=="000")
+    if(lastId==="000" || year>prevYear){
+     //Yearly reset or First Entry for Bid no Sequence No done here  
+      newSqNo="001";
+    }
+    else if(lastId!=="000")
     {
     var sq_no = parseInt(lastId.substring(9, 12)) + 1;    
     if (sq_no < 10) {
@@ -290,24 +295,23 @@ const BidCreation = () => {
 
     //  }
   }
-  else if(lastId==="000"){
-    newSqNo="001";
-  }
+ 
     let newBidNo = "BID" + statecode + year + month + newSqNo;
     setbidnoValue(newBidNo);
   };
-  const getLastCustomerId = () => {
-    axios
-      .get(`${baseUrl}/api/bidcreation/creation/getlastbidno`)
+
+
+  const getLastCustomerId = async (scode) => {
+    
+    // let data={scode : scode};
+   await axios
+      .get(`${baseUrl}/api/bidcreation/creation/getlastbidno/${scode}`,)
       .then((resp) => {
-        console.log("resp",resp.data.lastbidno);
         if(resp.data.lastbidno===null)
         {
-          console.log("resp is null")
           setLastId("000");
         }
         else if (resp.data.lastbidno.bidno) {
-
           setLastId(resp.data.lastbidno.bidno);
         }
       });
@@ -315,15 +319,18 @@ const BidCreation = () => {
 
   useEffect(() => {
     if (!id) {
+      
       let statecode = "";
-      getLastCustomerId();
+      // getLastCustomerId();
       if (
         stateValue !== "" &&
         stateValue !== null &&
-        stateValue !== undefined &&
-        lastId !== "" &&
-        lastId !== undefined
+        stateValue !== undefined 
+        // &&
+        // lastId !== "" &&
+        // lastId !== undefined
       ) {
+        console.log("Test23");
         var now = new Date();
         var currentYear = now.getFullYear() % 1000;
         var currentMonth =
@@ -334,6 +341,8 @@ const BidCreation = () => {
           )
           .then((resp) => {
             statecode = resp.data.state_code;
+            getLastCustomerId(statecode);
+            console.log("lastId && statecode",lastId && statecode);
             if (lastId && statecode) {
               setBidNo(statecode, lastId, currentYear, currentMonth);
             } else {
@@ -417,8 +426,6 @@ const BidCreation = () => {
   const getTenderCreationData = () => {
     axios.get(`${baseUrl}/api/tendercreation/${tenderid}`).then((resp) => {
       if (resp.data.tender) {
-        // navigate('/tender/bidmanagement/list')
-        // console.log(resp.data.tender)
         let data = resp.data.tender;
         setNITdateValue(data.nitdate);
         setcustomernameValue(data.nameOfCustomer);
@@ -553,7 +560,7 @@ const BidCreation = () => {
       return;
     }
 
-    console.log("Submitted!");
+    // console.log("Submitted!");
 
     let bidcreationData = {
       bidno: bidnoValue,
