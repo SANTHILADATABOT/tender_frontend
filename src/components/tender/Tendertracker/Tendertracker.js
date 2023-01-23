@@ -149,12 +149,12 @@ function Tendertracker(props) {
               <div className="card-body">
                 <div className="row d-flex justify-content-between">
                   <div className="col-lg-12 row">
-                    <div className="col-sm-5 row d-flex align-items-center">
-                      <div className="col-lg-5 text-dark font-weight-bold">
+                    <div className="col-lg-4 row d-flex align-items-center">
+                      <div className="col-lg-4 text-dark font-weight-bold">
                         <label htmlFor="From">Quantity :</label>
 					
                       </div>
-                      <div className="col-lg-7">
+                      <div className="col-sm-8">
 					  <Select
                     name="qty"
                     id="qty"
@@ -173,8 +173,9 @@ function Tendertracker(props) {
                   ></Select>
                       </div>
                     </div>
-                    <div className="col-sm-5 row d-flex align-items-center">
-                    <div className="col-lg-4 text-dark font-weight-bold">
+                    <div className="col-lg-1 row d-flex align-items-center"></div>
+                    <div className="col-lg-4 row d-flex align-items-center">
+                    <div className="col-lg-3 text-dark font-weight-bold">
                         <label htmlFor="From">State :</label>
                       </div>
                       <div className="col-lg-8">

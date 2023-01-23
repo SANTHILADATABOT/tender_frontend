@@ -218,6 +218,14 @@ function Sidebar() {
             <NavLink
               className={`collapse-item ${({ isActive }) =>
                 isActive ? "active" : undefined}`}
+              to={`/${pathName}/bidmanagement/list`}
+              onClick={() => hideSidebarElement("tenderMenu")}
+            >
+              Bid's Management
+            </NavLink>
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
               to={`/${pathName}/tendertracker`}
               onClick={() => hideSidebarElement("tenderMenu")}
             >
@@ -231,14 +239,7 @@ function Sidebar() {
             >
               Legacy Statement
             </NavLink>
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-                isActive ? "active" : undefined}`}
-              to={`/${pathName}/bidmanagement/list`}
-              onClick={() => hideSidebarElement("tenderMenu")}
-            >
-              Bid's Management
-            </NavLink>
+            
           </div>
         </div>
       </li>
