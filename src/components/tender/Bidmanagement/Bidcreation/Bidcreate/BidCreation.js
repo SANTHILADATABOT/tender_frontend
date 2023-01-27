@@ -384,34 +384,33 @@ const BidCreation = () => {
     setFormId(data.id);
     setbidnoValue(data.bidno);
     setcustomernameValue(data.customername);
-    setbidcallValue(data.bidcall);
-    settenderidValue(data.tenderid);
-    settenderinvtauthValue(data.tenderinvtauth);
-    settenderrefValue(data.tenderref);
+    setbidcallValue(data.bidcall? data.bidcall : "");
+    settenderidValue(data.tenderid? data.tenderid:"");
+    settenderinvtauthValue(data.tenderinvtauth?data.tenderinvtauth:"");
+    settenderrefValue(data.tenderref?data.tenderref:"");
     setState(data.state);
     setulb(data.ulb);
-    setTenderDescriptionValue(data.TenderDescription);
+    setTenderDescriptionValue(data.TenderDescription?data.TenderDescription:"");
     setNITdateValue(data.NITdate);
-    setprebiddateValue(data.prebiddate);
+    setprebiddateValue(data.prebiddate?data.prebiddate:"");
     setsubmissiondateValue(data.submissiondate);
-    setqualityValue(data.quality);
-    setprojectperioddate1Value(data.projectperioddate1);
+    setqualityValue(data.quality?data.quality:"");
+    setprojectperioddate1Value(data.projectperioddate1?data.projectperioddate1:"");
     // setprojectperioddate2Value(data.projectperioddate2)
-
-    setprojectperioddate2Value(
-      projectperiodOptions.find((x) => x.value === data.projectperioddate2)
-    );
-    setestprojectvalueValue(data.estprojectvalue);
-    settenderfeevalueValue(data.tenderfeevalue);
-    setpriceperunitValue(data.priceperunit);
+    data.projectperioddate2 ? (setprojectperioddate2Value(
+      projectperiodOptions.find((x) => x.value === data.projectperioddate2 ))) : setprojectperioddate2Value(null);
+   
+    setestprojectvalueValue(data.estprojectvalue?data.estprojectvalue:"");
+    settenderfeevalueValue(data.tenderfeevalue?data.tenderfeevalue:"");
+    setpriceperunitValue(data.priceperunit?data.priceperunit:"");
     // setemdmodeValue(data.emdmode)
     setemdmodeValue(modeOptions.find((x) => x.value === data.emdmode));
 
-    setemdamtValue(data.emdamt);
-    setdumpsiterValue(data.dumpsiter);
-    setlocationValue(data.location);
+    setemdamtValue(data.emdamt?data.emdamt:"");
+    setdumpsiterValue(data.dumpsiter?data.dumpsiter:"");
+    setlocationValue(data.location?data.location:"");
     setunitValue(data.unit);
-    setEMDValue(data.EMD);
+    setEMDValue(data.EMD? data.EMD:"");
     settenderevalutionsysytemValue(data.tenderevalutionsysytem);
   };
 
@@ -522,34 +521,38 @@ const BidCreation = () => {
         setdatasending(false);
       });
   };
-  let formIsValid = false;
+
+  //let formIsValid = true;
+  //$$$
+ let formIsValid = false;
 
   if (
-    bidnoIsValid &&
-    customernameIsValid &&
-    bidcallIsValid &&
-    tenderidIsValid &&
-    tenderinvtauthIsValid &&
-    tenderrefIsValid &&
+  //   bidnoIsValid &&
+  //   customernameIsValid &&
+  //   bidcallIsValid &&
+  //   tenderidIsValid &&
+  //   tenderinvtauthIsValid &&
+  //   tenderrefIsValid &&
     stateIsValid &&
-    ulbIsValid &&
-    TenderDescriptionIsValid &&
-    NITdateIsValid &&
-    prebiddateIsValid &&
-    submissiondateIsValid &&
-    qualityIsValid &&
-    projectperioddate1IsValid &&
-    projectperioddate2IsValid &&
-    estprojectvalueIsValid &&
-    tenderfeevalueIsValid &&
-    priceperunitIsValid &&
-    emdmodeIsValid &&
-    emdamtIsValid &&
-    dumpsiterIsValid &&
-    locationIsValid
+  //   ulbIsValid &&
+  //   TenderDescriptionIsValid &&
+  //   NITdateIsValid &&
+  //   prebiddateIsValid &&
+    submissiondateIsValid //&&
+  //   qualityIsValid &&
+  //   projectperioddate1IsValid &&
+  //   projectperioddate2IsValid &&
+  //   estprojectvalueIsValid &&
+  //   tenderfeevalueIsValid &&
+  //   priceperunitIsValid &&
+  //   emdmodeIsValid &&
+  //   emdamtIsValid &&
+  //   dumpsiterIsValid &&
+  //   locationIsValid
   ) {
     formIsValid = true;
   }
+  //$$$
   const submitHandler = (e) => {
     e.preventDefault();
 
@@ -559,8 +562,6 @@ const BidCreation = () => {
       setdatasending(false);
       return;
     }
-
-    // console.log("Submitted!");
 
     let bidcreationData = {
       bidno: bidnoValue,
@@ -578,11 +579,15 @@ const BidCreation = () => {
       unit: unitValue,
       tenderevalutionsysytem: tenderevalutionsysytemValue,
       projectperioddate1: projectperioddate1Value,
-      projectperioddate2: projectperioddate2Value.value,
+      projectperioddate2: ((projectperioddate2Value===null) ? null 
+                             : ((projectperioddate2Value.value)?projectperioddate2Value.value : null)),
       estprojectvalue: estprojectvalueValue,
       tenderfeevalue: tenderfeevalueValue,
       priceperunit: priceperunitValue,
-      emdmode: emdmodeValue.value,
+      emdmode: ((emdmodeValue===undefined) ? null
+                      : (emdmodeValue===null) ? null 
+                             : ((emdmodeValue.value)?emdmodeValue.value : null)),
+      // emdmode: (emdmodeValue.value)?emdmodeValue.value : "",
       emdamt: emdamtValue,
       dumpsiter: dumpsiterValue,
       prebiddate: prebiddateValue,
@@ -661,13 +666,13 @@ const BidCreation = () => {
                     onBlur={bidnoBlurHandler}
                     disabled={true}
                   />
-                  {bidnoHasError && (
+                  {/* {bidnoHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Bid no. is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -688,13 +693,13 @@ const BidCreation = () => {
                     onBlur={customernameBlurHandler}
                     disabled={true}
                   />
-                  {customernameHasError && (
+                  {/* {customernameHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Customer Category is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -714,13 +719,13 @@ const BidCreation = () => {
                     onChange={bidcallChangeHandler}
                     onBlur={bidcallBlurHandler}
                   />
-                  {bidcallHasError && (
+                  {/* {bidcallHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Bid Call is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -740,13 +745,13 @@ const BidCreation = () => {
                     onChange={tenderidChangeHandler}
                     onBlur={tenderidBlurHandler}
                   />
-                  {tenderidHasError && (
+                  {/* {tenderidHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Tender ID is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -768,13 +773,13 @@ const BidCreation = () => {
                     onChange={tenderinvtauthChangeHandler}
                     onBlur={tenderinvtauthBlurHandler}
                   />
-                  {tenderinvtauthHasError && (
+                  {/* {tenderinvtauthHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Tender Inviting Authority is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -794,20 +799,20 @@ const BidCreation = () => {
                     onChange={tenderrefChangeHandler}
                     onBlur={tenderrefBlurHandler}
                   />
-                  {tenderrefHasError && (
+                  {/* {tenderrefHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Tender Ref # is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center">
                 <div className="col-lg-4 text-dark font-weight-bold">
-                  <label htmlFor="state">State :</label>
+                  <label htmlFor="state">State <span className="text-danger h6 font-weight-bolder">*</span>:</label>
                 </div>
                 <div className="col-lg-8">
                   <Select
@@ -856,13 +861,13 @@ const BidCreation = () => {
                     isLoading={ulbOptions.isLoading}
                     isDisabled={true}
                   ></Select>
-                  {ulbHasError && (
+                  {/* {ulbHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         ULB is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -892,13 +897,13 @@ const BidCreation = () => {
                     onKeyUp={validateInputLength}
                     maxLength="255"
                   ></textarea>
-                  {TenderDescriptionHasError && (
+                  {/* {TenderDescriptionHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Tender Description is required.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -920,20 +925,20 @@ const BidCreation = () => {
                     onBlur={NITdateBlurHandler}
                     disabled={true}
                   />
-                  {NITdateHasError && (
+                  {/* {NITdateHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         NIT is invalid
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="submissiondate">Submission Date :</label>
+                  <label htmlFor="submissiondate">Submission Date <span className="text-danger h6 font-weight-bolder">*</span>:</label>
                 </div>
                 <div className="col-lg-8">
                   <input
@@ -972,13 +977,13 @@ const BidCreation = () => {
                     onChange={qualityChangeHandler}
                     onBlur={qualityBlurHandler}
                   />
-                  {qualityHasError && (
+                  {/* {qualityHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Quantity of Legacy Waste is Invalid.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1112,14 +1117,14 @@ const BidCreation = () => {
                     ></Select>
                   </div>
 
-                  {(projectperioddate1HasError ||
+                  {/* {(projectperioddate1HasError ||
                     projectperioddate2HasError) && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Project period (both fields) is required .
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1141,13 +1146,13 @@ const BidCreation = () => {
                     onChange={estprojectvalueChangeHandler}
                     onBlur={estprojectvalueBlurHandler}
                   />
-                  {estprojectvalueHasError && (
+                  {/* {estprojectvalueHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Est Project value is invalid.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1167,13 +1172,13 @@ const BidCreation = () => {
                     onChange={tenderfeevalueChangeHandler}
                     onBlur={tenderfeevalueBlurHandler}
                   />
-                  {tenderfeevalueHasError && (
+                  {/* {tenderfeevalueHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Tender Fee is invalid.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1193,13 +1198,13 @@ const BidCreation = () => {
                     onChange={priceperunitChangeHandler}
                     onBlur={priceperunitBlurHandler}
                   />
-                  {priceperunitHasError && (
+                  {/* {priceperunitHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Price per unit is invalid.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1231,13 +1236,13 @@ const BidCreation = () => {
                     onBlur={emdmodeBlurHandler}
                     value={emdmodeValue}
                   ></Select>
-                  {emdmodeHasError && (
+                  {/* {emdmodeHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         EMD Mode is Invalid.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1257,13 +1262,13 @@ const BidCreation = () => {
                     onChange={emdamtChangeHandler}
                     onBlur={emdamtBlurHandler}
                   />
-                  {emdamtHasError && (
+                  {/* {emdamtHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         EMD is invalid.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1283,13 +1288,13 @@ const BidCreation = () => {
                     onChange={dumpsiterChangeHandler}
                     onBlur={dumpsiterBlurHandler}
                   />
-                  {dumpsiterHasError && (
+                  {/* {dumpsiterHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Dump Siter name is required.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1309,13 +1314,13 @@ const BidCreation = () => {
                     onChange={prebiddateChangeHandler}
                     onBlur={prebiddateBlurHandler}
                   />
-                  {prebiddateHasError && (
+                  {/* {prebiddateHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Prebid Date is required.
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1387,13 +1392,13 @@ const BidCreation = () => {
                     onBlur={locationBlurHandler}
                     disabled={false}
                   />
-                  {locationHasError && (
+                  {/* {locationHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Location. is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>

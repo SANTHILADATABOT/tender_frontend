@@ -4,15 +4,21 @@ import { Fragment, useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 import useInputValidation from "../../../hooks/useInputValidation";
-import { isEmailValid, isMobileValidation } from "../CommonValidation";
+// import { isEmailValid, isMobileValidation } from "../CommonValidation";
+import { isEmailValid, isMobileValidation } from "../CommonValidation_copy";
 import CustomerCreationContactSubtable from "./CustomerCreationContactSubtable";
 import Swal from "sweetalert2";
 
 
 
 //validation custom functions
-const isNotEmpty = (value) => value.trim() !== "";
-const isEmail = (value) => value.includes("@");
+// const isNotEmpty = (value) => value.trim() !== "";
+// const isEmail = (value) => value.includes("@");
+//$$$$$
+const isNotEmpty = (value) => true;
+const isEmail = (value) => true;
+
+
 
 
 const CustomerCreationContactPerson = () => {
@@ -99,18 +105,19 @@ const CustomerCreationContactPerson = () => {
         buttons:`<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
         sl_no : index+1
       }))
-      console.log(listarr)
+      // console.log(listarr)
       setcontactlist(listarr)
     });
   }
 
   const onEdit =(data) => {
+    // console.log("Data", data);
     setisEditbtn(true)
     setcontactid(data.id)
-    setcontactpersonValue(data.contact_person)
-    setdesignationValue(data.designation)
-    setemailValue(data.email)
-    setmobileValue(data.mobile_no)
+    setcontactpersonValue(data.contact_person ? data.contact_person: "")
+    setdesignationValue(data.designation? data.designation: "")
+    setemailValue(data.email?data.email:"")
+    setmobileValue(data.mobile_no?data.mobile_no:"")
   }
 
   const onDelete = (data) => {
@@ -157,7 +164,7 @@ const CustomerCreationContactPerson = () => {
 
   const postData = (data) => {
     axios.post(`${baseUrl}/api/customercreationcontact`, data).then((resp) => {
-      console.log(resp);
+      // console.log(resp);
       if (resp.data.status === 200) {
         getsublist()
         toastSuccess(resp.data.message)
@@ -172,7 +179,7 @@ const CustomerCreationContactPerson = () => {
 
   const putData =(data) => {
     axios.put(`${baseUrl}/api/customercreationcontact/${contactid}`, data).then((resp) =>{
-      console.log(resp);
+      // console.log(resp);
       if (resp.data.status === 200) {
         getsublist()
         resetform()
@@ -200,7 +207,7 @@ const CustomerCreationContactPerson = () => {
     setdatasending(true)
 
     if (!formIsValid) {
-      console.log("Inavlid Form!");
+      // console.log("Inavlid Form!");
       setdatasending(false)
       return;
     }
@@ -341,7 +348,8 @@ const CustomerCreationContactPerson = () => {
                 </div>
                 <div className="col-lg-8">
                   <input
-                    type="number"
+                    // type="number"
+                    type="text"
                     className="form-control"
                     id="mobile"
                     placeholder="Enter Mobile No"
@@ -349,7 +357,7 @@ const CustomerCreationContactPerson = () => {
                     value={mobileValue}
                     onChange={mobileChangeHandler}
                     onBlur={mobileBlurHandler}
-                    maxLength={10}
+                    // $$$maxLength={10}
                     />
                   {mobileHasError && (
                     <div className="pt-1">

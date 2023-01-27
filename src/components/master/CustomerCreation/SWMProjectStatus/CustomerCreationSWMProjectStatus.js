@@ -7,13 +7,16 @@ import useInputValidation from "../../../hooks/useInputValidation";
 import { projectType as projectTypeOptions, statusOptions, vendorTypeOptions} from "../data";
 import SWMProjectStatusSubTable from "./SWMProjectStatusSubTable";
 import Swal from "sweetalert2";
+
 // validations for input value
 const isNotNull = (value) => {
-    if (value === null) {
-        return false;
-      } else if (value === "") {
-        return false;
-      }
+  //$$$$$
+    // if (value === null) {
+    //     return false;
+    //   } else if (value === "") {
+    //     return false;
+    //   }
+  //$$$$$
       return true;
 }
 
@@ -24,7 +27,9 @@ const initialOptions = {
 
 
 
-const isNotEmpty = (value) => value.trim() !== "";
+//$$$ const isNotEmpty = (value) => value.trim() !== "";
+const isNotEmpty = (value) => true;
+
 let projectstatusList ; 
 let projectTypeList;
 const CustomerCreationSWMProjectStatus = () => {
@@ -49,6 +54,8 @@ const CustomerCreationSWMProjectStatus = () => {
         reset: resetvendor,
       } = useInputValidation(isNotEmpty);
 
+     
+
       const {
         value: projectstatusValue,
         isValid: projectstatusIsValid,
@@ -58,7 +65,7 @@ const CustomerCreationSWMProjectStatus = () => {
         setInputValue: setprojectstatusValue,
         reset: resetprojectstatus,
       } = useInputValidation(isNotNull);
-
+      
       const {
         value: projectvalueValue,
         isValid: projectvalueIsValid,
@@ -68,7 +75,7 @@ const CustomerCreationSWMProjectStatus = () => {
         setInputValue: setprojectvalueValue,
         reset: resetprojectvalue,
       } = useInputValidation(isNotEmpty);
-
+      
       const {
         value: durationdate1Value,
         isValid: durationdate1IsValid,
@@ -78,7 +85,7 @@ const CustomerCreationSWMProjectStatus = () => {
         setInputValue: setdurationdate1Value,
         reset: resetdurationdate1,
       } = useInputValidation(isNotEmpty);
-
+      
       const {
         value: durationdate2Value,
         isValid: durationdate2IsValid,
@@ -121,6 +128,15 @@ const CustomerCreationSWMProjectStatus = () => {
         reset: resetvendorType,
     } = useInputValidation(isNotNull);
 
+    // console.log("vendorValue",vendorValue);
+    // console.log("vendorValue",projectstatusValue);
+    // console.log("projectvalueValue",projectvalueValue);
+    // console.log("durationdate1Value",durationdate1Value);
+    // console.log("durationdate2Value",durationdate2Value);
+    // console.log("projectTypeValue",projectTypeValue);
+    // console.log("statusValue",statusValue);
+    // console.log("vendorTypeValue",vendorTypeValue);
+
     const monthDiff = (d1, d2) => {
       var months;
       var date1 = new Date(d1);
@@ -143,11 +159,12 @@ const CustomerCreationSWMProjectStatus = () => {
         let listarr = list.map((item, index, arr)=> ({
             ...item,
             duration: monthDiff(item.duration1, item.duration2),
-            status_label: statusOptions.find(o => o.value === item.status.toString()).label, 
-            vendortype_label: vendorTypeOptions.find(o => o.value === item.vendortype.toString()).label,
+            status_label: (item.status ? (statusOptions.find(o => o.value === item.status.toString()).label):""), 
+            vendortype_label: (item.vendortype ? (vendorTypeOptions.find(o => o.value === item.vendortype.toString()).label):""),
             buttons:`<i class="fa fa-edit text-success mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
             sl_no : index + 1
           }))
+         
           setProjectList(listarr)
         });
       }
@@ -200,7 +217,7 @@ const CustomerCreationSWMProjectStatus = () => {
 
       const putData =(data) => {
         axios.put(`${baseUrl}/api/customercreationsmwprojectstatus/${projectid}`, data).then((resp) =>{
-          console.log(resp.data);
+          // console.log(resp.data);
           if (resp.data.status === 200) {
             getsublist()
             resetform()
@@ -216,16 +233,17 @@ const CustomerCreationSWMProjectStatus = () => {
       const onEdit =(data) => {
         setisEditbtn(true)
         setProjectId(data.id)
-        setvendorValue(data.vendor)
+        setvendorValue(data.vendor?data.vendor:"")
         setprojectstatusValueFunction(data)
-        setprojectvalueValue(data.projectvalue)
-        setdurationdate1Value(data.duration1)
-        setdurationdate2Value(data.duration2)
+        setprojectvalueValue(data.projectvalue ? data.projectvalue :"")
+        setdurationdate1Value(data.duration1?data.duration1:"")
+        setdurationdate2Value(data.duration2?data.duration2:"")
         setprojectTypeValueFunction(data)
       
         // setprojectTypeValue(projectTypeOptions.find(o => o.value === data.projecttype.toString()))
-        setstatusValue(statusOptions.find(o => o.value === data.status.toString()))
-        setvendorTypeValue(vendorTypeOptions.find(o => o.value === data.vendortype.toString()))
+        //$$$
+        setstatusValue(data.status ? (statusOptions.find(o => o.value === data.status.toString())):"")
+        setvendorTypeValue(data.vendortype ? vendorTypeOptions.find(o => o.value === data.vendortype.toString()):"")
       }
    
       const setprojectTypeValueFunction = (data) => {
@@ -244,17 +262,20 @@ const CustomerCreationSWMProjectStatus = () => {
           //     ]
           //   }
           // })
-
-          setprojectTypeValue( {
+          
+          setprojectTypeValue( data.projecttype!==null ? {
             'value' : data.projecttype,
             'label' : data.projecttype_label
-          })
+          } :""
+          )
+
         }
       }
 
       const setprojectstatusValueFunction = (data) => {
-        console.log(data)
+        
         if(projectstatusList.options.find(o => o.value === data.projectstatus)){
+
           setprojectstatusValue(projectstatusList.options.find(o => o.value === data.projectstatus))
         }else{
           // setprojectstatusoptions((prev)=> {
@@ -268,12 +289,12 @@ const CustomerCreationSWMProjectStatus = () => {
           //     ]
           //   }
           // })
-
-          setprojectstatusValue( {
+          setprojectstatusValue( data.projectstatus? {
             'value' : data.projectstatus,
             'label' : data.projectstatus_label
-          })
+          }:"")
         }
+       
       }
       
 
@@ -312,10 +333,19 @@ const CustomerCreationSWMProjectStatus = () => {
 
     let formIsValid = false;
 
+  //$$$ if (
+  //   projectTypeIsValid && statusIsValid && vendorIsValid && vendorTypeIsValid && projectvalueIsValid && projectstatusIsValid && durationdate1IsValid && durationdate2IsValid
+  // ) {
+  //   formIsValid = true;
+  // }
   if (
-    projectTypeIsValid && statusIsValid && vendorIsValid && vendorTypeIsValid && projectvalueIsValid && projectstatusIsValid && durationdate1IsValid && durationdate2IsValid
+    projectTypeValue || statusValue || vendorValue || vendorTypeValue || projectvalueValue || projectstatusValue || durationdate1Value || durationdate2Value
   ) {
     formIsValid = true;
+  }
+  else{
+    formIsValid = false;
+    // toastError("Can't Submit Empty Data");
   }
 
     const resetform = ()=> {
@@ -336,21 +366,33 @@ const CustomerCreationSWMProjectStatus = () => {
         setdatasending(true)
     
         if (!formIsValid) {
-          console.log("Inavlid Form!");
+          // console.log("Inavlid Form!");
           setdatasending(false)
           return;
         }
 
+        //$$$
+        // let swmProjectStatus = {
+        //     vendor : vendorValue,
+        //     projectstatus : projectstatusValue,
+        //     projectvalue : projectvalueValue,
+        //     duarationdate1 : durationdate1Value,
+        //     duarationdate2 : durationdate2Value,
+        //     projecttype : projectTypeValue,
+        //     status : statusValue,
+        //     vendortype: vendorTypeValue,
+        //  }
+
         let swmProjectStatus = {
-            vendor : vendorValue,
-            projectstatus : projectstatusValue,
-            projectvalue : projectvalueValue,
-            duarationdate1 : durationdate1Value,
-            duarationdate2 : durationdate2Value,
-            projecttype : projectTypeValue,
-            status : statusValue,
-            vendortype: vendorTypeValue,
-         }
+          vendor : vendorValue,
+          projectstatus : (!projectstatusValue? "":projectstatusValue.value),
+          projectvalue : projectvalueValue,
+          duarationdate1 : durationdate1Value,
+          duarationdate2 : durationdate2Value,
+          projecttype : (!projectTypeValue.value? "":projectTypeValue.value),
+          status : (!statusValue ? "" :statusValue.value),
+          vendortype: (!vendorTypeValue ? "" : vendorTypeValue.value),
+       }
 
          let datatosend ={
             swmProjectStatus,
@@ -365,7 +407,7 @@ const CustomerCreationSWMProjectStatus = () => {
           }
       
     }
-
+// console.log("formIsValid", formIsValid);
     return(
         <Fragment>
         <div className="formContent">

@@ -102,6 +102,7 @@ const Tendercreation = () => {
         setInputValidation({...inputValidation, [e.target.name]:true});
     }
     else{
+      setFormIsValid(false);
       setInputValidation({...inputValidation, [e.target.name]:false});
     }
   };
@@ -117,14 +118,23 @@ const Tendercreation = () => {
         setInputValidation({...inputValidation, [action.name]:true});
     }
     else{
+      setFormIsValid(false);
       setInputValidation({...inputValidation, [action.name]:false});
     }
   };
  
   useEffect(()=>{
-    if(input.customerName!=="" && input.nitDate!=="" && input.organisation!=="" && (input.tenderType.value!=="" | input.tenderType.value!==undefined))
+    
+    if(
+  (input.customerName ? (input.customerName.value!=="" && input.customerName.value!==undefined && input.customerName.value!==null): false) &&
+      input.nitDate!=="" &&
+      (input.organisation ? (input.organisation.value!=="" && input.organisation.value!==undefined && input.organisation.value!==null): false) && 
+      (input.tenderType ? (input.tenderType.value!=="" && input.tenderType.value!==undefined && input.tenderType.value!==null): false))
     {
       setFormIsValid(true);
+    }
+    else{
+      setFormIsValid(false);
     }
   },[input]);
 
@@ -232,7 +242,7 @@ const Tendercreation = () => {
       <div className="inputgroup col-lg-5 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark">
-              <label htmlFor="organisation" className="font-weight-bold"> Organisation </label>
+              <label htmlFor="organisation" className="font-weight-bold"> Organisation<span className="text-danger">&nbsp;*</span> </label>
             </div>
             <div className="col-lg-8">
             <Select
@@ -261,7 +271,7 @@ const Tendercreation = () => {
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark">
               <label htmlFor="customerName" className="font-weight-bold">
-              Customer Name
+              Customer Name<span className="text-danger">&nbsp;*</span>
               </label>
             </div>
             <div className="col-lg-8">

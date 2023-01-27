@@ -2,14 +2,16 @@ import { Fragment, useEffect, useState } from "react"
 import { useNavigate, useOutletContext, useParams } from "react-router-dom"
 import { useBaseUrl } from "../../../hooks/useBaseUrl"
 import useInputValidation from "../../../hooks/useInputValidation"
-import { isIFSCvalid } from "../CommonValidation"
+//import { isIFSCvalid } from "../CommonValidation"
+import { isIFSCvalid } from "../CommonValidation_copy"
 import axios from "axios";
 import CustomerCreationBankDetailsubtable from "./CusromerCreationBankDetailsubtable";
 import Swal from "sweetalert2";
 
 
 
-const isNotEmpty = (value) => value.trim() !== "";
+//$$$ const isNotEmpty = (value) => value.trim() !== "";
+const isNotEmpty = (value) => true;
 const isEmail = (value) => value.includes("@");
 
 const CustomerCreationBankDetails = () => {
@@ -107,16 +109,25 @@ const CustomerCreationBankDetails = () => {
 
       let formIsValid = false;
 
+      // if (
+      //   banknameIsValid &&
+      //   bankaddressIsValid &&
+      //   ifsccodeIsValid &&
+      //   beneficiaryaccountnameIsValid &&
+      //   accountnumberIsValid 
+      // ) {
+      //   formIsValid = true;
+      // }
+    
       if (
-        banknameIsValid &&
-        bankaddressIsValid &&
-        ifsccodeIsValid &&
-        beneficiaryaccountnameIsValid &&
-        accountnumberIsValid 
+        banknameValue ||
+        bankaddressValue ||
+        ifsccodeValue ||
+        beneficiaryaccountnameValue ||
+        accountnumberValue 
       ) {
         formIsValid = true;
       }
-    
 
       const submitHandler = (e) => {
         e.preventDefault();
@@ -211,11 +222,11 @@ const CustomerCreationBankDetails = () => {
     const onEdit =(data) => {
       setisEditbtn(true)
       setbankid(data.id)
-      setbanknameValue(data.bankname)
-      setbankaddressValue(data.bankaddress)
-      setifsccodeValue(data.ifsccode)
-      setbeneficiaryaccountnameValue(data.beneficiaryaccountname)
-      setaccountnumberValue(data.accountnumber)
+      setbanknameValue(data.bankname?data.bankname:"")
+      setbankaddressValue(data.bankaddress?data.bankaddress:"")
+      setifsccodeValue(data.ifsccode?data.ifsccode:"")
+      setbeneficiaryaccountnameValue(data.beneficiaryaccountname?data.beneficiaryaccountname:"")
+      setaccountnumberValue(data.accountnumber?data.accountnumber:"")
     }
   
     const onDelete = (data) => {

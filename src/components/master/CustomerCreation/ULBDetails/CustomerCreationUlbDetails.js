@@ -4,49 +4,49 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 
 const initialState = {
-  area : "", 
-  population2011 : "",
-  presentpopulation : "",
-  wards : "",
-  households : "",
-  commercial : "",
-  ABbusstand : "",
-  CDbusstand : "",
-  market_morethan_oneacre : "",
-  market_lessthan_oneacre : "",
-  lengthofroad : "",
-  lengthofrouteroad : "",
-  lengthofotherroad : "",
-  lengthoflanes : "",
-  lengthofpucca : "",
-  lengthofcutcha : "",
-  parks : "",
-  parksforpublicuse : "",
-  tricycle : "",
-  bov : "",
-  bovrepair : "",
-  lcv : "",
-  lcvrepair : "",
-  compactor : "",
-  hookloaderwithcapacity : "",
-  compactorbin : "",
-  hookloader : "",
-  tractortipper : "",
-  lorries : "",
-  jcb : "",
-  bobcat : "",
-  sanitaryworkers_sanctioned : "",
-  sanitaryworkers_inservice : "",
-  sanitarysupervisor_sanctioned : "",
-  sanitarysupervisor_inservice : "",
-  permanentdrivers : "",
-  regulardrivers : "",
-  publicgathering : "",
-  secondarystorage : "",
-  transferstation : "",
-  households_animatorsurvey : "",
-  assessments_residential : "",
-  assessments_commercial : "",
+  area: "",
+  population2011: "",
+  presentpopulation: "",
+  wards: "",
+  households: "",
+  commercial: "",
+  ABbusstand: "",
+  CDbusstand: "",
+  market_morethan_oneacre: "",
+  market_lessthan_oneacre: "",
+  lengthofroad: "",
+  lengthofrouteroad: "",
+  lengthofotherroad: "",
+  lengthoflanes: "",
+  lengthofpucca: "",
+  lengthofcutcha: "",
+  parks: "",
+  parksforpublicuse: "",
+  tricycle: "",
+  bov: "",
+  bovrepair: "",
+  lcv: "",
+  lcvrepair: "",
+  compactor: "",
+  hookloaderwithcapacity: "",
+  compactorbin: "",
+  hookloader: "",
+  tractortipper: "",
+  lorries: "",
+  jcb: "",
+  bobcat: "",
+  sanitaryworkers_sanctioned: "",
+  sanitaryworkers_inservice: "",
+  sanitarysupervisor_sanctioned: "",
+  sanitarysupervisor_inservice: "",
+  permanentdrivers: "",
+  regulardrivers: "",
+  publicgathering: "",
+  secondarystorage: "",
+  transferstation: "",
+  households_animatorsurvey: "",
+  assessments_residential: "",
+  assessments_commercial: "",
 };
 
 let formvalid = false;
@@ -55,78 +55,161 @@ const CustomerCreationUlbDetails = () => {
   const [datasending, setdatasending] = useState(false);
   const [isDisabled, setDisabled] = useState(true);
   const [input, setInput] = useState(initialState);
-  const [ulbid, setuldid] =  useState(null);
+  const [ulbid, setuldid] = useState(null);
   const { id } = useParams();
   const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
-  const [toastSuccess, toastError, setCustomerCreationMainID] = useOutletContext();
+  const [toastSuccess, toastError, setCustomerCreationMainID] =
+    useOutletContext();
 
+  const setPresentPopulation = () => {
+    if (input.population2011) {
+      let date = new Date();
+      var currentYear = date.getFullYear();
+      //Lastest census year = 2011;
+      //Approximate Annual Poppulation growth is 1%
 
-  const getulbdetails = () => {
-    axios.get(`${baseUrl}/api/customercreationulbdetails/${id}`).then((resp) => {
-      if (resp.data.status === 200) {
+      // let currentPopulation=  (currentYear-2011)*1*input.population2011;
 
-       let  ulbdetails =   resp.data.ulbdetails ;
-        setInput({
-          ...input,
-          area : (ulbdetails.area) ? (ulbdetails.area) : "",
-          population2011 : (ulbdetails.population2011) ? (ulbdetails.population2011) : "",
-          presentpopulation : (ulbdetails.presentpopulation) ? (ulbdetails.presentpopulation) : "",
-          wards : (ulbdetails.wards) ? (ulbdetails.wards) : "",
-          households : (ulbdetails.households) ? (ulbdetails.households) : "",
-          commercial : (ulbdetails.commercial) ? (ulbdetails.commercial) : "",
-          ABbusstand : (ulbdetails.ABbusstand) ? (ulbdetails.ABbusstand) : "",
-          CDbusstand : (ulbdetails.CDbusstand) ? (ulbdetails.CDbusstand) : "",
-          market_morethan_oneacre : (ulbdetails.market_morethan_oneacre) ? (ulbdetails.market_morethan_oneacre) : "",
-          market_lessthan_oneacre : (ulbdetails.market_lessthan_oneacre) ? (ulbdetails.market_lessthan_oneacre) : "",
-          lengthofroad : (ulbdetails.lengthofroad) ? (ulbdetails.lengthofroad) : "",
-          lengthofrouteroad : (ulbdetails.lengthofrouteroad) ? (ulbdetails.lengthofrouteroad) : "",
-          lengthofotherroad : (ulbdetails.lengthofotherroad) ? (ulbdetails.lengthofotherroad) : "",
-          lengthoflanes : (ulbdetails.lengthoflanes) ? (ulbdetails.lengthoflanes) : "",
-          lengthofpucca : (ulbdetails.lengthofpucca) ? (ulbdetails.lengthofpucca) : "",
-          lengthofcutcha : (ulbdetails.lengthofcutcha) ? (ulbdetails.lengthofcutcha) : "",
-          parks : (ulbdetails.parks) ? (ulbdetails.parks) : "",
-          parksforpublicuse : (ulbdetails.parksforpublicuse) ? (ulbdetails.parksforpublicuse) : "",
-          tricycle : (ulbdetails.tricycle) ? (ulbdetails.tricycle) : "",
-          bov : (ulbdetails.bov) ? (ulbdetails.bov) : "",
-          bovrepair : (ulbdetails.bovrepair) ? (ulbdetails.bovrepair) : "",
-          lcv : (ulbdetails.lcv) ? (ulbdetails.lcv) : "",
-          lcvrepair : (ulbdetails.lcvrepair) ? (ulbdetails.lcvrepair) : "",
-          compactor : (ulbdetails.compactor) ? (ulbdetails.compactor) : "",
-          hookloaderwithcapacity : (ulbdetails.hookloaderwithcapacity) ? (ulbdetails.hookloaderwithcapacity) : "",
-          compactorbin : (ulbdetails.compactorbin) ? (ulbdetails.compactorbin) : "",
-          hookloader : (ulbdetails.hookloader) ? (ulbdetails.hookloader) : "",
-          tractortipper : (ulbdetails.tractortipper) ? (ulbdetails.tractortipper) : "",
-          lorries : (ulbdetails.lorries) ? (ulbdetails.lorries) : "",
-          jcb : (ulbdetails.jcb) ? (ulbdetails.jcb) : "",
-          bobcat : (ulbdetails.bobcat) ? (ulbdetails.bobcat) : "",
-          sanitaryworkers_sanctioned : (ulbdetails.sanitaryworkers_sanctioned) ? (ulbdetails.sanitaryworkers_sanctioned) : "",
-          sanitaryworkers_inservice : (ulbdetails.sanitaryworkers_inservice) ? (ulbdetails.sanitaryworkers_inservice) : "",
-          sanitarysupervisor_sanctioned : (ulbdetails.sanitarysupervisor_sanctioned) ? (ulbdetails.sanitarysupervisor_sanctioned) : "",
-          sanitarysupervisor_inservice : (ulbdetails.sanitarysupervisor_inservice) ? (ulbdetails.sanitarysupervisor_inservice) : "",
-          permanentdrivers : (ulbdetails.permanentdrivers) ? (ulbdetails.permanentdrivers) : "",
-          regulardrivers : (ulbdetails.regulardrivers) ? (ulbdetails.regulardrivers) : "",
-          publicgathering : (ulbdetails.publicgathering) ? (ulbdetails.publicgathering) : "",
-          secondarystorage : (ulbdetails.secondarystorage) ? (ulbdetails.secondarystorage) : "",
-          transferstation : (ulbdetails.transferstation) ? (ulbdetails.transferstation) : "",
-          households_animatorsurvey : (ulbdetails.households_animatorsurvey) ? (ulbdetails.households_animatorsurvey) : "",
-          assessments_residential : (ulbdetails.assessments_residential) ? (ulbdetails.assessments_residential) : "",
-          assessments_commercial : (ulbdetails.assessments_commercial) ? (ulbdetails.assessments_commercial) : "",
-        });
-        setuldid(ulbdetails.id)
+      // f(x)=a(1+r)^x - exponential growth over time period
+      //x- time interval
+      //a- intial amount
+      //r- growth rate
 
-        // navigate("/tender/master/customercreation/list/main/contactPerson/"+id);
-      }
-      setLoading(false)      
-    });
-  }
+      let currentPopulation = Math.round(
+        input.population2011 * (1 + 1 / 100) ** (currentYear - 2011)
+      );
+
+      setInput((prev) => {
+        return { ...prev, presentpopulation: currentPopulation };
+      });
+    } else {
+      setInput({ ...input, presentpopulation: "" });
+    }
+  };
 
   useEffect(() => {
-    if(id){
-      setCustomerCreationMainID(id)
-      getulbdetails()
+    setPresentPopulation();
+  }, [input.population2011]);
+
+  const getulbdetails = () => {
+    axios
+      .get(`${baseUrl}/api/customercreationulbdetails/${id}`)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          let ulbdetails = resp.data.ulbdetails;
+          setInput({
+            ...input,
+            area: ulbdetails.area ? ulbdetails.area : "",
+            population2011: ulbdetails.population2011
+              ? ulbdetails.population2011
+              : "",
+            // presentpopulation : (ulbdetails.presentpopulation) ? (ulbdetails.presentpopulation) : "",
+            wards: ulbdetails.wards ? ulbdetails.wards : "",
+            households: ulbdetails.households ? ulbdetails.households : "",
+            commercial: ulbdetails.commercial ? ulbdetails.commercial : "",
+            ABbusstand: ulbdetails.ABbusstand ? ulbdetails.ABbusstand : "",
+            CDbusstand: ulbdetails.CDbusstand ? ulbdetails.CDbusstand : "",
+            market_morethan_oneacre: ulbdetails.market_morethan_oneacre
+              ? ulbdetails.market_morethan_oneacre
+              : "",
+            market_lessthan_oneacre: ulbdetails.market_lessthan_oneacre
+              ? ulbdetails.market_lessthan_oneacre
+              : "",
+            lengthofroad: ulbdetails.lengthofroad
+              ? ulbdetails.lengthofroad
+              : "",
+            lengthofrouteroad: ulbdetails.lengthofrouteroad
+              ? ulbdetails.lengthofrouteroad
+              : "",
+            lengthofotherroad: ulbdetails.lengthofotherroad
+              ? ulbdetails.lengthofotherroad
+              : "",
+            lengthoflanes: ulbdetails.lengthoflanes
+              ? ulbdetails.lengthoflanes
+              : "",
+            lengthofpucca: ulbdetails.lengthofpucca
+              ? ulbdetails.lengthofpucca
+              : "",
+            lengthofcutcha: ulbdetails.lengthofcutcha
+              ? ulbdetails.lengthofcutcha
+              : "",
+            parks: ulbdetails.parks ? ulbdetails.parks : "",
+            parksforpublicuse: ulbdetails.parksforpublicuse
+              ? ulbdetails.parksforpublicuse
+              : "",
+            tricycle: ulbdetails.tricycle ? ulbdetails.tricycle : "",
+            bov: ulbdetails.bov ? ulbdetails.bov : "",
+            bovrepair: ulbdetails.bovrepair ? ulbdetails.bovrepair : "",
+            lcv: ulbdetails.lcv ? ulbdetails.lcv : "",
+            lcvrepair: ulbdetails.lcvrepair ? ulbdetails.lcvrepair : "",
+            compactor: ulbdetails.compactor ? ulbdetails.compactor : "",
+            hookloaderwithcapacity: ulbdetails.hookloaderwithcapacity
+              ? ulbdetails.hookloaderwithcapacity
+              : "",
+            compactorbin: ulbdetails.compactorbin
+              ? ulbdetails.compactorbin
+              : "",
+            hookloader: ulbdetails.hookloader ? ulbdetails.hookloader : "",
+            tractortipper: ulbdetails.tractortipper
+              ? ulbdetails.tractortipper
+              : "",
+            lorries: ulbdetails.lorries ? ulbdetails.lorries : "",
+            jcb: ulbdetails.jcb ? ulbdetails.jcb : "",
+            bobcat: ulbdetails.bobcat ? ulbdetails.bobcat : "",
+            sanitaryworkers_sanctioned: ulbdetails.sanitaryworkers_sanctioned
+              ? ulbdetails.sanitaryworkers_sanctioned
+              : "",
+            sanitaryworkers_inservice: ulbdetails.sanitaryworkers_inservice
+              ? ulbdetails.sanitaryworkers_inservice
+              : "",
+            sanitarysupervisor_sanctioned:
+              ulbdetails.sanitarysupervisor_sanctioned
+                ? ulbdetails.sanitarysupervisor_sanctioned
+                : "",
+            sanitarysupervisor_inservice:
+              ulbdetails.sanitarysupervisor_inservice
+                ? ulbdetails.sanitarysupervisor_inservice
+                : "",
+            permanentdrivers: ulbdetails.permanentdrivers
+              ? ulbdetails.permanentdrivers
+              : "",
+            regulardrivers: ulbdetails.regulardrivers
+              ? ulbdetails.regulardrivers
+              : "",
+            publicgathering: ulbdetails.publicgathering
+              ? ulbdetails.publicgathering
+              : "",
+            secondarystorage: ulbdetails.secondarystorage
+              ? ulbdetails.secondarystorage
+              : "",
+            transferstation: ulbdetails.transferstation
+              ? ulbdetails.transferstation
+              : "",
+            households_animatorsurvey: ulbdetails.households_animatorsurvey
+              ? ulbdetails.households_animatorsurvey
+              : "",
+            assessments_residential: ulbdetails.assessments_residential
+              ? ulbdetails.assessments_residential
+              : "",
+            assessments_commercial: ulbdetails.assessments_commercial
+              ? ulbdetails.assessments_commercial
+              : "",
+          });
+          setuldid(ulbdetails.id);
+
+          // navigate("/tender/master/customercreation/list/main/contactPerson/"+id);
+        }
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (id) {
+      setCustomerCreationMainID(id);
+      getulbdetails();
     }
-  },[])
+  }, []);
 
   const inputHandler = (e) => {
     setInput({
@@ -136,112 +219,123 @@ const CustomerCreationUlbDetails = () => {
   };
 
   for (const key in input) {
-    if(input[key].trim() !== ""){
+    try{
+    if (input[key].trim() !== "") {
       formvalid = true;
       break;
-    }else{
+    } else {
       formvalid = false;
     }
   }
+  catch(err){
+    formvalid = false;
+    toastError("Form is Invalid");
+  }
+  }
 
- 
   const submitHandler = (e) => {
     e.preventDefault();
     setdatasending(true);
     let ulbdetails = {
-      area : input.area,
-      population2011 : input.population2011,
-      presentpopulation : input.presentpopulation,
-      wards : input.wards,
-      households : input.households,
-      commercial : input.commercial,
-      ABbusstand : input.ABbusstand,
-      CDbusstand : input.CDbusstand,
-      market_morethan_oneacre : input.market_morethan_oneacre,
-      market_lessthan_oneacre : input.market_lessthan_oneacre,
-      lengthofroad : input.lengthofroad,
-      lengthofrouteroad : input.lengthofrouteroad,
-      lengthofotherroad : input.lengthofotherroad,
-      lengthoflanes : input.lengthoflanes,
-      lengthofpucca : input.lengthofpucca,
-      lengthofcutcha : input.lengthofcutcha,
-      parks : input.parks,
-      parksforpublicuse : input.parksforpublicuse,
-      tricycle : input.tricycle,
-      bov : input.bov,
-      bovrepair : input.bovrepair,
-      lcv : input.lcv,
-      lcvrepair : input.lcvrepair,
-      compactor : input.compactor,
-      hookloaderwithcapacity : input.hookloaderwithcapacity,
-      compactorbin : input.compactorbin,
-      hookloader : input.hookloader,
-      tractortipper : input.tractortipper,
-      lorries : input.lorries,
-      jcb : input.jcb,
-      bobcat : input.bobcat,
-      sanitaryworkers_sanctioned : input.sanitaryworkers_sanctioned,
-      sanitaryworkers_inservice : input.sanitaryworkers_inservice,
-      sanitarysupervisor_sanctioned : input.sanitarysupervisor_sanctioned,
-      sanitarysupervisor_inservice : input.sanitarysupervisor_inservice,
-      permanentdrivers : input.permanentdrivers,
-      regulardrivers : input.regulardrivers,
-      publicgathering : input.publicgathering,
-      secondarystorage : input.secondarystorage,
-      transferstation : input.transferstation,
-      households_animatorsurvey : input.households_animatorsurvey,
-      assessments_residential : input.assessments_residential,
-      assessments_commercial : input.assessments_commercial,
-      cust_creation_mainid : id,
-    }
-
-    let data = {
-      ulbdetails : ulbdetails,
-      tokenid : localStorage.getItem("token"),
+      area: input.area,
+      population2011: input.population2011,
+      // presentpopulation: input.presentpopulation,
+      wards: input.wards,
+      households: input.households,
+      commercial: input.commercial,
+      ABbusstand: input.ABbusstand,
+      CDbusstand: input.CDbusstand,
+      market_morethan_oneacre: input.market_morethan_oneacre,
+      market_lessthan_oneacre: input.market_lessthan_oneacre,
+      lengthofroad: input.lengthofroad,
+      lengthofrouteroad: input.lengthofrouteroad,
+      lengthofotherroad: input.lengthofotherroad,
+      lengthoflanes: input.lengthoflanes,
+      lengthofpucca: input.lengthofpucca,
+      lengthofcutcha: input.lengthofcutcha,
+      parks: input.parks,
+      parksforpublicuse: input.parksforpublicuse,
+      tricycle: input.tricycle,
+      bov: input.bov,
+      bovrepair: input.bovrepair,
+      lcv: input.lcv,
+      lcvrepair: input.lcvrepair,
+      compactor: input.compactor,
+      hookloaderwithcapacity: input.hookloaderwithcapacity,
+      compactorbin: input.compactorbin,
+      hookloader: input.hookloader,
+      tractortipper: input.tractortipper,
+      lorries: input.lorries,
+      jcb: input.jcb,
+      bobcat: input.bobcat,
+      sanitaryworkers_sanctioned: input.sanitaryworkers_sanctioned,
+      sanitaryworkers_inservice: input.sanitaryworkers_inservice,
+      sanitarysupervisor_sanctioned: input.sanitarysupervisor_sanctioned,
+      sanitarysupervisor_inservice: input.sanitarysupervisor_inservice,
+      permanentdrivers: input.permanentdrivers,
+      regulardrivers: input.regulardrivers,
+      publicgathering: input.publicgathering,
+      secondarystorage: input.secondarystorage,
+      transferstation: input.transferstation,
+      households_animatorsurvey: input.households_animatorsurvey,
+      assessments_residential: input.assessments_residential,
+      assessments_commercial: input.assessments_commercial,
+      cust_creation_mainid: id,
     };
 
-    if(ulbid){
-      putData(data)
-    }else{
-      postData(data)
-    }
+    let data = {
+      ulbdetails: ulbdetails,
+      tokenid: localStorage.getItem("token"),
+    };
 
+    if (ulbid) {
+      putData(data);
+    } else {
+      postData(data);
+    }
   };
 
   const postData = (data) => {
-    axios.post(`${baseUrl}/api/customercreationulbdetails`, data).then((resp) => {
-      if (resp.data.status === 200) {
-        toastSuccess(resp.data.message)
-        resetall()
-        navigate("/tender/master/customercreation/list/main/bankdetails/"+id);
-      } else if (resp.data.status === 400) {
-        toastError(resp.data.message)
-      }
-      setdatasending(false)
-    });
-  }
+    axios
+      .post(`${baseUrl}/api/customercreationulbdetails`, data)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          toastSuccess(resp.data.message);
+          resetall();
+          navigate(
+            "/tender/master/customercreation/list/main/bankdetails/" + id
+          );
+        } else if (resp.data.status === 400) {
+          toastError(resp.data.message);
+        }
+        setdatasending(false);
+      });
+  };
 
   const putData = (data) => {
-    axios.put(`${baseUrl}/api/customercreationulbdetails/${ulbid}`, data).then((resp) => {
-      if (resp.data.status === 200) {
-        toastSuccess(resp.data.message)
-        resetall()
-        navigate("/tender/master/customercreation/list/main/bankdetails/"+id);
-      } else if (resp.data.status === 400) {
-        toastError(resp.data.message)
-      }
-      setdatasending(false)
-    });
-  }
+    axios
+      .put(`${baseUrl}/api/customercreationulbdetails/${ulbid}`, data)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          toastSuccess(resp.data.message);
+          resetall();
+          navigate(
+            "/tender/master/customercreation/list/main/bankdetails/" + id
+          );
+        } else if (resp.data.status === 400) {
+          toastError(resp.data.message);
+        }
+        setdatasending(false);
+      });
+  };
 
-  const cancelHandler = () =>{
-    resetall()
-   
-  }
+  const cancelHandler = () => {
+    resetall();
+  };
 
   const resetall = () => {
-    setInput(initialState)
-  }
+    setInput(initialState);
+  };
   return (
     <Fragment>
       <div className="formContent">
@@ -254,9 +348,17 @@ const CustomerCreationUlbDetails = () => {
             />
           </div>
         )}
-        {!id && <div className="loading">
-          <img id="loading-image" src="/assets/img/lock.png" alt="Loading..." width ="150" height="150"/>
-        </div>}
+        {!id && (
+          <div className="loading">
+            <img
+              id="loading-image"
+              src="/assets/img/lock.png"
+              alt="Loading..."
+              width="150"
+              height="150"
+            />
+          </div>
+        )}
         <form onSubmit={submitHandler}>
           <div className="row align-items-center">
             <div className="inputgroup col-lg-6 mb-4">
@@ -282,8 +384,8 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="population2011">Population as per 2011</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
-                    type="text"
+                  <input
+                    type="number"
                     className="form-control"
                     id="population2011"
                     name="population2011"
@@ -299,13 +401,14 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="presentpopulation">Present Population</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="presentpopulation"
                     name="presentpopulation"
                     value={input.presentpopulation}
                     onChange={inputHandler}
+                    disabled={true}
                   />
                 </div>
               </div>
@@ -316,7 +419,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="wards">No. of Wards</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="wards"
@@ -333,7 +436,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="households">No. House holds</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="households"
@@ -347,10 +450,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="commercial">No. of commercial establishments</label>
+                  <label htmlFor="commercial">
+                    No. of commercial establishments
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="commercial"
@@ -367,7 +472,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="ABbusstand">No. of A&B grade bus stand</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="ABbusstand"
@@ -384,7 +489,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="CDbusstand">No. of C&D grade bus stand</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="CDbusstand"
@@ -398,10 +503,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="market_morethan_oneacre">No. of markets available (having area more than one acre)</label>
+                  <label htmlFor="market_morethan_oneacre">
+                    No. of markets available (having area more than one acre)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="mamarket_morethan_oneacrerket"
@@ -415,10 +522,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="market_lessthan_oneacre">No. of markets available (having area less than one acre)</label>
+                  <label htmlFor="market_lessthan_oneacre">
+                    No. of markets available (having area less than one acre)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="market_lessthan_oneacre"
@@ -432,10 +541,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lengthofroad">Total length of Roads (Km)</label>
+                  <label htmlFor="lengthofroad">
+                    Total length of Roads (Km)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lengthofroad"
@@ -449,10 +560,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lengthofrouteroad">Length of route Roads alone (Km)</label>
+                  <label htmlFor="lengthofrouteroad">
+                    Length of route Roads alone (Km)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lengthofrouteroad"
@@ -466,10 +579,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lengthofotherroad">Length of other roads/streets alone (Km)</label>
+                  <label htmlFor="lengthofotherroad">
+                    Length of other roads/streets alone (Km)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lengthofotherroad"
@@ -480,13 +595,15 @@ const CustomerCreationUlbDetails = () => {
                 </div>
               </div>
             </div>
-             <div className="inputgroup col-lg-6 mb-4">
+            <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lengthoflanes">Length of other Lanes alone (Km)</label>
+                  <label htmlFor="lengthoflanes">
+                    Length of other Lanes alone (Km)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lengthoflanes"
@@ -500,10 +617,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lengthofpucca">Length of Pucca drain (Km)</label>
+                  <label htmlFor="lengthofpucca">
+                    Length of Pucca drain (Km)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lengthofpucca"
@@ -517,10 +636,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lengthofcutcha">Length of Cutcha drain (Km)</label>
+                  <label htmlFor="lengthofcutcha">
+                    Length of Cutcha drain (Km)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lengthofcutcha"
@@ -537,7 +658,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="parks">No. of parks available</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="parks"
@@ -551,10 +672,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="parksforpublicuse">No. of parks dedicated to public use</label>
+                  <label htmlFor="parksforpublicuse">
+                    No. of parks dedicated to public use
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="parksforpublicuse"
@@ -568,10 +691,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="tricycle">No. of Tricycle available for d2d collection</label>
+                  <label htmlFor="tricycle">
+                    No. of Tricycle available for d2d collection
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="tricycle"
@@ -588,7 +713,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="bov">No. of bov in working condition</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="bov"
@@ -605,7 +730,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="bovrepair">No. of bov in repair</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="bovrepair"
@@ -619,10 +744,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lcv">No. of LCV available in working condition</label>
+                  <label htmlFor="lcv">
+                    No. of LCV available in working condition
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lcv"
@@ -636,10 +763,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lcvrepair">No. of LCV available with repair</label>
+                  <label htmlFor="lcvrepair">
+                    No. of LCV available with repair
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lcvrepair"
@@ -653,10 +782,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="compactor">No. of compactor available and its capacity</label>
+                  <label htmlFor="compactor">
+                    No. of compactor available and its capacity
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="compactor"
@@ -670,10 +801,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="hookloaderwithcapacity">No. of Hook loader available and its capacity</label>
+                  <label htmlFor="hookloaderwithcapacity">
+                    No. of Hook loader available and its capacity
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="hookloaderwithcapacity"
@@ -687,10 +820,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="compactorbin">No. of compactor bin available</label>
+                  <label htmlFor="compactorbin">
+                    No. of compactor bin available
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="compactorbin"
@@ -704,10 +839,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="hookloader">No. of Hook loader available</label>
+                  <label htmlFor="hookloader">
+                    No. of Hook loader available
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="hookloader"
@@ -721,10 +858,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="tractortipper">No. of tractor cum tipper vehicle available</label>
+                  <label htmlFor="tractortipper">
+                    No. of tractor cum tipper vehicle available
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="tractortipper"
@@ -738,10 +877,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="lorries">No. of Lorries available and its capacity</label>
+                  <label htmlFor="lorries">
+                    No. of Lorries available and its capacity
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="lorries"
@@ -758,7 +899,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="jcb">No. of JCB available</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="jcb"
@@ -775,7 +916,7 @@ const CustomerCreationUlbDetails = () => {
                   <label htmlFor="bobcat">No. of bobCat available</label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="bobcat"
@@ -789,10 +930,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="sanitaryworkers_sanctioned">No. of sanitary workers (permanent) sanctioned</label>
+                  <label htmlFor="sanitaryworkers_sanctioned">
+                    No. of sanitary workers (permanent) sanctioned
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="sanitaryworkers_sanctioned"
@@ -806,10 +949,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="sanitaryworkers_inservice">No. of sanitary workers are in service on date (available)</label>
+                  <label htmlFor="sanitaryworkers_inservice">
+                    No. of sanitary workers are in service on date (available)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="sanitaryworkers_inservice"
@@ -823,10 +968,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="sanitarysupervisor_sanctioned">No. of (permanent) sanitary supervisor sanctioned</label>
+                  <label htmlFor="sanitarysupervisor_sanctioned">
+                    No. of (permanent) sanitary supervisor sanctioned
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="sanitarysupervisor_sanctioned"
@@ -840,10 +987,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="sanitarysupervisor_inservice">No. of sanitary supervisor are in service (available)</label>
+                  <label htmlFor="sanitarysupervisor_inservice">
+                    No. of sanitary supervisor are in service (available)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="sanitarysupervisor_inservice"
@@ -857,10 +1006,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="permanentdrivers">No. of permanenty drivers sanctioned</label>
+                  <label htmlFor="permanentdrivers">
+                    No. of permanenty drivers sanctioned
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="permanentdrivers"
@@ -874,10 +1025,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="regulardrivers">No. of regular drivers available</label>
+                  <label htmlFor="regulardrivers">
+                    No. of regular drivers available
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="regulardrivers"
@@ -891,10 +1044,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="publicgathering">No. of public gathering area (public meeting point)</label>
+                  <label htmlFor="publicgathering">
+                    No. of public gathering area (public meeting point)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="publicgathering"
@@ -908,10 +1063,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="secondarystorage">No. of secondary storage point if any</label>
+                  <label htmlFor="secondarystorage">
+                    No. of secondary storage point if any
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="secondarystorage"
@@ -925,10 +1082,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="transferstation">No. of Transfer station if any</label>
+                  <label htmlFor="transferstation">
+                    No. of Transfer station if any
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="transferstation"
@@ -942,10 +1101,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="households_animatorsurvey">No. of household (as per animator survey)</label>
+                  <label htmlFor="households_animatorsurvey">
+                    No. of household (as per animator survey)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="households_animatorsurvey"
@@ -959,10 +1120,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="assessments_residential">No. of assessments (residential)</label>
+                  <label htmlFor="assessments_residential">
+                    No. of assessments (residential)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="assessments_residential"
@@ -976,10 +1139,12 @@ const CustomerCreationUlbDetails = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="assessments_commercial">No. of assessments (commercial)</label>
+                  <label htmlFor="assessments_commercial">
+                    No. of assessments (commercial)
+                  </label>
                 </div>
                 <div className="col-lg-8">
-                   <input
+                  <input
                     type="text"
                     className="form-control"
                     id="assessments_commercial"
@@ -990,24 +1155,31 @@ const CustomerCreationUlbDetails = () => {
                 </div>
               </div>
             </div>
-            <div className = "col-lg-12 mt-3 d-flex justify-content-end">
-         
-            <button
-                className={(!formvalid) ?  "btn btn-outline-primary mr-3 rounded-pill" :  "btn btn-primary mr-3 rounded-pill"} 
+            <div className="col-lg-12 mt-3 d-flex justify-content-end">
+              <button
+                className={
+                  !formvalid
+                    ? "btn btn-outline-primary mr-3 rounded-pill"
+                    : "btn btn-primary mr-3 rounded-pill"
+                }
                 onClick={submitHandler}
                 disabled={!formvalid || datasending}
               >
-             {datasending && <span className="spinner-border spinner-border-sm mr-2"></span> }
-             {datasending && ((ulbid) ? "Updating..." : "Saving...")}
-             {!datasending && ((ulbid) ? "Update & Continue" : "Save & Continue")}
-            </button>
-            <button className="btn  btn-outline-dark rounded-pill"
-              onClick = {() => navigate("/tender/master/customercreation/list")}
-              disabled = {datasending}
+                {datasending && (
+                  <span className="spinner-border spinner-border-sm mr-2"></span>
+                )}
+                {datasending && (ulbid ? "Updating..." : "Saving...")}
+                {!datasending &&
+                  (ulbid ? "Update & Continue" : "Save & Continue")}
+              </button>
+              <button
+                className="btn  btn-outline-dark rounded-pill"
+                onClick={() => navigate("/tender/master/customercreation/list")}
+                disabled={datasending}
               >
                 Cancel
-            </button>
-          </div>    
+              </button>
+            </div>
           </div>
         </form>
       </div>

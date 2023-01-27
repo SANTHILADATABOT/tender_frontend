@@ -147,8 +147,8 @@ function Legacystatement() {
 		setLoading(true)
 
 		let response =  await axios.post(`${baseUrl}/api/legacystatement`, data);
-		console.log(response.data.legacylist)
-		console.log(response.data.sql)
+		// console.log(response.data.legacylist)
+		// console.log(response.data.sql)
 		let listarr = await generateListArray(response)
 		
 		setListarr(listarr)

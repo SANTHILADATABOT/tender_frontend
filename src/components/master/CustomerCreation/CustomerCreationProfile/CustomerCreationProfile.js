@@ -12,7 +12,8 @@ import {
 } from "../apiUtilites";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 import axios from "axios";
-import { isMobileValidation, isPincodeValid, isEmailValid, isPanValid, isgstNoValid, isUrlValid } from "../CommonValidation";
+// import { isMobileValidation, isPincodeValid, isEmailValid, isPanValid, isgstNoValid, isUrlValid } from "../CommonValidation";
+import { isMobileValidation, isPincodeValid, isEmailValid, isPanValid, isgstNoValid, isUrlValid } from "../CommonValidation_copy";
 
 
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
@@ -172,7 +173,7 @@ const CustomerCreationProfile = () => {
     inputBlurHandler: panBlurHandler,
     setInputValue: setpanValue,
     reset: resetpan,
-  } = useInputValidation(isPanValid);
+   } = useInputValidation(isPanValid); 
 
   const {
     value: mobilenoValue,
@@ -278,7 +279,8 @@ const CustomerCreationProfile = () => {
 
 
     const setsavedDataToForm = (savedData) => {
-      // console.log(savedData)
+      // console.log(savedData) // $$$$
+
       setFormId(savedData.id)
       setFormNo(savedData.form_no)
       setcustomernoValue(savedData.customer_no)
@@ -286,19 +288,19 @@ const CustomerCreationProfile = () => {
       setcustomercategoryValue(savedData.customer_category)
       setSmartCity(savedData.smart_city)
       setcustomersubcategoryValue(CustSubCatgyOpts.find((x) => x.value === savedData.customer_sub_category.toString()))
-      setpincodeValue(savedData.pincode.toString())
-      setphoneValue(savedData.phone.toString())
-      setpanValue(savedData.pan)
-      setmobilenoValue(savedData.mobile_no.toString())
+      setpincodeValue(savedData.pincode===null? "":savedData.pincode.toString())
+      setphoneValue(savedData.phone===null ? "": savedData.phone)
+      setpanValue(savedData.pan===null? "":savedData.pan)
+      setmobilenoValue(savedData.mobile_no=== null ? "": savedData.mobile_no);
       // setcurrentyrdateValue(savedData.current_year_date)
       setemailValue(savedData.email)
-      setgstReg(savedData.gst_registered)
-      savedData.gst_registered === "no" ? setGstNoDisable(true) : setGstNoDisable(false)
+      setgstReg((savedData.gst_no===null || savedData.gst_registered === "no") ? "no" : "yes");
+      (savedData.gst_no===null || savedData.gst_registered === "no") ? setGstNoDisable(true) : setGstNoDisable(false);
       savedData.gst_no === null ? setgstnoValue("") :  setgstnoValue(savedData.gst_no)
      
       // setpopulationyrdataValue(savedData.population_year_data)
-      setaddressValue(savedData.address)
-      setwebsiteValue(savedData.website)
+      setaddressValue(savedData.address === null ? "" : savedData.address)
+      setwebsiteValue(savedData.website ===null ? "": savedData.website)
     }
 
     const getprofileofcust = async () => {
@@ -584,29 +586,29 @@ const CustomerCreationProfile = () => {
   //   { value: "silver", label: "Silver" },
   // ];
 
-  let formIsValid = false;
+  let formIsValid = true;
 
-  if (
-    customernoValue &&
-    customernameIsValid &&
-    customersubcategoryIsValid &&
-    stateIsValid &&
-    countryIsValid &&
-    cityIsValid &&
-    districtIsValid &&
-    addressIsValid &&
-    pincodeIsValid &&
-    phoneIsValid &&
-    panIsValid &&
-    mobilenoIsValid &&
-    // currentyrdateIsValid &&
-    emailIsValid &&
-    (gstnoIsValid || GstNoDisable) &&
-    // populationyrdataIsValid &&
-    websiteIsValid
-  ) {
-    formIsValid = true;
-  }
+  // if (
+  //   customernoValue &&
+  //   customernameIsValid &&
+  //   customersubcategoryIsValid &&
+  //   stateIsValid &&
+  //   countryIsValid &&
+  //   cityIsValid &&
+  //   districtIsValid &&
+  //   addressIsValid &&
+  //   pincodeIsValid &&
+  //   phoneIsValid &&
+  //   panIsValid &&
+  //   mobilenoIsValid &&
+  //   // currentyrdateIsValid &&
+  //   emailIsValid &&
+  //   (gstnoIsValid || GstNoDisable) &&
+  //   // populationyrdataIsValid &&
+  //   websiteIsValid
+  // ) {
+  //   formIsValid = true;
+  // }
 
   const resetall = () => {
     resetcustomerno();
@@ -658,8 +660,13 @@ const CustomerCreationProfile = () => {
       } else if (resp.data.status === 400) {
         toastError(resp.data.message)
       }
+      
       setdatasending(false)
-    });
+    })
+    .catch(()=>{
+        toastError("Can't allow empty values")
+        setdatasending(false)
+    })
   };
 
 
@@ -672,7 +679,7 @@ const CustomerCreationProfile = () => {
       return;
     }
 
-    console.log("Submitted!");
+    try{
     let profileData = {
       customer_no: customernoValue,
       customer_category: customercategoryValue,
@@ -708,8 +715,13 @@ const CustomerCreationProfile = () => {
     }else if(formId > 0){
       putData(data)
     }
-
-  };
+}
+catch(ex){
+  // console.log(ex);
+  toastError("Only allow to Update Not make Empty")
+  setdatasending(false)
+} ;
+  }
 
   
 
@@ -728,7 +740,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="customerno" className="pr-3">Customer No:</label>
+                <label htmlFor="customerno" className="pr-3">Customer No <span className="text-danger">&nbsp;*</span> </label>
                 {isCustNoFetching && 
                 <><span className="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span>
                 <span className="sr-only">Loading...</span></>}
@@ -760,7 +772,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="customercategory">Customer Category:</label>
+                <label htmlFor="customercategory">Customer Category<span className="text-danger">&nbsp;*</span> </label>
               </div>
               <div className="col-lg-8">
                 <div className="form-check form-check-inline">
@@ -824,7 +836,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="customername">Customer Name:</label>
+                <label htmlFor="customername">Customer Name<span className="text-danger">&nbsp;*</span> </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -850,7 +862,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="smartcity">Smart City:</label>
+                <label htmlFor="smartcity">Smart City<span className="text-danger">&nbsp;*</span> </label>
               </div>
               <div className="col-lg-8">
                 <div className="form-check form-check-inline">
@@ -920,7 +932,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="country">Country:</label>
+                <label htmlFor="country">Country<span className="text-danger">&nbsp;*</span> </label>
               </div>
               <div className="col-lg-8">
                 <Select
@@ -947,7 +959,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="state">State:</label>
+                <label htmlFor="state">State<span className="text-danger">&nbsp;*</span> </label>
               </div>
               <div className="col-lg-8">
                 <Select
@@ -976,7 +988,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="distrit">District :</label>
+                <label htmlFor="distrit">District <span className="text-danger">&nbsp;*</span> </label>
               </div>
               <div className="col-lg-8">
                 <Select
@@ -1003,7 +1015,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="city">City/Town/Village:</label>
+                <label htmlFor="city">City/Town/Village<span className="text-danger">&nbsp;*</span> </label>
               </div>
               <div className="col-lg-8">
                 <Select
@@ -1030,7 +1042,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="pincode">Pincode :</label>
+                <label htmlFor="pincode">Pincode <span className="text-danger">&nbsp;*</span> </label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -1055,9 +1067,9 @@ const CustomerCreationProfile = () => {
           </div>
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="address">Address : </label>
-                <p className="text-info font-weight-bold"><small><b>({addresslen} Characters Remaining) </b></small></p> 
+              <div className="col-lg-4 text-dark mt-2">
+                <label htmlFor="address">Address &nbsp;</label>
+                <p className="text-info font-weight-bold mt-n3"><small><b>({addresslen} Characters Remaining) </b></small></p> 
               </div>
               <div className="col-lg-8">
                 <textarea
@@ -1085,7 +1097,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold  mb-4">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="phone">Phone :</label>
+                <label htmlFor="phone">Phone &nbsp;</label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -1109,8 +1121,8 @@ const CustomerCreationProfile = () => {
             </div>
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="pan">Pan :</label>
-                <p className="text-info font-weight-bold"><small><b>(Example: FDTPM0000D)</b></small></p> 
+                <label htmlFor="pan">Pan &nbsp;</label>
+                <p className="text-info font-weight-bold mt-n3"><small><b>(Example: FDTPM0000D)</b></small></p> 
               </div>
               <div className="col-lg-8">
                 <input
@@ -1136,11 +1148,11 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="mobile">Mobile No :</label>
+                <label htmlFor="mobile">Mobile No &nbsp;</label>
               </div>
               <div className="col-lg-8">
                 <input
-                  type="number"
+                  type="text"
                   className="form-control"
                   id="mobile"
                   placeholder="Enter Mobile No"
@@ -1162,7 +1174,7 @@ const CustomerCreationProfile = () => {
           {/* <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="currentyrdate">Current Year/Date :</label>
+                <label htmlFor="currentyrdate">Current Year/Date &nbsp;</label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -1188,7 +1200,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="email">Email :</label>
+                <label htmlFor="email">Email &nbsp;</label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -1214,7 +1226,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="website">Website :</label>
+                <label htmlFor="website">Website &nbsp;</label>
               </div>
               <div className="col-lg-8">
                 <input
@@ -1241,7 +1253,7 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="gstregistered">GST Registered:</label>
+                <label htmlFor="gstregistered">GST Registered&nbsp;</label>
                
               </div>
               <div className="col-lg-8">
@@ -1282,8 +1294,8 @@ const CustomerCreationProfile = () => {
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
-                <label htmlFor="gstno">GST No. :</label>
-                {!GstNoDisable && <p className="text-info font-weight-bold"><small><b>(Ex : 22AAAAA0000A1Z5)</b></small></p> }
+                <label htmlFor="gstno">GST No. &nbsp;</label>
+                {!GstNoDisable && <p className="text-info font-weight-bold mt-n3"><small><b>(Ex : 22AAAAA0000A1Z5)</b></small></p> }
               </div>
               <div className="col-lg-8">
                 <input

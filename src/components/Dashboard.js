@@ -3,8 +3,10 @@ import { Navigate } from "react-router-dom";
 import AuthContext from "../storeAuth/auth-context";
 import { useBaseUrl } from "./hooks/useBaseUrl";
 import axios from "axios";
-function Dashboard() {
+import './logoicon.css';
 
+
+function Dashboard() {
   const authCtx = useContext(AuthContext);
  
     // const authCtx = useContext(AuthContext);
@@ -35,19 +37,21 @@ function Dashboard() {
             <div className="row">
               {/* Content Row */}  
               <div className="col-xl-4 col-md-6 mb-4">
-                <div className="card border-left-primary shadow h-100 py-2">
-                  <div className="card-body">
-                    <div className="row no-gutters align-items-center">
+                <div className="card  shadow h-100 py-2 border-left-primary border-3">
+                  <div className="card-body ">
+                    <div className="row no-gutters align-items-center " >
                       <div className="col mr-2">
                         <div className="h4 text-xl font-weight-bold text-primary text-uppercase mb-2 text-center">
                           Live Tenders
                         </div>
+                        
                         <div className="h2 mb-0 font-weight-bold text-gray-800 text-center">
                          {Live_tenders_count}
                         </div>
                       </div>
                       <div className="col-auto">
-                        <i className="fas fa-calendar fa-2x text-gray-300" />
+                      <div className="triangle-live"></div>
+                        {/* <i className="fas fa-calendar fa-2x text-gray-300" /> */}
                       </div>
                     </div>
                   </div>
@@ -55,7 +59,7 @@ function Dashboard() {
               </div>
               
               <div className="col-xl-4 col-md-6 mb-4">
-                <div className="card border-left-success shadow h-100 py-2">
+                <div className="card border-left-success shadow h-100 py-2  border-3">
                   <div className="card-body">
                     <div className="row no-gutters align-items-center">
                       <div className="col mr-2">
@@ -67,7 +71,8 @@ function Dashboard() {
                         </div>
                       </div>
                       <div className="col-auto">
-                        <i className="fas fa-clipboard-list fa-2x text-gray-300" />
+                      <div className="triangle-fresh"></div>
+                        {/* <i className="fas fa-clipboard-list fa-2x text-gray-300" /> */}
                       </div>
                      
                     </div>
@@ -76,7 +81,7 @@ function Dashboard() {
               </div>
               
               {/* <div className="col-xl-4 col-md-6 mb-4 ">
-                <div className="card border-left-info shadow h-100 py-2">
+                <div className="card border-left-info shadow h-100 py-2  border-3">
                   <div className="card-body">
                     <div className="row no-gutters align-items-center">
                       <div className="col pl-3 ">
@@ -88,7 +93,8 @@ function Dashboard() {
                         </div>
                       </div>
                       <div className="col-auto">
-                         <i className="fas fa-dollar-sign fa-2x text-gray-300" /> 
+                      <div className="triangle-awarded"></div>
+                        //  <i className="fas fa-dollar-sign fa-2x text-gray-300" /> 
                         {/* <img src="assets/icons/tender_awarded1.png" alt="" width="50" height="50" className="mb-1 text-gray-300"/>}
                       </div>
                     </div>
