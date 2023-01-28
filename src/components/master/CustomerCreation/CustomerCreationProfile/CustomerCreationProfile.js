@@ -636,7 +636,6 @@ const CustomerCreationProfile = () => {
 
   const postData = (data) => {
     axios.post(`${baseUrl}/api/customercreationprofile`, data).then((resp) => {
-      console.log(resp);  
       if (resp.data.status === 200) {
         setCustomerCreationMainID(resp.data.id)
         toastSuccess(resp.data.message)
@@ -652,8 +651,9 @@ const CustomerCreationProfile = () => {
 
  
   const putData = (data) => {
+    
     axios.put(`${baseUrl}/api/customercreationprofile/${formId}`, data).then((resp) => {
-      console.log(resp);
+      
       if (resp.data.status === 200) {
         toastSuccess(resp.data.message)
         navigate(`/tender/master/customercreation/list/main/contactPerson/${formId}`);

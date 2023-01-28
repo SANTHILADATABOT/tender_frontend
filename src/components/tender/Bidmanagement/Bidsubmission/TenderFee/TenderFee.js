@@ -3,7 +3,8 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import useInputValidation from "../../../../hooks/useInputValidation";
 import CollapseCard from "../../../../UI/CollapseCard";
 import LockCard from "../../../../UI/LockCard";
-import { isNotEmpty, isNotNull } from "../../../CommonFunctions/CommonFunctions";
+// import { isNotEmpty, isNotNull } from "../../../CommonFunctions/CommonFunctions";
+import { isNotEmpty, isNotNull } from "../../../CommonFunctions/CommonFunctions_copy";
 import Select from "react-select";
 import styles from "./TenderFee.module.css";
 import ReadyToUpload from "./ReadyToupload";
@@ -162,20 +163,20 @@ const TenderFee = () => {
               if (resp.data.status === 200) {
                   setFormId(resp.data.BidCreationTenderFee.id)
                   let tenderfee = resp.data.BidCreationTenderFee
-                  setbanknameValue(tenderfee.bankname)
-                  setbankbranchValue(tenderfee.bankbranch)
+                  setbanknameValue(tenderfee.bankname?tenderfee.bankname:"")
+                  setbankbranchValue(tenderfee.bankbranch?tenderfee.bankbranch:"")
                   setmode(modeOptions.find(
                       (x) => x.value === tenderfee.mode
                   ))
-                  setdateofsubmissionValue(tenderfee.dateofsubmission)
-                  setbgnoValue(tenderfee.bgno)
-                  setddnoValue(tenderfee.ddno)
-                  setutrnoValue(tenderfee.utrno)
-                  setrefnoValue(tenderfee.refno)
-                  setdateofissueValue(tenderfee.dateofissue)
-                  setexpiaryDateValue(tenderfee.expiaryDate)
-                  setdateofpaymentValue(tenderfee.dateofpayment)
-                  setvalueValue (tenderfee.value)
+                  setdateofsubmissionValue(tenderfee.dateofsubmission?tenderfee.dateofsubmission:"")
+                  setbgnoValue(tenderfee.bgno?tenderfee.bgno:"")
+                  setddnoValue(tenderfee.ddno?tenderfee.ddno:"")
+                  setutrnoValue(tenderfee.utrno?tenderfee.utrno:"")
+                  setrefnoValue(tenderfee.refno?tenderfee.refno:"")
+                  setdateofissueValue(tenderfee.dateofissue?tenderfee.dateofissue:"")
+                  setexpiaryDateValue(tenderfee.expiaryDate?tenderfee.expiaryDate:"")
+                  setdateofpaymentValue(tenderfee.dateofpayment?tenderfee.dateofpayment:"")
+                  setvalueValue (tenderfee.value?tenderfee.value:"")
   
                   if(resp.data.file){
                       axios({
@@ -234,19 +235,33 @@ const TenderFee = () => {
     const cancelHandler = () => {
 
     }
-
-    if(banknameIsValid &&
-        bankbranchIsValid &&
-        modeIsValid &&
-        dateofsubmissionIsValid &&
-       (((modeValue.value==='bg') && bgnoIsValid && dateofissueIsValid && expiaryDateIsValid) ||
-        ((modeValue.value==='dd') && ddnoIsValid && dateofissueIsValid) ||
-        ((modeValue.value==='neft/rtgs' || modeValue.value==='onlineTransfer' ) && utrnoIsValid && refnoIsValid &&  dateofpaymentIsValid)) &&
-        valueIsValid &&
-        (file !== null)
-    ){
+//$$$
+    // if(banknameIsValid &&
+    //     bankbranchIsValid &&
+    //     modeIsValid &&
+    //     dateofsubmissionIsValid &&
+    //    (((modeValue.value==='bg') && bgnoIsValid && dateofissueIsValid && expiaryDateIsValid) ||
+    //     ((modeValue.value==='dd') && ddnoIsValid && dateofissueIsValid) ||
+    //     ((modeValue.value==='neft/rtgs' || modeValue.value==='onlineTransfer' ) && utrnoIsValid && refnoIsValid &&  dateofpaymentIsValid)) &&
+    //     valueIsValid &&
+    //     (file !== null)
+    // ){
+    //     formIsValid = true;
+    // }
+   
+    if((banknameValue ||
+        bankbranchValue ||
+        modeValue ||
+        dateofsubmissionValue) &&
+       (((modeValue.value==='bg') && bgnoValue ||( dateofissueValue || expiaryDateValue) ||
+        ((modeValue.value==='dd') && ddnoValue || ( dateofissueValue)) ||
+        ((modeValue.value==='neft/rtgs' || modeValue.value==='onlineTransfer') && utrnoValue)) &&
+        (valueValue ||
+        (file !== null))
+    )){
         formIsValid = true;
     }
+
     var config = {
         onUploadProgress: function (progressEvent) {
             var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -458,7 +473,7 @@ const TenderFee = () => {
                             <div className="inputgroup col-lg-6 mb-4">
                                 <div className="row align-items-center">
                                     <div className="col-lg-4 text-dark font-weight-bold">
-                                        <label htmlFor="mode">Mode :</label>
+                                        <label htmlFor="mode">Mode : <span className="text-danger">*</span></label>
                                     </div>
                                     <div className="col-lg-8">
                                         <Select
@@ -518,7 +533,7 @@ const TenderFee = () => {
                                 <div className="row align-items-center font-weight-bold">
                                     <div className="col-lg-4 text-dark">
                                         <label htmlFor="bgno" className="pr-3">
-                                            BG No :
+                                            BG No :<span className="text-danger">*</span>
                                         </label>
                                     </div>
                                     <div className="col-lg-8">
@@ -547,7 +562,7 @@ const TenderFee = () => {
                                 <div className="row align-items-center font-weight-bold">
                                     <div className="col-lg-4 text-dark">
                                         <label htmlFor="ddno" className="pr-3">
-                                            DD No :
+                                            DD No : <span className="text-danger">*</span>
                                         </label>
                                     </div>
                                     <div className="col-lg-8">
@@ -576,7 +591,7 @@ const TenderFee = () => {
                                 <div className="row align-items-center font-weight-bold">
                                     <div className="col-lg-4 text-dark">
                                         <label htmlFor="utrno" className="pr-3">
-                                            UTR No :
+                                            UTR No :<span className="text-danger">*</span>
                                         </label>
                                     </div>
                                     <div className="col-lg-8">
@@ -721,7 +736,7 @@ const TenderFee = () => {
                                 <div className="row align-items-center font-weight-bold">
                                     <div className="col-lg-4 text-dark">
                                         <label htmlFor="value" className="pr-3">
-                                            Value :
+                                            Value :<span className="text-danger">*</span>
                                         </label>
                                     </div>
                                     <div className="col-lg-8">

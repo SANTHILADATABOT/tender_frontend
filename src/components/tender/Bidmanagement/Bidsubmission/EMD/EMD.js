@@ -1,9 +1,11 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import useInputValidation from "../../../../hooks/useInputValidation";
+// import useInputValidation from "../../../../hooks/useInputValidation";
+import useInputValidation from "../../../../hooks/useInputValidation_copy";
 import CollapseCard from "../../../../UI/CollapseCard";
 import LockCard from "../../../../UI/LockCard";
-import { isNotEmpty, isNotNull } from "../../../CommonFunctions/CommonFunctions";
+//import { isNotEmpty, isNotNull } from "../../../CommonFunctions/CommonFunctions";
+import { isNotEmpty, isNotNull } from "../../../CommonFunctions/CommonFunctions_copy";
 import Select from "react-select";
 import styles from "./TenderFee.module.css";
 import ReadyToUpload from "./ReadyToupload";
@@ -163,20 +165,20 @@ const EMD = () => {
                 console.log("resp.data",resp.data);
                   setFormId(resp.data.BidCreationEMD.id)
                   let emdfee = resp.data.BidCreationEMD
-                  setbanknameValue(emdfee.bankname)
-                  setbankbranchValue(emdfee.bankbranch)
+                  setbanknameValue(emdfee.bankname?emdfee.bankname:"")
+                  setbankbranchValue(emdfee.bankbranch?emdfee.bankbranch:"")
                   setmode(modeOptions.find(
                       (x) => x.value === emdfee.mode
                   ))
-                  setdateofsubmissionValue(emdfee.dateofsubmission)
-                  setbgnoValue(emdfee.bgno)
-                  setddnoValue(emdfee.ddno)
-                  setutrnoValue(emdfee.utrno)
-                  setrefnoValue(emdfee.refno)
-                  setdateofissueValue(emdfee.dateofissue)
-                  setexpiaryDateValue(emdfee.expiaryDate)
-                  setdateofpaymentValue(emdfee.dateofpayment)
-                  setvalueValue (emdfee.value)
+                  setdateofsubmissionValue(emdfee.dateofsubmission?emdfee.dateofsubmission:"")
+                  setbgnoValue(emdfee.bgno?emdfee.bgno:"")
+                  setddnoValue(emdfee.ddno? emdfee.ddno:"")
+                  setutrnoValue(emdfee.utrno? emdfee.utrno:"")
+                  setrefnoValue(emdfee.refno? emdfee.refno :"")
+                  setdateofissueValue(emdfee.dateofissue?emdfee.dateofissue:"")
+                  setexpiaryDateValue(emdfee.expiaryDate?emdfee.expiaryDate:"")
+                  setdateofpaymentValue(emdfee.dateofpayment?emdfee.dateofpayment:"")
+                  setvalueValue (emdfee.value?emdfee.value:"")
   
                   if(resp.data.file){
                       axios({
@@ -236,18 +238,33 @@ const EMD = () => {
 
     }
 
-    if(banknameIsValid &&
-        bankbranchIsValid &&
-        modeIsValid &&
-        dateofsubmissionIsValid &&
-       (((modeValue.value==='bg') && bgnoIsValid && dateofissueIsValid && expiaryDateIsValid) ||
-        ((modeValue.value==='dd') && ddnoIsValid && dateofissueIsValid) ||
-        ((modeValue.value==='neft/rtgs' || modeValue.value==='onlineTransfer' ) && utrnoIsValid && refnoIsValid &&  dateofpaymentIsValid)) &&
-        valueIsValid &&
-        (file !== null)
-    ){
+    // if(banknameIsValid &&
+    //     bankbranchIsValid &&
+    //     modeIsValid &&
+    //     dateofsubmissionIsValid &&
+    //    (((modeValue.value==='bg') && bgnoIsValid && dateofissueIsValid && expiaryDateIsValid) ||
+    //     ((modeValue.value==='dd') && ddnoIsValid && dateofissueIsValid) ||
+    //     ((modeValue.value==='neft/rtgs' || modeValue.value==='onlineTransfer' ) && utrnoIsValid && refnoIsValid &&  dateofpaymentIsValid)) &&
+    //     valueIsValid &&
+    //     (file !== null)
+    // ){
+    //     formIsValid = true;
+    // }
+
+    if((banknameValue ||
+        bankbranchValue ||
+        modeValue ||
+        dateofsubmissionValue) &&
+       (((modeValue.value==='bg') && bgnoValue ||( dateofissueValue || expiaryDateValue) ||
+        ((modeValue.value==='dd') && ddnoValue || ( dateofissueValue)) ||
+        ((modeValue.value==='neft/rtgs' || modeValue.value==='onlineTransfer') && utrnoValue)) &&
+        (valueValue ||
+        (file !== null))
+    )){
         formIsValid = true;
     }
+    
+
     var config = {
         onUploadProgress: function (progressEvent) {
             var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -459,7 +476,7 @@ const EMD = () => {
                             <div className="inputgroup col-lg-6 mb-4">
                                 <div className="row align-items-center">
                                     <div className="col-lg-4 text-dark font-weight-bold">
-                                        <label htmlFor="mode">Mode :</label>
+                                        <label htmlFor="mode">Mode :<span className="text-danger">*</span></label>
                                     </div>
                                     <div className="col-lg-8">
                                         <Select
@@ -519,7 +536,7 @@ const EMD = () => {
                                 <div className="row align-items-center font-weight-bold">
                                     <div className="col-lg-4 text-dark">
                                         <label htmlFor="bgno" className="pr-3">
-                                            BG No :
+                                            BG No :<span className="text-danger">*</span>
                                         </label>
                                     </div>
                                     <div className="col-lg-8">
@@ -548,7 +565,7 @@ const EMD = () => {
                                 <div className="row align-items-center font-weight-bold">
                                     <div className="col-lg-4 text-dark">
                                         <label htmlFor="ddno" className="pr-3">
-                                            DD No :
+                                            DD No : <span className="text-danger">*</span>
                                         </label>
                                     </div>
                                     <div className="col-lg-8">
@@ -577,7 +594,7 @@ const EMD = () => {
                                 <div className="row align-items-center font-weight-bold">
                                     <div className="col-lg-4 text-dark">
                                         <label htmlFor="utrno" className="pr-3">
-                                            UTR No :
+                                            UTR No :<span className="text-danger">*</span>
                                         </label>
                                     </div>
                                     <div className="col-lg-8">
@@ -722,7 +739,7 @@ const EMD = () => {
                                 <div className="row align-items-center font-weight-bold">
                                     <div className="col-lg-4 text-dark">
                                         <label htmlFor="value" className="pr-3">
-                                            Value :
+                                            Value :<span className="text-danger">*</span>
                                         </label>
                                     </div>
                                     <div className="col-lg-8">

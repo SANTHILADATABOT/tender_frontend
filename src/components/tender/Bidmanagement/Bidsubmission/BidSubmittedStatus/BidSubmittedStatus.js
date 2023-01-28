@@ -8,7 +8,8 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import Select from "react-select";
 import useInputValidation from "../../../../hooks/useInputValidation";
-import { isNotNull } from "../../../CommonFunctions/CommonFunctions";
+// import { isNotNull } from "../../../CommonFunctions/CommonFunctions";
+import { isNotNull } from "../../../CommonFunctions/CommonFunctions_copy";
 import ReadyToUpload from "./ReadyToupload";
 import styles from '../TenderFee/TenderFee.module.css'
 
@@ -116,11 +117,18 @@ const BidSubmittedStatus = () => {
         }
     }, [])
 
-    if( modeIsValid &&
+    // if( modeIsValid &&
+    //     (file !== null)
+    // ){
+    //     formIsValid = true;
+    // }
+
+    if( modeValue ||
         (file !== null)
     ){
         formIsValid = true;
     }
+
     var config = {
         onUploadProgress: function (progressEvent) {
             var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);

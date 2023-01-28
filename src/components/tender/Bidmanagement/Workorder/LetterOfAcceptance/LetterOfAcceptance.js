@@ -136,7 +136,7 @@ const LetterOfAcceptance = () => {
 
   let formIsValid = false;
 
-  if (
+  if ( 
     DateIsValid &&
     refrenceNoIsValid &&
     fromIsValid &&
