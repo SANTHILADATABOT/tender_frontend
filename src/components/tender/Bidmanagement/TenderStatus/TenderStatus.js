@@ -1,7 +1,7 @@
 import { usePageTitle } from "../../../hooks/usePageTitle";
 import Bidders from "./Bidders/Bidders";
 import { useState, useEffect} from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
@@ -14,10 +14,18 @@ const TenderStatus = () => {
     const [status, setStatus]=useState();
     const [loading,setLoading]=useState();
     let tokenId = localStorage.getItem("token");
+    const { id } = useParams();
 
     useEffect(() => {
         getBidders();
     }, []);
+
+    useEffect(() => {
+      if(id) {
+          setBidManagementMainId(id)
+      }
+    } , [])
+
 
     const getBidders = () =>
     {

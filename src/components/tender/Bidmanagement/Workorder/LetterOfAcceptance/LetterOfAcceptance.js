@@ -6,10 +6,15 @@ import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import useInputValidation from "../../../../hooks/useInputValidation";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
+// import {
+//   isNotEmpty,
+//   isNotNull,
+// } from "../../../CommonFunctions/CommonFunctions";
 import {
   isNotEmpty,
   isNotNull,
-} from "../../../CommonFunctions/CommonFunctions";
+} from "../../../CommonFunctions/CommonFunctions_copy";
+
 import axios from "axios";
 import Swal from "sweetalert2";
 import LetterAcceptanceDoc from "./LetterAcceptanceDocsupload";
@@ -136,13 +141,24 @@ const LetterOfAcceptance = () => {
 
   let formIsValid = false;
 
-  if ( 
-    DateIsValid &&
-    refrenceNoIsValid &&
-    fromIsValid &&
-    mediumIsValid &&
-    medRefrenceNoIsValid &&
-    mediumSelectIsValid
+  // if (
+  //   DateIsValid &&
+  //   refrenceNoIsValid &&
+  //   fromIsValid &&
+  //   mediumIsValid &&
+  //   medRefrenceNoIsValid &&
+  //   mediumSelectIsValid
+  // ) {
+  //   formIsValid = true;
+  // }
+
+  if (
+    Datevalue ||
+    refrenceNovalue ||
+    fromvalue ||
+    mediumvalue ||
+    medRefrenceNovalue ||
+    mediumSelectvalue
   ) {
     formIsValid = true;
   }
@@ -183,12 +199,16 @@ const LetterOfAcceptance = () => {
     // console.log(data)
     if (data !== undefined) {
       setlettacpId(data.id);
-      setDateValue(data.date);
-      setrefrenceNoValue(data.refrence_no);
-      setfromValue(data.from);
-      setmediumValue(data.medium);
-      setmedRefrenceNoValue(data.med_refrence_no);
-      mediumSelectValue(options.find((x) => x.value === data.medium_select));
+      setDateValue(data.date ? data.date : "");
+      setrefrenceNoValue(data.refrence_no ? data.refrence_no : "");
+      setfromValue(data.from ? data.from : "");
+      setmediumValue(data.medium ? data.medium : "");
+      setmedRefrenceNoValue(data.med_refrence_no ? data.med_refrence_no : "");
+      mediumSelectValue(
+        data.medium_select
+          ? options.find((x) => x.value === data.medium_select)
+          : ""
+      );
     }
   };
 
@@ -214,20 +234,24 @@ const LetterOfAcceptance = () => {
   };
 
   var getWorkOrderImage = async () => {
-    if(lettacpId){
-    await axios({
-      url: `${baseUrl}/api/download/letterofacceptance/workorderimage/${id}`,
-      method: "GET",
-      responseType: "blob", // important
-    }).then((response) => {
-      if (response.status === 200) {
-        setWorkOrderImage(response);
-      } else {
-        alert("Unable to Process Now!");
-      }
-      setFetchLoading(false);
-    });
-  }
+    if (lettacpId) {
+      await axios({
+        url: `${baseUrl}/api/download/letterofacceptance/workorderimage/${id}`,
+        method: "GET",
+        responseType: "blob", // important
+      }).then((response) => {
+        if (response.status === 200) {
+          // if (response.data.type === "application/json") {
+          //   setFile("");
+          // } else {
+            setWorkOrderImage(response);
+          // }
+        } else {
+          alert("Unable to Process Now!");
+        }
+        setFetchLoading(false);
+      });
+    }
   };
 
   useEffect(() => {
@@ -237,6 +261,7 @@ const LetterOfAcceptance = () => {
   }, [lettacpId]);
 
   const putData = (data, lettacpId) => {
+    console.log('data',data);
     axios
       .post(
         `${baseUrl}/api/letteracceptance/creation/update/${lettacpId}`,
@@ -276,17 +301,19 @@ const LetterOfAcceptance = () => {
     const formdata = new FormData();
 
     let data = {
-      Date: Datevalue,
-      refrenceNo: refrenceNovalue,
-      from: fromvalue,
-      medium: mediumvalue,
-      medRefrenceNo: medRefrenceNovalue,
-      mediumSelect: mediumSelectvalue.value,
+      Date: Datevalue ? Datevalue : "",
+      refrenceNo: refrenceNovalue ? refrenceNovalue : "",
+      from: fromvalue ? fromvalue : "",
+      medium: mediumvalue ? mediumvalue : "",
+      medRefrenceNo: medRefrenceNovalue ? medRefrenceNovalue : "",
+      mediumSelect: mediumSelectvalue ? mediumSelectvalue.value : "",
       tokenid: localStorage.getItem("token"),
       bidid: id,
-      wofile: file,
     };
 
+    if (file) {
+      data.wofile = file;
+    }
     if (file instanceof Blob) {
       data.wofile = new File([file], file.name);
     }
@@ -388,32 +415,32 @@ const LetterOfAcceptance = () => {
                 <label htmlFor="to">Medium</label>
               </div>
               <div className="col-lg-8 ">
-              <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-between">
                   <div className="col-lg-6">
-                  <input
-                    type="text"
-                    name="medium"
-                    id="medium"
-                    className="form-control"
-                    value={mediumvalue}
-                    onChange={mediumChangeHandler}
-                    onBlur={mediumBlurHandler}
-                  />
+                    <input
+                      type="text"
+                      name="medium"
+                      id="medium"
+                      className="form-control"
+                      value={mediumvalue}
+                      onChange={mediumChangeHandler}
+                      onBlur={mediumBlurHandler}
+                    />
                   </div>
                   <div className="col-lg-6 ml-2">
-                  <Select
-                    name="mediumSelect"
-                    id="mediumSelect"
-                    options={options}
-                    isSearchable="true"
-                    isClearable="true"
-                    value={mediumSelectvalue}
-                    onChange={(selectedOptions) => {
-                      mediumSelectChangeHandler(selectedOptions);
-                      // getcustno(selectedOptions);
-                    }}
-                    onBlur={mediumSelectBlurHandler}
-                  ></Select>
+                    <Select
+                      name="mediumSelect"
+                      id="mediumSelect"
+                      options={options}
+                      isSearchable="true"
+                      isClearable="true"
+                      value={mediumSelectvalue}
+                      onChange={(selectedOptions) => {
+                        mediumSelectChangeHandler(selectedOptions);
+                        // getcustno(selectedOptions);
+                      }}
+                      onBlur={mediumSelectBlurHandler}
+                    ></Select>
                   </div>
                 </div>
                 <div className="d-flex justify-content-between">

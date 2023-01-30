@@ -1,14 +1,10 @@
 import { Fragment, useEffect, useState } from "react";
 import { ImageConfig } from "../../Config";
-// import axios from "axios";
-// import { useBaseUrl } from "../../../../hooks/useBaseUrl";
-// import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
 
 const WorkOrderUploadFile = (props) => {
   const [preview, setPreview] = useState(undefined);
-  // const { server1: baseUrl } = useBaseUrl();
-  // const [woFileName, setwofilename] = useState();
-  // const { workorderfile: wofileame } = useImageStoragePath();
+  
+
   useEffect(() => {
     if (!props.file || (props.file.type.split("/")[0] !== "image" && props.file.type.split("/")[0] !== "application")) {
       setPreview(undefined);

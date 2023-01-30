@@ -13,7 +13,7 @@ const BidmanagementMain = () => {
     const { id, tenderid } = useParams();
     const { server1: baseUrl } = useBaseUrl();
     const navigate = useNavigate();
-
+console.log("id", id);
     useEffect(() => {
       if(id){
         if(tenderid){
@@ -58,6 +58,7 @@ const BidmanagementMain = () => {
           position: toast.POSITION.TOP_CENTER
         });
       }
+      console.log("bidManageMainId",bidManageMainId);
     return (
         <Fragment>
           <ToastContainer />

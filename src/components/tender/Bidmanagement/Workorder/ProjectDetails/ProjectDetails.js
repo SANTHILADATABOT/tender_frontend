@@ -3,10 +3,14 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import CollapseCard from "../../../../UI/CollapseCard";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import useInputValidation from "../../../../hooks/useInputValidation";
+// import {
+//   isNotEmpty,
+//   isNotNull,
+// } from "../../../CommonFunctions/CommonFunctions";
 import {
   isNotEmpty,
   isNotNull,
-} from "../../../CommonFunctions/CommonFunctions";
+} from "../../../CommonFunctions/CommonFunctions_copy";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -123,16 +127,28 @@ const ProjetDetails = () => {
   let formIsValid = false;
 
   if (
-    proPeriodIsValid &&
-    mobPeriodIsValid &&
-    monsoonPeriodIsValid &&
-    monthDurationIsValid &&
-    supplyScapeIsValid &&
-    supplyDateIsValid &&
-    erectionStartIsValid &&
-    commercialProducIsValid &&
-    tarCompletionIsValid &&
-    producCompletionIsValid
+    // proPeriodIsValid &&
+    // mobPeriodIsValid &&
+    // monsoonPeriodIsValid &&
+    // monthDurationIsValid &&
+    // supplyScapeIsValid &&
+    // supplyDateIsValid &&
+    // erectionStartIsValid &&
+    // commercialProducIsValid &&
+    // tarCompletionIsValid &&
+    // producCompletionIsValid
+
+    proPeriodvalue ||
+    mobPeriodvalue ||
+    monsoonPeriodvalue ||
+    monthDurationvalue ||
+    supplyScapevalue ||
+    supplyDatevalue ||
+    erectionStartvalue ||
+    commercialProducvalue ||
+    tarCompletionvalue ||
+    producCompletionvalue
+
   ) {
     formIsValid = true;
   }
@@ -155,16 +171,16 @@ const ProjetDetails = () => {
     if(data)
     {
     setproid(data.id);
-    setproPeriodValue(data.properiod);
-    setmobPeriodValue(data.mobPeriod);
-    setmonsoonPeriodValue(data.monsoonperiod);
-    setmonthDurationValue(data.monthduration);
-    setsupplyScapeValue(data.supplyscape);
-    setsupplyDateValue(data.supplydate);
-    seterectionStartValue(data.erectionstart);
-    setcommercialProducValue(data.commercialproduc);
-    settarCompletionValue(data.tarcompletion);
-    setproducCompletionValue(data.produccompletion);
+    setproPeriodValue(data.properiod?data.properiod:"");
+    setmobPeriodValue(data.mobPeriod?data.mobPeriod:"");
+    setmonsoonPeriodValue(data.monsoonperiod?data.monsoonperiod:"");
+    setmonthDurationValue(data.monthduration?data.monthduration:"");
+    setsupplyScapeValue(data.supplyscape?data.supplyscape:"");
+    setsupplyDateValue(data.supplydate?data.supplydate:"");
+    seterectionStartValue(data.erectionstart?data.erectionstart:"");
+    setcommercialProducValue(data.commercialproduc?data.commercialproduc:"");
+    settarCompletionValue(data.tarcompletion?data.tarcompletion:"");
+    setproducCompletionValue(data.produccompletion?data.produccompletion:"");
     }
   };
 
@@ -214,7 +230,7 @@ const ProjetDetails = () => {
         if (res.data.status === 200) {
           Swal.fire({
             icon: "success",
-            title: "Workorder",
+            title: "Project Details",
             text: "Updated Successfully!",
             confirmButtonColor: "#5156ed",
           });

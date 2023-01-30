@@ -6,10 +6,14 @@ import useInputValidation from "../../../../hooks/useInputValidation";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 //import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
+// import {
+//   isNotEmpty,
+//   isNotNull,
+// } from "../../../CommonFunctions/CommonFunctions";
 import {
   isNotEmpty,
   isNotNull,
-} from "../../../CommonFunctions/CommonFunctions";
+} from "../../../CommonFunctions/CommonFunctions_copy";
 import axios from "axios";
 import Swal from "sweetalert2";
 import WorkOrderUploadFile from "./WorkeOrderUploadFile";
@@ -219,13 +223,25 @@ const WorkOrder = () => {
 
   let formIsValid = false;
 
+  // if (
+  //   orderQuantityIsValid &&
+  //   PricePerUnitIsValid &&
+  //   LoaDateIsValid &&
+  //   OrderDateIsValid &&
+  //   AgreeDateIsValid &&
+  //   SiteHandOverDateIsValid
+  // ) {
+  //   formIsValid = true;
+  // }
+
   if (
-    orderQuantityIsValid &&
-    PricePerUnitIsValid &&
-    LoaDateIsValid &&
-    OrderDateIsValid &&
-    AgreeDateIsValid &&
-    SiteHandOverDateIsValid
+    orderQuantityvalue ||
+    PricePerUnitvalue ||
+    LoaDatevalue ||
+    OrderDatevalue ||
+    AgreeDatevalue ||
+    SiteHandOverDatevalue ||
+    file || file1 || file 
   ) {
     formIsValid = true;
   }
@@ -265,12 +281,12 @@ const WorkOrder = () => {
     let data = response.data.WorkOrder[0];
     if (data !== undefined) {
       setworkid(data.id);
-      setorderQuantityValue(data.orderquantity);
-      setPricePerUnitValue(data.priceperunit);
-      setLoaDateValue(data.loadate);
-      setOrderDateValue(data.orderdate);
-      setAgreeDateValue(data.agreedate);
-      SiteHandOverDateValue(data.sitehandoverdate);
+      setorderQuantityValue(data.orderquantity?data.orderquantity:"");
+      setPricePerUnitValue(data.priceperunit?data.priceperunit:"");
+      setLoaDateValue(data.loadate?data.loadate:"");
+      setOrderDateValue(data.orderdate?data.orderdate:"");
+      setAgreeDateValue(data.agreedate?data.agreedate:"");
+      SiteHandOverDateValue(data.sitehandoverdate?data.sitehandoverdate:"");
     }
   };
 
@@ -279,7 +295,7 @@ const WorkOrder = () => {
     let response = await axios.get(
       `${baseUrl}/api/workorder/creation/Workorder/${id}`
     );
-    if (response.status === 200) {
+    if (response.status === 200 ) {
       setWorkOrderForm(response);
     }
   };
@@ -304,7 +320,8 @@ const WorkOrder = () => {
         responseType: "blob", //important
       }).then((response) => {
         if (response.status === 200) {
-          setWorkOrderImage(response);
+          if(response.data.size >0 )
+            {setWorkOrderImage(response);}
         } else {
           alert("Unable to Process Now!");
         }
@@ -330,7 +347,8 @@ const WorkOrder = () => {
         responseType: "blob", // important
       }).then((response) => {
         if (response.status === 200) {
-          setAgreementImage(response);
+          if(response.data.size >0 )
+          {setAgreementImage(response);}
         } else {
           alert("Unable to Process Now!");
         }
@@ -365,7 +383,8 @@ const WorkOrder = () => {
         responseType: "blob", // important
       }).then((response) => {
         if (response.status === 200) {
-          setSitehandoverImage(response);
+          if(response.data.size >0 )
+          {setSitehandoverImage(response);}
         } else {
           alert("Unable to Process Now!");
         }
@@ -438,11 +457,11 @@ const WorkOrder = () => {
       data.wofile = new File([file], file.name);
     }
 
-    if (file instanceof Blob) {
+    if (file1 instanceof Blob) {
       data.agfile = new File([file1], file1.name);
     }
 
-    if (file instanceof Blob) {
+    if (file2 instanceof Blob) {
       data.shofile = new File([file2], file2.name);
     }
 

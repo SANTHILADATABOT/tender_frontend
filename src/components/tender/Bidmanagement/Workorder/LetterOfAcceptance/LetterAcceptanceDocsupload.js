@@ -2,7 +2,8 @@ import { Fragment, useEffect, useState } from "react";
 import { ImageConfig } from "../../Config";
 
 const WorkOrderUploadFile = (props) => {
-  const [preview, setPreview] = useState(undefined);
+  // const [preview, setPreview] = useState(undefined);
+  const [preview, setPreview] = useState();
 
 
   useEffect(() => {
@@ -10,9 +11,21 @@ const WorkOrderUploadFile = (props) => {
       setPreview(undefined);
       return;
     }
+      // const objectUrl = URL.createObjectURL(props.file);
+      // setPreview(objectUrl);
+  
       const objectUrl = URL.createObjectURL(props.file);
       setPreview(objectUrl);
+      // let link = document.createElement('a');
+      // var fileExt =props.file.type.split("/")[0]
+      // link.download = 'LetterOfAcceptence'.fileExt;
+      // let blob = new Blob([props.file], {type: props.file.type});
+      // link.href = URL.createObjectURL(blob);  
+      // link.click();
+
+
   
+
       // free memory when ever this component is unmounted
       return () => URL.revokeObjectURL(objectUrl);
     
@@ -63,6 +76,7 @@ const WorkOrderUploadFile = (props) => {
                     width="75px"
                     height="75px"
                     onClick={() => window.open(preview, "_blank")}
+                    title="Click for Preview13"
                   />
                 )}
                 {/* <i className="fas fa-clipboard-list fa-2x " /> */}

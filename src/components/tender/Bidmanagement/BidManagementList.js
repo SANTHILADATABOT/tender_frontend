@@ -37,6 +37,7 @@ const BidManagementList = (props) => {
     const location = useLocation();
 
     useEffect(() => {
+      
         table =  $('#dataTable').DataTable({
             data : BidManagementList,
             columns: [

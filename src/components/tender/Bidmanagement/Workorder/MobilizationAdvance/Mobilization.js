@@ -3,10 +3,14 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import CollapseCard from "../../../../UI/CollapseCard";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import useInputValidation from "../../../../hooks/useInputValidation";
+// import {
+//   isNotEmpty,
+//   isNotNull,
+// } from "../../../CommonFunctions/CommonFunctions";
 import {
   isNotEmpty,
   isNotNull,
-} from "../../../CommonFunctions/CommonFunctions";
+} from "../../../CommonFunctions/CommonFunctions_copy";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -82,12 +86,19 @@ const Mobilization = () => {
   let formIsValid = false;
 
   if (
-    mobAdvanceIsValid &&
-    bankNameIsValid &&
-    bankBranchIsValid &&
-    mobAdvModeIsValid &&
-    dateMobAdvIsValid &&
-    validUptoIsValid
+    // mobAdvanceIsValid &&
+    // bankNameIsValid &&
+    // bankBranchIsValid &&
+    // mobAdvModeIsValid &&
+    // dateMobAdvIsValid &&
+    // validUptoIsValid
+
+    mobAdvancevalue ||
+    bankNamevalue ||
+    bankBranchvalue ||
+    mobAdvModevalue ||
+    dateMobAdvvalue ||
+    validUptovalue
   ) {
     formIsValid = true;
   }
@@ -129,12 +140,12 @@ const Mobilization = () => {
     if(data)
     {
     setmobId(data.id);
-    setmobAdvanceValue(data.mobadvance);
-    setbankNameValue(data.bankname);
-    setbankBranchValue(data.bankbranch);
-    setmobAdvModeValue(data.mobadvmode);
-    setdateMobAdvValue(data.datemobadv);
-    setvalidUptoValue(data.validupto);
+    setmobAdvanceValue(data.mobadvance?data.mobadvance:"");
+    setbankNameValue(data.bankname?data.bankname:"");
+    setbankBranchValue(data.bankbranch?data.bankbranch:"");
+    setmobAdvModeValue(data.mobadvmode?data.mobadvmode:"");
+    setdateMobAdvValue(data.datemobadv?data.datemobadv:"");
+    setvalidUptoValue(data.validupto?data.validupto:"");
     }
   };
 
@@ -159,7 +170,7 @@ const Mobilization = () => {
         if (res.data.status === 200) {
           Swal.fire({
             icon: "success",
-            title: "Workorder",
+            title: "Mobilization Advance",
             text: "Updated Successfully!",
             confirmButtonColor: "#5156ed",
           });
