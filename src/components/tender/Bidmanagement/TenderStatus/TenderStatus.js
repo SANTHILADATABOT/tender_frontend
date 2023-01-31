@@ -1,5 +1,6 @@
 import { usePageTitle } from "../../../hooks/usePageTitle";
 import Bidders from "./Bidders/Bidders";
+import TechnicalEvalution from "./TechnicalEvalution/TechnicalEvalution";
 import { useState, useEffect} from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import axios from "axios";
@@ -96,24 +97,49 @@ const errorUpdate = () =>{
         </div>
       )}
 
+
+        {/* Biddres Form */}
       <div className="card mb-2  ">
         <a
-          href="#tenderStatus"
+          href="#bidders"
           className="d-block card-header py-3 bg-white "
           data-toggle="collapse"
           role="button"
           aria-expanded="true"
-          aria-controls="tenderStatus"
+          aria-controls="bidders"
         >
           <h6 className="m-0 font-weight-bold text-dark">BIDDERS</h6>
         </a>
         {/* Card Content - Collapse */}
-        <div className="collapse" id="tenderStatus">
+        <div className="collapse" id="bidders">
           <div className="card-header">
             <Bidders />
           </div>
         </div>
       </div>
+
+
+      {/* Technical Evaluation Form */}
+      <div className="card mb-2  ">
+        <a
+          href="#technicalEvaluation"
+          className="d-block card-header py-3 bg-white "
+          data-toggle="collapse"
+          role="button"
+          aria-expanded="true"
+          aria-controls="technicalEvaluation"
+        >
+          <h6 className="m-0 font-weight-bold text-dark">TECHNICAL EVALUATION</h6>
+        </a>
+        {/* Card Content - Collapse */}
+        <div className="collapse" id="technicalEvaluation">
+          <div className="card-header">
+            <TechnicalEvalution />
+          </div>
+        </div>
+      </div>
+
+
       <div className="row mt-5">
         <div className="col-lg-6">
             
