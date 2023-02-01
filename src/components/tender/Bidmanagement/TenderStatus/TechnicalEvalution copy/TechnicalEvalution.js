@@ -3,14 +3,17 @@ import { Fragment, useRef, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import useInputValidation from "../../../../hooks/useInputValidation";
+// import CollapseCard from "../../../../UI/CollapseCard";
 import { isNotEmpty } from "../../../CommonFunctions/CommonFunctions";
+import ReadyToUploadTechnicalEvalution from "./ReadyTouploadTechnicalEvalution";
 import ReadyToUpload from "./ReadyToupload";
 import styles from "./UploadDocTechnicalEvalution.module.css";
 import Swal from "sweetalert2";
+// import DocListTechnicalEvalution from "./DocListTechnicalEvalution";
 import LockCard from "../../../../UI/LockCard";
 import PreLoader from "../../../../UI/PreLoader";
 import AcceptedBidders from "./AcceptedBidders";
-
+import { Input } from "rsuite";
 
 const TechnicalEvalution = () => {
   const [file, setFile] = useState(null);
@@ -39,7 +42,7 @@ const TechnicalEvalution = () => {
     reset: resetDate,
   } = useInputValidation(isNotEmpty);
 
- 
+  const [input, setInput] = useState([]);
 
   const onDragEnter = () => {
     wrapperRef.current.classList.add(styles["dragover"]);
@@ -216,7 +219,25 @@ const TechnicalEvalution = () => {
     // setInput({});
   };
 
- 
+  const textInputHandler = (id, e) => {
+    e.persist();
+    setInput((prev) => {
+      return {
+        ...prev,
+        [id]: {
+          ...prev[id],
+          [e.target.name]: e.target.value,
+        },
+      };
+      // return {
+      //   ...prev,
+      //   id: id,
+      //     ...prev.value,
+      //     [e.target.name]: e.target.value,
+      //   },
+      });
+    }
+
   return (
     <LockCard locked={!id}>
       <PreLoader loading={FetchLoading}>
@@ -319,6 +340,10 @@ const TechnicalEvalution = () => {
                 <div className="col-lg-12 text-dark font-weight-bold">
                   <AcceptedBidders
                     bidManageMainId={bidManageMainId}
+                    inputHandler={inputHandler}
+                    input={input}
+                    textInputHandler={textInputHandler}
+                    setInput={setInput}
                   />
                 </div>
               </div>
