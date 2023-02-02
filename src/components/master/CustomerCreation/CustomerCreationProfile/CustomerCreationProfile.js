@@ -11,13 +11,20 @@ import {
   getCustSubCatList,
 } from "../apiUtilites";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 // import { isMobileValidation, isPincodeValid, isEmailValid, isPanValid, isgstNoValid, isUrlValid } from "../CommonValidation";
 import { isMobileValidation, isPincodeValid, isEmailValid, isPanValid, isgstNoValid, isUrlValid } from "../CommonValidation_copy";
 
 
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { profiledataActions } from "../store/CusProfileSlice";
+import { contactPersonActions } from "../store/ContactPersonSlice";
+import { swmprojectstatusActions } from "../store/SWMProjectStatusSlice";
+import { ULBDetailsActions } from "../store/ULBDetailsSlice";
+import { bankDetailsActions } from "../store/BankDetailsSlice";
 
 
 
@@ -40,6 +47,7 @@ const initialOptions = {
 
 
 const CustomerCreationProfile = () => {
+  const location = useLocation();
   const { server1: baseUrl } = useBaseUrl();
   const [formNo, setFormNo]= useState(1);
   const [formId, setFormId]= useState(0);
@@ -62,6 +70,9 @@ const CustomerCreationProfile = () => {
 
   const navigate = useNavigate()
   const [toastSuccess, toastError, setCustomerCreationMainID] = useOutletContext();
+
+  let cust_name = useSelector((state) => state.profiledata.inputData)
+  const dispatch = useDispatch();
 
   const {
     value: customernoValue,
@@ -163,7 +174,7 @@ const CustomerCreationProfile = () => {
     inputBlurHandler: phoneBlurHandler,
     setInputValue: setphoneValue,
     reset: resetphone,
-  } = useInputValidation(isNotEmpty);
+  } = useInputValidation(isMobileValidation);
 
   const {
     value: panValue,
@@ -245,6 +256,74 @@ const CustomerCreationProfile = () => {
     reset: resetwebsite,
   } = useInputValidation(isUrlValid);
 
+  useEffect(() => {
+    validateInputLength(addressValue)
+  }, [addressValue])
+
+  const dispatchData = (e) => {
+
+    if(e.target.name === 'gstregistered'){
+      dispatch(profiledataActions.storeInput({name : 'gstno', value : ''}));
+    }
+
+    dispatch(profiledataActions.storeInput({name : e.target.name, value : e.target.value}));
+  }
+
+  const customernameChangeHandler_store = (e) => dispatchData(e)
+  const pincodeChangeHandler_store =(e) => dispatchData(e)
+  const phoneChangeHandler_store =(e) => dispatchData(e)
+  const panChangeHandler_store =(e) => dispatchData(e)
+  const mobilenoChangeHandler_store =(e) => dispatchData(e)
+  const emailChangeHandler_store =(e) => dispatchData(e)
+  const gstnoChangeHandler_store =(e) => dispatchData(e)
+  const addressChangeHandler_store =(e) => dispatchData(e)
+  const websiteChangeHandler_store =(e) => dispatchData(e)
+  const customercategoryhandler_store = (e) => dispatchData(e)
+  const smartcityhandler_store = (e) => dispatchData(e)
+  const gstregistered_store = (e) =>  dispatchData(e)
+
+  const customersubcategoryChangeHandler_store = (selectedOptions) => {
+    
+    if(selectedOptions === null){
+      dispatch(profiledataActions.storeInput({name : 'customersubcategory', value : '0' }));
+      return; 
+    }
+    dispatch(profiledataActions.storeInput({name : 'customersubcategory', value : selectedOptions})); 
+  }
+
+  const countryChangeHandler_store = (selectedOptions) => {
+  
+    if(selectedOptions === null){
+      dispatch(profiledataActions.storeInput({name : 'country', value : '0' }));
+      return; 
+    }
+    dispatch(profiledataActions.storeInput({name : 'country', value : selectedOptions})); 
+  }
+  
+  const stateChangeHandler_store = (selectedOptions) => {
+    if(selectedOptions === null){
+      dispatch(profiledataActions.storeInput({name : 'state', value : '0' }));
+      return; 
+    }
+    dispatch(profiledataActions.storeInput({name : 'state', value : selectedOptions})); 
+  }
+
+  const districtChangeHandler_store = (selectedOptions) => {
+    if(selectedOptions === null){
+      dispatch(profiledataActions.storeInput({name : 'district', value : '0' }));
+      return; 
+    }
+    dispatch(profiledataActions.storeInput({name : 'district', value : selectedOptions})); 
+  }
+
+  const cityChangeHandler_store = (selectedOptions) => {
+    if(selectedOptions === null){
+      dispatch(profiledataActions.storeInput({name : 'city', value : '0' }));
+      return; 
+    }
+    dispatch(profiledataActions.storeInput({name : 'city', value : selectedOptions})); 
+  }
+
   
   useEffect(() => {
 
@@ -279,28 +358,29 @@ const CustomerCreationProfile = () => {
 
 
     const setsavedDataToForm = (savedData) => {
-      // console.log(savedData) // $$$$
-
-      setFormId(savedData.id)
-      setFormNo(savedData.form_no)
-      setcustomernoValue(savedData.customer_no)
-      setcustomernameValue(savedData.customer_name)
-      setcustomercategoryValue(savedData.customer_category)
-      setSmartCity(savedData.smart_city)
-      setcustomersubcategoryValue(CustSubCatgyOpts.find((x) => x.value === savedData.customer_sub_category.toString()))
-      setpincodeValue(savedData.pincode===null? "":savedData.pincode.toString())
-      setphoneValue(savedData.phone===null ? "": savedData.phone)
-      setpanValue(savedData.pan===null? "":savedData.pan)
-      setmobilenoValue(savedData.mobile_no=== null ? "": savedData.mobile_no);
+      
+      setFormId(savedData.id);
+      setFormNo(savedData.form_no);
+      setcustomernoValue(savedData.customer_no);
+      !(cust_name && cust_name.customername)          && setcustomernameValue(savedData.customer_name);
+      !(cust_name && cust_name.customercategory)      && setcustomercategoryValue(savedData.customer_category);
+      !(cust_name && cust_name.smartcity)             && setSmartCity(savedData.smart_city);
+      !(cust_name && cust_name.customersubcategory)   &&  setcustomersubcategoryValue(CustSubCatgyOpts.find((x) => x.value === savedData.customer_sub_category.toString()));
+      !(cust_name && cust_name.pincode)               && setpincodeValue(savedData.pincode===null? "":savedData.pincode.toString());
+      !(cust_name && cust_name.phone)                 && setphoneValue(savedData.phone===null ? "": savedData.phone);
+      !(cust_name && cust_name.pan)                   && setpanValue(savedData.pan===null? "":savedData.pan);
+      !(cust_name && cust_name.mobile)                && setmobilenoValue(savedData.mobile_no=== null ? "": savedData.mobile_no);
       // setcurrentyrdateValue(savedData.current_year_date)
-      setemailValue(savedData.email)
-      setgstReg((savedData.gst_no===null || savedData.gst_registered === "no") ? "no" : "yes");
-      (savedData.gst_no===null || savedData.gst_registered === "no") ? setGstNoDisable(true) : setGstNoDisable(false);
-      savedData.gst_no === null ? setgstnoValue("") :  setgstnoValue(savedData.gst_no)
+      !(cust_name && cust_name.email)                 && setemailValue(savedData.email);
+      !(cust_name && cust_name.gstregistered)         && setgstReg((savedData.gst_no===null || savedData.gst_registered === "no") ? "no" : "yes");
+      !(cust_name && cust_name.gstregistered)         && ((savedData.gst_no===null || savedData.gst_registered === "no") ? handleGST(true, '') : handleGST(false, savedData.gst_no));
+
+      // !(cust_name && cust_name.gstregistered) && (savedData.gst_no===null || savedData.gst_registered === "no") ? setGstNoDisable(true) : setGstNoDisable(false);
+      // savedData.gst_no === null ? setgstnoValue("") :  setgstnoValue(savedData.gst_no)
      
       // setpopulationyrdataValue(savedData.population_year_data)
-      setaddressValue(savedData.address === null ? "" : savedData.address)
-      setwebsiteValue(savedData.website ===null ? "": savedData.website)
+      !(cust_name && cust_name.address) && setaddressValue(savedData.address === null ? "" : savedData.address);
+      !(cust_name && cust_name.website) && setwebsiteValue(savedData.website ===null ? "": savedData.website);
     }
 
     const getprofileofcust = async () => {
@@ -344,8 +424,60 @@ const CustomerCreationProfile = () => {
     // getProfileFormData();
   }, [baseUrl]);
 
+  useEffect(() => {
+    const data = location.state?.data;
+    if(data?.byclicking){
+      dispatch(profiledataActions.resetInput())
+      dispatch(contactPersonActions.resetInput())
+      dispatch(swmprojectstatusActions.resetInput())
+      dispatch(ULBDetailsActions.resetInput())
+      dispatch(bankDetailsActions.resetInput())
+      return;
+    }
+
+    (cust_name && cust_name.customername) && setcustomernameValue(cust_name.customername);
+    (cust_name && cust_name.pincode)      && setpincodeValue(cust_name.pincode);
+    (cust_name && cust_name.address)      && setaddressValue(cust_name.address);
+    (cust_name && cust_name.phone)        && setphoneValue(cust_name.phone);
+    (cust_name && cust_name.pan)          && setpanValue(cust_name.pan);
+    (cust_name && cust_name.mobile)       && setmobilenoValue(cust_name.mobile);
+    (cust_name && cust_name.email)        && setemailValue(cust_name.email);
+    (cust_name && cust_name.website)      && setwebsiteValue(cust_name.website);
+    // gstregistered
+    (cust_name && cust_name.gstno)        && setgstnoValue(cust_name.gstno);
+    (cust_name && cust_name.customercategory) && setcustomercategoryValue(cust_name.customercategory);
+
+    (cust_name && cust_name.smartcity)      && setSmartCity(cust_name.smartcity);
+    (cust_name && cust_name.gstregistered)  && setgstReg(cust_name.gstregistered) ; 
+    (cust_name && cust_name.gstregistered)  && (cust_name.gstregistered === "no" ? handleGST(true, '') : handleGST(false, cust_name.gstno));   
+  }, [])
+
+  const handleGST = (status, gst_no) => {
+    if(status){
+      setGstNoDisable(true)
+      setgstnoValue("")
+    }else{
+      setGstNoDisable(false)
+      if(gst_no === null){
+        setgstnoValue("")
+      }else{
+        setgstnoValue(gst_no)
+      }
+    }
+  }
   
   useEffect(() => {
+
+    if(custsubcategoryOptions.options.length > 0 && cust_name && cust_name.customersubcategory){
+      if(cust_name.customersubcategory !== '0'){
+        let sustsubcatSelectedOption = custsubcategoryOptions.options.find(
+          (x) => x.value === cust_name.customersubcategory.value
+        );
+        customersubcategoryChangeHandler(sustsubcatSelectedOption);
+      }
+      return;
+    }
+
     if (Object.keys(formData).length !== 0 && custsubcategoryOptions.options.length > 0) {
       let sustsubcatSelectedOption = custsubcategoryOptions.options.find(
         (x) => x.value === formData.customer_sub_category
@@ -357,7 +489,21 @@ const CustomerCreationProfile = () => {
 
 
   useEffect(() => {
+    if(CountryOptions.options.length > 0 && cust_name && cust_name.country){
+      // console.log('country1')
+      if(cust_name.country !== '0'){
+        let countrySelectedOption = CountryOptions.options.find(
+          (x) => x.value === cust_name.country.value
+        );
+        countryChangeHandler(countrySelectedOption);
+      }else{
+        setLoading(false)
+      }
+      return;
+    }
+
     if (Object.keys(formData).length !== 0 && CountryOptions.options.length > 0) {
+      // console.log('country2')
       let countrySelectedOption = CountryOptions.options.find(
         (x) => x.value === formData.country
       );
@@ -366,16 +512,47 @@ const CustomerCreationProfile = () => {
   }, [formData, CountryOptions.options]);
 
   useEffect(() => {
+
+    if(StateOptions.options.length > 0 && cust_name && cust_name.state){
+      // console.log('state1')
+      if(cust_name.state !== '0'){
+      let stateSelectedOption = StateOptions.options.find(
+        (x) => x.value === cust_name.state.value
+      );
+      stateChangeHandler(stateSelectedOption);
+      }else{
+        setLoading(false)
+      }
+      return;
+    }
+
     if (Object.keys(formData).length !== 0 && StateOptions.options.length > 0) {
+      // console.log('state2')
       let StateSelectedOption = StateOptions.options.find(
         (x) => x.value === formData.state
       );
       stateChangeHandler(StateSelectedOption);
     }
-  }, [formData, StateOptions.options]);
+  }, [formData,StateOptions.options]);
+
+ 
 
   useEffect(() => {
+    if(DistrictOptions.options.length > 0 && cust_name && cust_name.district){
+      if(cust_name.district !== '0'){
+        // console.log('district1')
+        let districtSelectedOption = DistrictOptions.options.find(
+          (x) => x.value === cust_name.district.value
+          );
+        districtChangeHandler(districtSelectedOption);
+      }else{
+        setLoading(false)
+      }
+      return;
+    }
+
     if (Object.keys(formData).length !== 0 && DistrictOptions.options.length > 0) {
+      // console.log('district2')
       let districtSelectedOption = DistrictOptions.options.find(
         (x) => x.value === formData.district
       );
@@ -384,6 +561,17 @@ const CustomerCreationProfile = () => {
   }, [formData, DistrictOptions.options]);
 
   useEffect(() => {
+    if(CityOptions.options.length > 0 && cust_name && cust_name.city){
+      if(cust_name.city !== '0'){
+        let citySelectedOption = CityOptions.options.find(
+          (x) => x.value === cust_name.city.value
+        );
+         cityChangeHandler(citySelectedOption);
+      }
+      setLoading(false)
+      return;
+    }
+
     if (Object.keys(formData).length !== 0 && CityOptions.options.length > 0) {
       let citySelectedOption = CityOptions.options.find(
         (x) => x. value === formData.city
@@ -440,6 +628,8 @@ const CustomerCreationProfile = () => {
 
   },[stateValue, smartcity])
 
+ 
+
   // const getcustno = (selectedOptions) => {
 
   //   console.log(selectedOptions, smartcity)
@@ -463,50 +653,86 @@ const CustomerCreationProfile = () => {
   //   // if(selectedOptions === null){setcustomernoValue("")}
   // }
 
+  
 
-  const countryChangeHandler = async (selectedOptions) => {
-    if (countryValue === selectedOptions && countryValue !== null) {
+  const countryChangeHandler = async (selectedOptions, isTouched=null) => {
+    if ((countryValue === selectedOptions && countryValue !== null) || selectedOptions===undefined) {
+      setLoading(false)
       return;
     }
 
     countrySelectedValue(selectedOptions);
+    isTouched && countryChangeHandler_store(selectedOptions);
 
     if (selectedOptions === null) {
       resetstatedistrictcity();
+      if(isTouched){
+        dispatch(profiledataActions.storeInput({name : 'state', value : '0'})); 
+        dispatch(profiledataActions.storeInput({name : 'district', value : '0'})); 
+        dispatch(profiledataActions.storeInput({name : 'city', value : '0'})); 
+      }
       return;
     }
     resetstatedistrictcity();
+ 
+    if(isTouched){
+      dispatch(profiledataActions.storeInput({name : 'state', value : null})); 
+      dispatch(profiledataActions.storeInput({name : 'district', value : null})); 
+      dispatch(profiledataActions.storeInput({name : 'city', value : null})); 
+    }
     // setState(null);
     // setDistrict(null);
     // setCity(null);
     renderStateList(selectedOptions, customercategoryValue)
+    setDistrictoptions(initialOptions);
+    setCityoptions(initialOptions);
     
   };
 
   const renderStateList = async (selectedOptions, category) => {
     setStateoptions({ ...StateOptions, isLoading: true });
     const stateListData = await getSatateData(baseUrl, selectedOptions.value, category, savedData.state);
+    if(stateListData.options.length === 0){
+      setLoading(false)
+    }
     setStateoptions(stateListData);
   }
 
-  const stateChangeHandler = async (selectedOptions) => {
-    if (stateValue === selectedOptions && stateValue !== null) {
+  const stateChangeHandler = async (selectedOptions, isTouched=null) => {
+    if ((stateValue === selectedOptions && stateValue !== null) || selectedOptions===undefined) {
+      setLoading(false)
       return;
     }
 
     stateSelectedValue(selectedOptions);
+    isTouched && stateChangeHandler_store(selectedOptions);
 
     if (selectedOptions === null) {
       districtSelectedValue(selectedOptions);
       cityChangeHandler(selectedOptions);
+
+      if(isTouched){
+        dispatch(profiledataActions.storeInput({name : 'district', value : '0'})); 
+        dispatch(profiledataActions.storeInput({name : 'city', value : '0'})); 
+      }
 
       setDistrictoptions(initialOptions);
       setCityoptions(initialOptions);
       return;
     }
 
-    setDistrict(null);
-    setCity(null);
+    // setDistrict(null);
+    // setCity(null);
+
+    districtSelectedValue(null);
+    cityChangeHandler(null);
+
+    if(isTouched){
+      dispatch(profiledataActions.storeInput({name : 'district', value : null})); 
+      dispatch(profiledataActions.storeInput({name : 'city', value : null})); 
+    }
+
+
     setDistrictoptions({ ...DistrictOptions, isLoading: true });
     const districtListData = await getDistrictData(
       baseUrl,
@@ -514,24 +740,45 @@ const CustomerCreationProfile = () => {
       selectedOptions.value,
       savedData.district
     );
+
+    if(districtListData.options.length === 0){
+      setLoading(false)
+    }
+
     setDistrictoptions(districtListData);
+    setCityoptions(initialOptions);
   };
 
-  const districtChangeHandler = async (selectedOptions) => {
-    if (districtValue === selectedOptions && districtValue !== null) {
+  const districtChangeHandler = async (selectedOptions, isTouched=null) => {
+
+    if ((districtValue === selectedOptions && districtValue !== null) || selectedOptions===undefined) {
+      setLoading(false)
       return;
     }
 
     districtSelectedValue(selectedOptions);
+    isTouched && districtChangeHandler_store(selectedOptions);
+
     if (selectedOptions === null) {
       cityChangeHandler(selectedOptions);
-
+      if(isTouched){
+        dispatch(profiledataActions.storeInput({name : 'city', value : '0'})); 
+      }
       setCityoptions(initialOptions);
       return;
     }
 
-    setCity(null);
+    
+
+    // setCity(null); 
+    cityChangeHandler(null);
+    if(isTouched){
+      dispatch(profiledataActions.storeInput({name : 'city', value : null})); 
+    }
+
+    // console.log(selectedOptions)
     setCityoptions({ ...CityOptions, isLoading: true });
+
     const cityListData = await getCityData(
       baseUrl,
       countryValue.value,
@@ -539,12 +786,18 @@ const CustomerCreationProfile = () => {
       selectedOptions.value,
       savedData.city,
     );
+
+    if(cityListData.options.length === 0){
+      setLoading(false)
+    };
+
     setCityoptions(cityListData);
     setIsrendered(true)
   };
 
   const gstregistered = (e) => {
     setgstReg(e.target.value);
+    gstregistered_store(e);
     if (e.target.value === "yes") {
       setGstNoDisable(false);
     } else {
@@ -565,13 +818,24 @@ const CustomerCreationProfile = () => {
 
   const customercategoryhandler = (e) => {
       setcustomercategoryValue(e.target.value)
+      customercategoryhandler_store(e)
+
+      dispatch(profiledataActions.storeInput({name : 'state', value : '0'})); 
+      dispatch(profiledataActions.storeInput({name : 'district', value : '0'})); 
+      dispatch(profiledataActions.storeInput({name : 'city', value : '0'})); 
+
       resetstatedistrictcity();
       renderStateList(countryValue, e.target.value)
   }
 
-  const validateInputLength = (e) => {
+  const smartcityhandler = (e) => {
+    smartcityhandler_store(e)
+    setSmartCity(e.target.value); 
+  }
+
+  const validateInputLength = (value) => {
     let maxLength =255;
-    setaddresslength(maxLength-e.target.value.length);  
+    setaddresslength(maxLength-value.length);  
   }
   // const ColourOption = [
   //   { value: "ocean", label: "Ocean" },
@@ -639,6 +903,7 @@ const CustomerCreationProfile = () => {
       if (resp.data.status === 200) {
         setCustomerCreationMainID(resp.data.id)
         toastSuccess(resp.data.message)
+        dispatch(profiledataActions.resetInput()); 
         resetall()
         window.history.replaceState({},"Customer Creation", "/tender/master/customercreation/list/main/profile/"+resp.data.id);
         navigate("/tender/master/customercreation/list/main/contactPerson/"+resp.data.id);
@@ -656,6 +921,7 @@ const CustomerCreationProfile = () => {
       
       if (resp.data.status === 200) {
         toastSuccess(resp.data.message)
+        dispatch(profiledataActions.resetInput()); 
         navigate(`/tender/master/customercreation/list/main/contactPerson/${formId}`);
       } else if (resp.data.status === 400) {
         toastError(resp.data.message)
@@ -758,13 +1024,13 @@ catch(ex){
                   disabled={true}
                 />
                
-                {customernoHasError && (
+                {/* {customernoHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
                       Customer no. is required
                     </span>
                   </div>
-                )}
+                )} */}
 
               </div>
             </div>
@@ -846,13 +1112,13 @@ catch(ex){
                   placeholder="Enter Customer Name"
                   name="customername"
                   value={customernameValue}
-                  onChange={customernameChangeHandler}
+                  onChange={e => {customernameChangeHandler(e); customernameChangeHandler_store(e);}} 
                   onBlur={customernameBlurHandler}
                 />
                 {customernameHasError && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-normal">
-                      Customer Category is required
+                      Customer Name is required
                     </span>
                   </div>
                 )}
@@ -874,8 +1140,8 @@ catch(ex){
                       id="smartcityyyes"
                       checked={"yes" === smartcity}
                       value="yes"
-                      onChange={(e) => {setSmartCity(e.target.value); 
-                      
+                      onChange={(e) => {
+                        smartcityhandler(e)
                       }}
                     />
                     Yes
@@ -890,8 +1156,8 @@ catch(ex){
                       id="smartcityno"
                       checked={"no" === smartcity}
                       value="no"
-                      onChange={(e) => {setSmartCity(e.target.value); 
-                       
+                      onChange={(e) => {
+                        smartcityhandler(e)
                       }}
                     />
                     No
@@ -914,7 +1180,7 @@ catch(ex){
                   isSearchable="true"
                   isClearable="true"
                   options={custsubcategoryOptions.options}
-                  onChange={customersubcategoryChangeHandler}
+                  onChange={(selectedOptions) => {customersubcategoryChangeHandler(selectedOptions); customersubcategoryChangeHandler_store(selectedOptions)}}
                   onBlur={customersubcategoryBlurHandler}
                   value={customersubcategoryValue}
                   isLoading={custsubcategoryOptions.isLoading}
@@ -941,7 +1207,7 @@ catch(ex){
                   isSearchable="true"
                   options={CountryOptions.options}
                   isClearable="true"
-                  onChange={countryChangeHandler}
+                  onChange={(selectedOptions) => {countryChangeHandler(selectedOptions, 1)}}
                   onBlur={countryBlurHandler}
                   value={countryValue}
                   isLoading={CountryOptions.isLoading}
@@ -968,7 +1234,7 @@ catch(ex){
                   isSearchable="true"
                   isClearable="true"
                   options={StateOptions.options}
-                  onChange={(selectedOptions) =>{ stateChangeHandler(selectedOptions); 
+                  onChange={(selectedOptions) =>{ stateChangeHandler(selectedOptions, 1); 
                     // getcustno(selectedOptions);
                    }}
                   onBlur={stateBlurHandler}
@@ -997,7 +1263,7 @@ catch(ex){
                   isSearchable="true"
                   options={DistrictOptions.options}
                   isClearable="true"
-                  onChange={districtChangeHandler}
+                  onChange={(selectedOptions) => {districtChangeHandler(selectedOptions, 1); }}
                   onBlur={districtBlurHandler}
                   value={districtValue}
                   isLoading={DistrictOptions.isLoading}
@@ -1024,7 +1290,7 @@ catch(ex){
                   isSearchable="true"
                   options={CityOptions.options}
                   isClearable="true"
-                  onChange={cityChangeHandler}
+                  onChange={(selectedOptions) => {cityChangeHandler(selectedOptions); cityChangeHandler_store(selectedOptions)}}
                   onBlur={cityBlurHandler}
                   value={cityValue}
                   isLoading={CityOptions.isLoading}
@@ -1052,7 +1318,7 @@ catch(ex){
                   placeholder="Enter Pincode"
                   name="pincode"
                   value={pincodeValue}
-                  onChange={pincodeChangeHandler}
+                  onChange={e => {pincodeChangeHandler(e) ; pincodeChangeHandler_store(e)}}
                   onBlur={pincodeBlurHandler}
                 />
                 {pincodeHasError && (
@@ -1078,10 +1344,10 @@ catch(ex){
                   placeholder="Enter Address"
                   name="address"
                   rows="3"
-                  onChange={addressChangeHandler}
+                  onChange={e => {addressChangeHandler(e) ; addressChangeHandler_store(e)}}
                   onBlur={addressBlurHandler}
                   value={addressValue}
-                  onKeyUp={validateInputLength}
+                  onKeyUp={(e) => validateInputLength(e.target.value)}
                   maxLength="255"
                 ></textarea>
                 {addressHasError && (
@@ -1107,7 +1373,7 @@ catch(ex){
                   placeholder="Enter Phone No."
                   name="phone"
                   value={phoneValue}
-                  onChange={phoneChangeHandler}
+                  onChange={e => {phoneChangeHandler(e); phoneChangeHandler_store(e)}}
                   onBlur={phoneBlurHandler}
                 />
                 {phoneHasError && (
@@ -1132,7 +1398,7 @@ catch(ex){
                   placeholder="Enter PAN"
                   name="pan"
                   value={panValue}
-                  onChange={panChangeHandler}
+                  onChange={e => {panChangeHandler(e); panChangeHandler_store(e)}}
                   onBlur={panBlurHandler}
                 />
                 {panHasError && (
@@ -1158,7 +1424,7 @@ catch(ex){
                   placeholder="Enter Mobile No"
                   name="mobile"
                   value={mobilenoValue}
-                  onChange={mobilenoChangeHandler}
+                  onChange={e => {mobilenoChangeHandler(e); mobilenoChangeHandler_store(e)}}
                   onBlur={mobilenoBlurHandler}
                 />
                 {mobilenoHasError && (
@@ -1210,7 +1476,7 @@ catch(ex){
                   placeholder="Enter Email"
                   name="email"
                   value={emailValue}
-                  onChange={emailChangeHandler}
+                  onChange={e => {emailChangeHandler(e); emailChangeHandler_store(e)}}
                   onBlur={emailBlurHandler}
                 />
                 {emailHasError && (
@@ -1236,7 +1502,7 @@ catch(ex){
                   placeholder="Enter Website"
                   name="website"
                   value={websiteValue}
-                  onChange={websiteChangeHandler}
+                  onChange={e => {websiteChangeHandler(e); websiteChangeHandler_store(e)}}
                   onBlur={websiteBlurHandler}
                 />
                 {websiteHasError && (
@@ -1305,7 +1571,7 @@ catch(ex){
                   placeholder="Enter GST No"
                   name="gstno"
                   value={gstnoValue}
-                  onChange={gstnoChangeHandler}
+                  onChange={e => {gstnoChangeHandler(e); gstnoChangeHandler_store(e)}}
                   onBlur={gstnoBlurHandler}
                   disabled={GstNoDisable}
                 />

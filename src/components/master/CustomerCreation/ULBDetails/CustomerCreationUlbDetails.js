@@ -2,6 +2,8 @@ import { Fragment, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
+import { useDispatch, useSelector } from "react-redux";
+import { ULBDetailsActions } from "../store/ULBDetailsSlice";
 
 const initialState = {
   area: "",
@@ -62,6 +64,9 @@ const CustomerCreationUlbDetails = () => {
   const [toastSuccess, toastError, setCustomerCreationMainID] =
     useOutletContext();
 
+  let ulbdata = useSelector((state) => state.ulbdata.inputData)
+  const dispatch = useDispatch();
+
   const setPresentPopulation = () => {
     if (input.population2011) {
       let date = new Date();
@@ -91,6 +96,40 @@ const CustomerCreationUlbDetails = () => {
   useEffect(() => {
     setPresentPopulation();
   }, [input.population2011]);
+
+  // useEffect(() => {
+  //   if(ulbdata){
+     
+  //     for (const key in ulbdata) {
+      
+      
+  //         setInput((prev) => {
+  //           console.log(ulbdata[key])
+  //           return { 
+  //             ...prev,
+  //             [key] : ulbdata[key]
+  //           }
+  //         })
+     
+  //     }
+    
+  //   }
+  // }, [])
+  // console.log(input)
+ 
+
+  const updateWithRecentState = () => {
+    if(ulbdata){
+      for (const key in ulbdata) {
+          setInput((prev) => {
+            return { 
+              ...prev,
+              [key] : ulbdata[key]
+            }
+          })
+      }
+    }
+  }
 
   const getulbdetails = () => {
     axios
@@ -197,9 +236,9 @@ const CustomerCreationUlbDetails = () => {
               : "",
           });
           setuldid(ulbdetails.id);
-
           // navigate("/tender/master/customercreation/list/main/contactPerson/"+id);
         }
+        updateWithRecentState()
         setLoading(false);
       });
   };
@@ -211,12 +250,19 @@ const CustomerCreationUlbDetails = () => {
     }
   }, []);
 
+  const dispatchData = (e) => {
+    dispatch(ULBDetailsActions.storeInput({name : e.target.name, value : e.target.value}));
+  }
+
   const inputHandler = (e) => {
     setInput({
       ...input,
       [e.target.name]: e.target.value,
     });
+
+    dispatchData(e);
   };
+
 
   for (const key in input) {
     try{
@@ -335,6 +381,7 @@ const CustomerCreationUlbDetails = () => {
 
   const resetall = () => {
     setInput(initialState);
+    dispatch(ULBDetailsActions.resetInput())
   };
   return (
     <Fragment>
@@ -372,6 +419,7 @@ const CustomerCreationUlbDetails = () => {
                     className="form-control"
                     id="area"
                     name="area"
+                    // value={ulbdata?.area ? ulbdata.area : input.area}
                     value={input.area}
                     onChange={inputHandler}
                   />
@@ -389,6 +437,7 @@ const CustomerCreationUlbDetails = () => {
                     className="form-control"
                     id="population2011"
                     name="population2011"
+                    // value={ulbdata?.population2011 ? ulbdata.population2011 : input.population2011}
                     value={input.population2011}
                     onChange={inputHandler}
                   />
@@ -406,6 +455,7 @@ const CustomerCreationUlbDetails = () => {
                     className="form-control"
                     id="presentpopulation"
                     name="presentpopulation"
+                    // value={ulbdata?.presentpopulation ? ulbdata.presentpopulation : input.presentpopulation}
                     value={input.presentpopulation}
                     onChange={inputHandler}
                     disabled={true}
@@ -424,6 +474,7 @@ const CustomerCreationUlbDetails = () => {
                     className="form-control"
                     id="wards"
                     name="wards"
+                    // value={ulbdata?.wards ? ulbdata.wards : input.wards}
                     value={input.wards}
                     onChange={inputHandler}
                   />

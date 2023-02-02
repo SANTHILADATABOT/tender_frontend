@@ -7,6 +7,8 @@ import useInputValidation from "../../../hooks/useInputValidation";
 import { projectType as projectTypeOptions, statusOptions, vendorTypeOptions} from "../data";
 import SWMProjectStatusSubTable from "./SWMProjectStatusSubTable";
 import Swal from "sweetalert2";
+import { useDispatch, useSelector } from "react-redux";
+import { swmprojectstatusActions } from "../store/SWMProjectStatusSlice";
 
 // validations for input value
 const isNotNull = (value) => {
@@ -43,7 +45,11 @@ const CustomerCreationSWMProjectStatus = () => {
     const [toastSuccess, toastError, setCustomerCreationMainID] = useOutletContext()
     const { server1: baseUrl } = useBaseUrl();
     const [projecttypeoptions, setprojecttypeOptions] = useState(initialOptions);
-    const [projectstatusoptions,  setprojectstatusoptions] = useState(initialOptions)
+    const [projectstatusoptions,  setprojectstatusoptions] = useState(initialOptions);
+
+    let swmdata = useSelector((state) => state.swmdata.inputData)
+    const dispatch = useDispatch();
+
     const {
         value: vendorValue,
         isValid: vendorIsValid,
@@ -128,6 +134,62 @@ const CustomerCreationSWMProjectStatus = () => {
         reset: resetvendorType,
     } = useInputValidation(isNotNull);
 
+    const dispatchData = (e) => {
+      dispatch(swmprojectstatusActions.storeInput({name : e.target.name, value : e.target.value}));
+    }
+
+    const vendorChangeHandler_store = (e) => dispatchData(e);
+    const projectvalueChangeHandler_store = (e) => dispatchData(e);
+    const durationdate1ChangeHandler_store = (e) => dispatchData(e);
+    const durationdate2ChangeHandler_store = (e) => dispatchData(e);
+
+    const projectTypeChangeHandler_store = (selectedOptions) => {
+      // if(selectedOptions === null){
+      //   dispatch(swmprojectstatusActions.storeInput({name : 'projecttype', value : '0' }));
+      //   return; 
+      // }
+      dispatch(swmprojectstatusActions.storeInput({name : 'projecttype', value : selectedOptions})); 
+    }
+
+    const statusChangeHandler_store = (selectedOptions) => {
+      // if(selectedOptions === null){
+      //   dispatch(swmprojectstatusActions.storeInput({name : 'status', value : '0' }));
+      //   return; 
+      // }
+      dispatch(swmprojectstatusActions.storeInput({name : 'status', value : selectedOptions})); 
+    }
+  
+    const vendorTypeChangeHandler_store = (selectedOptions) => {
+      // if(selectedOptions === null){
+      //   dispatch(swmprojectstatusActions.storeInput({name : 'vendorType', value : '0' }));
+      //   return; 
+      // }
+      dispatch(swmprojectstatusActions.storeInput({name : 'vendorType', value : selectedOptions})); 
+    }
+
+    const projectstatusChangeHandler_store = (selectedOptions) => {
+      // if(selectedOptions === null){
+      //   dispatch(swmprojectstatusActions.storeInput({name : 'projectstatus', value : '0' }));
+      //   return; 
+      // }
+      dispatch(swmprojectstatusActions.storeInput({name : 'projectstatus', value : selectedOptions})); 
+    }
+
+    useEffect(()=> {
+      (swmdata?.projecttype)    && setprojectTypeValue(swmdata.projecttype);
+      (swmdata?.status)         && setstatusValue(swmdata.status);
+      // console.log(swmdata?.vendorType);
+      (swmdata?.vendorType)     && setvendorTypeValue(swmdata.vendorType);
+      (swmdata?.vendor)         && setvendorValue(swmdata.vendor);
+      (swmdata?.projectstatus)  && setprojectstatusValue(swmdata.projectstatus);
+      (swmdata?.projectvalue)   && setprojectvalueValue(swmdata.projectvalue);
+      (swmdata?.durationdate1)  && setdurationdate1Value(swmdata.durationdate1);
+      (swmdata?.durationdate2)  && setdurationdate2Value(swmdata.durationdate2);
+
+      (swmdata?.editbtn)        && setisEditbtn(swmdata.editbtn);
+      (swmdata?.projectid)      && setProjectId(swmdata.projectid);
+    },[])
+
     // console.log("vendorValue",vendorValue);
     // console.log("vendorValue",projectstatusValue);
     // console.log("projectvalueValue",projectvalueValue);
@@ -173,7 +235,7 @@ const CustomerCreationSWMProjectStatus = () => {
         setprojecttypeOptions((c) => {
           return { ...c, isLoading: true };
         });
-        let response = await axios.get(`${baseUrl}/api/projecttype/list/${id}`)  
+        let response = await axios.get(`${baseUrl}/api/projecttype/list/${id}`); 
         projectTypeList = { options: response.data.projectTypeList, isLoading: false }
         setprojecttypeOptions(projectTypeList)
       }
@@ -182,8 +244,8 @@ const CustomerCreationSWMProjectStatus = () => {
         setprojectstatusoptions((c) => {
           return { ...c, isLoading: true };
         });
-        let response = await axios.get(`${baseUrl}/api/projectstatus/list/${id}`)  
-         projectstatusList = { options: response.data.projectstatusList, isLoading: false }
+        let response = await axios.get(`${baseUrl}/api/projectstatus/list/${id}`);
+        projectstatusList = { options: response.data.projectstatusList, isLoading: false }
         setprojectstatusoptions(projectstatusList)
       }
 
@@ -233,10 +295,10 @@ const CustomerCreationSWMProjectStatus = () => {
       const onEdit =(data) => {
         setisEditbtn(true)
         setProjectId(data.id)
-        setvendorValue(data.vendor?data.vendor:"")
+        setvendorValue(data.vendor ? data.vendor : "")
         setprojectstatusValueFunction(data)
-        setprojectvalueValue(data.projectvalue ? data.projectvalue :"")
-        setdurationdate1Value(data.duration1?data.duration1:"")
+        setprojectvalueValue(data.projectvalue ? data.projectvalue : "")
+        setdurationdate1Value(data.duration1 ? data.duration1 : "")
         setdurationdate2Value(data.duration2?data.duration2:"")
         setprojectTypeValueFunction(data)
       
@@ -244,11 +306,27 @@ const CustomerCreationSWMProjectStatus = () => {
         //$$$
         setstatusValue(data.status ? (statusOptions.find(o => o.value === data.status.toString())):"")
         setvendorTypeValue(data.vendortype ? vendorTypeOptions.find(o => o.value === data.vendortype.toString()):"")
+
+
+       
+        dispatch(swmprojectstatusActions.storeInput({name : 'vendor', value : data?.vendor ? data.vendor : ""}));
+        dispatch(swmprojectstatusActions.storeInput({name : 'projectvalue', value : data?.projectvalue ? data.projectvalue : ""}));
+        dispatch(swmprojectstatusActions.storeInput({name : 'durationdate1', value : data?.duration1 ? data.duration1 : ""}));
+        dispatch(swmprojectstatusActions.storeInput({name : 'durationdate2', value : data?.duration2 ? data.duration2 : ""}));
+        dispatch(swmprojectstatusActions.storeInput({name : 'projectid', value : data?.id}));
+        dispatch(swmprojectstatusActions.storeInput({name : 'status', value : data?.status ? (statusOptions.find(o => o.value === data.status.toString())) : ""}));
+        dispatch(swmprojectstatusActions.storeInput({
+          name : 'vendorType',
+          value : data?.vendortype ? vendorTypeOptions.find(o => o.value === data.vendortype.toString()) : ""
+        }));
+        dispatch(swmprojectstatusActions.storeInput({name : 'editbtn', value : true}));
+
       }
    
       const setprojectTypeValueFunction = (data) => {
         if(projectTypeList.options.find(o => o.value === data.projecttype)){
           setprojectTypeValue(projectTypeList.options.find(o => o.value === data.projecttype))
+          dispatch(swmprojectstatusActions.storeInput({name : 'projecttype', value : projectTypeList.options.find(o => o.value === data.projecttype)}));
         }else{
           // setprojecttypeOptions((prev)=> {
           //   console.log(prev)
@@ -268,15 +346,19 @@ const CustomerCreationSWMProjectStatus = () => {
             'label' : data.projecttype_label
           } :""
           )
-
+          dispatch(swmprojectstatusActions.storeInput({
+            name : 'projecttype',
+            value : data.projecttype ? {'value' : data.projecttype, 'label' : data.projecttype_label} : ""
+          }));
         }
       }
 
       const setprojectstatusValueFunction = (data) => {
         
         if(projectstatusList.options.find(o => o.value === data.projectstatus)){
+          setprojectstatusValue(projectstatusList.options.find(o => o.value === data.projectstatus));
 
-          setprojectstatusValue(projectstatusList.options.find(o => o.value === data.projectstatus))
+          dispatch(swmprojectstatusActions.storeInput({name : 'projectstatus', value : projectstatusList.options.find(o => o.value === data.projectstatus)}));
         }else{
           // setprojectstatusoptions((prev)=> {
           //   return {
@@ -293,6 +375,11 @@ const CustomerCreationSWMProjectStatus = () => {
             'value' : data.projectstatus,
             'label' : data.projectstatus_label
           }:"")
+
+          dispatch(swmprojectstatusActions.storeInput({
+            name  : 'projectstatus',
+            value : data.projectstatus ? {'value' : data.projectstatus, 'label' : data.projectstatus_label} : ""
+          }));
         }
        
       }
@@ -359,6 +446,8 @@ const CustomerCreationSWMProjectStatus = () => {
         resetvendorType()
         setisEditbtn(false)
         setProjectId(null)
+
+        dispatch(swmprojectstatusActions.resetInput())
     }
 
     const submitHandler = (event) => {
@@ -389,7 +478,8 @@ const CustomerCreationSWMProjectStatus = () => {
           projectvalue : projectvalueValue,
           duarationdate1 : durationdate1Value,
           duarationdate2 : durationdate2Value,
-          projecttype : (!projectTypeValue.value? "":projectTypeValue.value),
+          // projecttype : (!projectTypeValue.value ? "":projectTypeValue.value),
+          projecttype : (projectTypeValue?.value ? projectTypeValue.value : "" ),
           status : (!statusValue ? "" :statusValue.value),
           vendortype: (!vendorTypeValue ? "" : vendorTypeValue.value),
        }
@@ -430,7 +520,7 @@ const CustomerCreationSWMProjectStatus = () => {
                     isSearchable="true"
                     options={projecttypeoptions.options}
                     isClearable="true"
-                    onChange={projectTypeChangeHandler}
+                    onChange={(selectedOptions) =>{ projectTypeChangeHandler(selectedOptions); projectTypeChangeHandler_store(selectedOptions)}}
                     onBlur={projectTypeBlurHandler}
                     value={projectTypeValue}
                     isLoading={projecttypeoptions.isLoading}
@@ -460,7 +550,7 @@ const CustomerCreationSWMProjectStatus = () => {
                     isSearchable="true"
                     options={statusOptions}
                     isClearable="true"
-                    onChange={statusChangeHandler}
+                    onChange={(selectedOptions) => {statusChangeHandler(selectedOptions); statusChangeHandler_store(selectedOptions);}}
                     onBlur={statusBlurHandler}
                     value={statusValue}
                     ></Select>
@@ -489,7 +579,7 @@ const CustomerCreationSWMProjectStatus = () => {
                     isSearchable="true"
                     options={vendorTypeOptions}
                     isClearable="true"
-                    onChange={vendorTypeChangeHandler}
+                    onChange={(selectedOptions) => {vendorTypeChangeHandler(selectedOptions); vendorTypeChangeHandler_store(selectedOptions)}}
                     onBlur={vendorTypeBlurHandler}
                     value={vendorTypeValue}
                     ></Select>
@@ -519,7 +609,7 @@ const CustomerCreationSWMProjectStatus = () => {
                     placeholder="Enter Vendor"
                     name="vendor"
                     value={vendorValue}
-                    onChange={vendorChangeHandler}
+                    onChange={(e) => {vendorChangeHandler(e); vendorChangeHandler_store(e)}}
                     onBlur={vendorBlurHandler}
                   />
                   {vendorHasError && (
@@ -547,7 +637,7 @@ const CustomerCreationSWMProjectStatus = () => {
                     isSearchable="true"
                     options={projectstatusoptions.options}
                     isClearable="true"
-                    onChange={projectstatusChangeHandler}
+                    onChange={(selectedOptions) => {projectstatusChangeHandler(selectedOptions); projectstatusChangeHandler_store(selectedOptions)}}
                     onBlur={projectstatusBlurHandler}
                     value={projectstatusValue}
                     isLoading={projectstatusoptions.isLoading}
@@ -578,7 +668,7 @@ const CustomerCreationSWMProjectStatus = () => {
                     placeholder="Enter Project Value"
                     name="projectvalue"
                     value={projectvalueValue}
-                    onChange={projectvalueChangeHandler}
+                    onChange={(e) => {projectvalueChangeHandler(e); projectvalueChangeHandler_store(e) }}
                     onBlur={projectvalueBlurHandler}
                   />
                   {projectvalueHasError && (
@@ -608,7 +698,7 @@ const CustomerCreationSWMProjectStatus = () => {
                     placeholder="Enter Date"
                     name="durationdate1"
                     value={durationdate1Value}
-                    onChange={durationdate1ChangeHandler}
+                    onChange={(e) => {durationdate1ChangeHandler(e); durationdate1ChangeHandler_store(e)}}
                     onBlur={durationdate1BlurHandler}
                   />
                    <input
@@ -618,7 +708,7 @@ const CustomerCreationSWMProjectStatus = () => {
                     placeholder="Enter Date"
                     name="durationdate2"
                     value={durationdate2Value}
-                    onChange={durationdate2ChangeHandler}
+                    onChange={(e) => {durationdate2ChangeHandler(e); durationdate2ChangeHandler_store(e)} }
                     onBlur={durationdate2BlurHandler}
                   />
                   </div>
@@ -655,6 +745,7 @@ const CustomerCreationSWMProjectStatus = () => {
               </button>  }  
               <button
                 className="btn  btn-outline-dark rounded-pill mx-3"
+                type="reset"
                 onClick={resetform}
                 disabled={isDatasending}
               >

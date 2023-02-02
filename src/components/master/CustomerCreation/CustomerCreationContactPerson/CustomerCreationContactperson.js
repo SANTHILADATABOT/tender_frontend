@@ -8,6 +8,8 @@ import useInputValidation from "../../../hooks/useInputValidation";
 import { isEmailValid, isMobileValidation } from "../CommonValidation_copy";
 import CustomerCreationContactSubtable from "./CustomerCreationContactSubtable";
 import Swal from "sweetalert2";
+import { useDispatch, useSelector } from "react-redux";
+import { contactPersonActions } from "../store/ContactPersonSlice";
 
 
 
@@ -33,6 +35,9 @@ const CustomerCreationContactPerson = () => {
    const [isDatasending, setdatasending] = useState(false)
    const {id} = useParams()
    const navigate = useNavigate()
+
+   let contact_data = useSelector((state) => state.contactdata.inputData)
+   const dispatch = useDispatch();
   //  const [formNo, setFormNo]= useState(1);
 
   const {
@@ -75,22 +80,33 @@ const CustomerCreationContactPerson = () => {
     reset: resetmobile,
   } = useInputValidation(isMobileValidation);
 
+  const dispatchData = (e) => {
+    dispatch(contactPersonActions.storeInput({name : e.target.name, value : e.target.value}));
+  }
 
-  // const isNumber = (evt) => {
-  //   evt = (evt) ? evt : window.event;
-  //   var charCode = (evt.which) ? evt.which : evt.keyCode;
-  //   if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-  //       return false;
-  //   }
-  //   return true;
-  // }
-
+  const contactpersonChangeHandler_store = (e) => dispatchData(e)
+  const designationChangeHandler_store = (e) => dispatchData(e)
+  const emailChangeHandler_store = (e) => dispatchData(e)
+  const mobileChangeHandler_store = (e) => dispatchData(e)
+  
   useEffect(() => {
    if(id){
     setCustomerCreationMainID(id)
     getsublist()
    }
   }, [])
+
+  useEffect(() => {
+    if(contact_data){
+      (contact_data.contactpersonname) &&  setcontactpersonValue(contact_data.contactpersonname);
+      (contact_data.designationname) && setdesignationValue(contact_data.designationname);
+      (contact_data.emailname) && setemailValue(contact_data.emailname);
+      (contact_data.mobile) && setmobileValue(contact_data.mobile) ;
+
+      (contact_data.editbtn) && setisEditbtn(contact_data.editbtn) ;
+      (contact_data.contactid) && setcontactid(contact_data.contactid) ;
+    }
+  },[])
 
    const getsublist =() =>{
     let data ={
@@ -118,6 +134,14 @@ const CustomerCreationContactPerson = () => {
     setdesignationValue(data.designation? data.designation: "")
     setemailValue(data.email?data.email:"")
     setmobileValue(data.mobile_no?data.mobile_no:"")
+
+
+    dispatch(contactPersonActions.storeInput({name : 'contactpersonname', value : data?.contact_person ? data.contact_person : ""}));
+    dispatch(contactPersonActions.storeInput({name : 'designationname', value : data?.designation ? data.designation : ""}));
+    dispatch(contactPersonActions.storeInput({name : 'emailname', value : data?.email ? data.email : ""}));
+    dispatch(contactPersonActions.storeInput({name : 'mobile', value : data?.mobile_no ? data.mobile_no : ""}));
+    dispatch(contactPersonActions.storeInput({name : 'editbtn', value : true}));
+    dispatch(contactPersonActions.storeInput({name : 'contactid', value : data.id}));
   }
 
   const onDelete = (data) => {
@@ -160,6 +184,8 @@ const CustomerCreationContactPerson = () => {
     resetmobile()
     setcontactid(null)
     setisEditbtn(false)
+
+    dispatch(contactPersonActions.resetInput())
   }
 
   const postData = (data) => {
@@ -167,6 +193,7 @@ const CustomerCreationContactPerson = () => {
       // console.log(resp);
       if (resp.data.status === 200) {
         getsublist()
+        dispatch(contactPersonActions.resetInput())
         toastSuccess(resp.data.message)
         resetform()
         // navigate("/tender/master/customercreation/list/main/contactPerson");
@@ -182,6 +209,7 @@ const CustomerCreationContactPerson = () => {
       // console.log(resp);
       if (resp.data.status === 200) {
         getsublist()
+        dispatch(contactPersonActions.resetInput())
         resetform()
         toastSuccess(resp.data.message)
       }else {
@@ -265,7 +293,7 @@ const CustomerCreationContactPerson = () => {
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
                   <label htmlFor="contactpersonname">
-                    Contact Person Name:
+                    Contact Person Name :
                   </label>
                 </div>
                 <div className="col-lg-8">
@@ -276,7 +304,7 @@ const CustomerCreationContactPerson = () => {
                     placeholder="Enter Contact Person"
                     name="contactpersonname"
                     value={contactpersonValue}
-                    onChange={contactpersonChangeHandler}
+                    onChange={(e) =>  {contactpersonChangeHandler(e); contactpersonChangeHandler_store(e)}}
                     onBlur={contactpersonBlurHandler}
                   />
                   {contactpersonHasError && (
@@ -302,7 +330,7 @@ const CustomerCreationContactPerson = () => {
                     placeholder="Enter Designation"
                     name="designationname"
                     value={designationValue}
-                    onChange={designationChangeHandler}
+                    onChange={(e) => {designationChangeHandler(e); designationChangeHandler_store(e)}}
                     onBlur={designationBlurHandler}
                   />
                   {designationHasError && (
@@ -328,7 +356,7 @@ const CustomerCreationContactPerson = () => {
                     placeholder="Enter Email id"
                     name="emailname"
                     value={emailValue}
-                    onChange={emailChangeHandler}
+                    onChange={(e) => {emailChangeHandler(e); emailChangeHandler_store(e)}}
                     onBlur={emailBlurHandler}
                   />
                   {emailHasError && (
@@ -355,7 +383,7 @@ const CustomerCreationContactPerson = () => {
                     placeholder="Enter Mobile No"
                     name="mobile"
                     value={mobileValue}
-                    onChange={mobileChangeHandler}
+                    onChange={(e) => {mobileChangeHandler(e); mobileChangeHandler_store(e)}}
                     onBlur={mobileBlurHandler}
                     // $$$maxLength={10}
                     />
@@ -391,6 +419,7 @@ const CustomerCreationContactPerson = () => {
 
               <button
                 className="btn  btn-outline-dark rounded-pill mx-3"
+                type="reset"
                 onClick={resetform}
                 disabled={isDatasending}
               >

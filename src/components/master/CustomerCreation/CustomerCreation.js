@@ -29,6 +29,10 @@ const CustomerCreation = () => {
  
   }
 
+  const data = {
+    byclicking: 'new'
+   }
+
   return (
     <>
       {/* Page Heading */}
@@ -38,7 +42,7 @@ const CustomerCreation = () => {
             <div className="card shadow mb-4">
               <div className="card-body">
                 <div className="float-right ">
-                  <Link to ="main/profile"  /*onClick={createCustomer}*/ className="rounded-pill btn btn-primary btn-icon-split">
+                  <Link to ="main/profile" state={{ data: data }}  className="rounded-pill btn btn-primary btn-icon-split">
                     <span className="icon text-white-50">
                       <i className="fas fa-plus-circle" />
                     </span>

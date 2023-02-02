@@ -41,6 +41,7 @@ const useInputValidation = (validateValue) => {
 
   const setInputValue = (value) => {
     dispatch({ type: "INPUT", value: value });
+    dispatch({ type: "BLUR" });
   }
 
   const reset = () => {

@@ -3,6 +3,8 @@ import { NavLink } from "react-router-dom";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import './customerCreationMain.css'
 import {  Outlet } from "react-router-dom";
+import { Provider } from "react-redux";
+import custStore from "./store";
 
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
@@ -29,6 +31,7 @@ const CustomerCreationMain = () => {
   }
 
   return (
+    <Provider store={custStore}>
     <Fragment>
       <ToastContainer />
       <div className="container-fluid p-0">
@@ -133,6 +136,7 @@ const CustomerCreationMain = () => {
         </div>
       </div>
     </Fragment>
+    </Provider>
   );
 };
 
