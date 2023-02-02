@@ -7,6 +7,8 @@ import { isIFSCvalid } from "../CommonValidation_copy"
 import axios from "axios";
 import CustomerCreationBankDetailsubtable from "./CusromerCreationBankDetailsubtable";
 import Swal from "sweetalert2";
+import { bankDetailsActions } from "../store/BankDetailsSlice"
+import { useDispatch, useSelector } from "react-redux"
 
 
 
@@ -25,7 +27,10 @@ const CustomerCreationBankDetails = () => {
     const [isEditbtn, setisEditbtn]= useState(false)
     const [bankid, setbankid]= useState(null);
     const [addresslen, setaddresslength] =  useState(255);
-    const [banklist, setbanklist] = useState(null)
+    const [banklist, setbanklist] = useState(null);
+
+    let bankdata = useSelector((state) => state.bankdata.inputData)
+    const dispatch = useDispatch();
 
     const {
         value: banknameValue,
@@ -78,26 +83,63 @@ const CustomerCreationBankDetails = () => {
       } = useInputValidation(isNotEmpty);
 
       useEffect(() => {
+
+        (bankdata?.ifsccode)                && setifsccodeValue(bankdata.ifsccode);
+        (bankdata?.bankname)                && setbanknameValue(bankdata.bankname);
+        (bankdata?.bankaddress)             && setbankaddressValue(bankdata.bankaddress);
+        (bankdata?.beneficiaryaccountname)  && setbeneficiaryaccountnameValue(bankdata.beneficiaryaccountname);
+        (bankdata?.accountnumber)           && setaccountnumberValue(bankdata.accountnumber);
+
+        (bankdata?.isEditbtn)               && setisEditbtn(bankdata.isEditbtn);
+        (bankdata?.bankid)                  && setbankid(bankdata.bankid);
+      
         if(id){
           setCustomerCreationMainID(id)
           getsublist()
         }
-      }, [])
-      
 
+      }, [])
+
+      useEffect(() => {
+        validateInputLength(bankaddressValue)
+      }, [bankaddressValue])
+
+      const dispatchData = (name, value) => {
+        dispatch(bankDetailsActions.storeInput({name : name, value : value}));
+      }
+
+      const banknameChangeHandler_store               = (e) => dispatchData(e.target.name, e.target.value)
+      const bankaddressChangeHandler_store            = (e) => dispatchData(e.target.name, e.target.value)
+      const ifsccodeChangeHandler_store               = (e) => dispatchData(e.target.name, e.target.value)
+      const beneficiaryaccountnameChangeHandler_store = (e) => dispatchData(e.target.name, e.target.value)
+      const accountnumberChangeHandler_store          = (e) => dispatchData(e.target.name, e.target.value)
+      
+      const checkIFSCvalid = (value) => {
+        if(!/^[A-Za-z]{4}0[A-Z0-9a-z]{6}$/.test(value)){
+            return false;
+        }else{
+            return true;
+        }
+      }
+      
       const getBank = async (e) => {
         let ifsccode = e.target.value
-        let isValid = isIFSCvalid(ifsccode);
+        let isValid = checkIFSCvalid(ifsccode);
         if(isValid){
           let response = await axios.get(`https://ifsc.razorpay.com/${ifsccode}`) ;
           if(response.status === 200){
             setbanknameValue(response.data.BANK)
             setbankaddressValue(response.data.ADDRESS)
             validateInputLength(response.data.ADDRESS)
+
+            dispatchData('bankname', response?.data?.BANK);
+            dispatchData('bankaddress', response?.data?.ADDRESS);
           }
         }else{
           setbanknameValue("")
+          dispatchData('bankname', '');
           setbankaddressValue("")
+          dispatchData('bankaddress', '');
           validateInputLength("")
         }
       }
@@ -217,6 +259,8 @@ const CustomerCreationBankDetails = () => {
       resetaccountnumber();
       setbankid(null)
       setisEditbtn(false)
+
+      dispatch(bankDetailsActions.resetInput())
     }
 
     const onEdit =(data) => {
@@ -227,6 +271,15 @@ const CustomerCreationBankDetails = () => {
       setifsccodeValue(data.ifsccode?data.ifsccode:"")
       setbeneficiaryaccountnameValue(data.beneficiaryaccountname?data.beneficiaryaccountname:"")
       setaccountnumberValue(data.accountnumber?data.accountnumber:"")
+
+      dispatchData( 'ifsccode' , (data.ifsccode)? data.ifsccode : '' );
+      dispatchData( 'bankname' , (data.bankname) ?  data.bankname : '');
+      dispatchData( 'bankaddress' , (data.bankaddress) ? data.bankaddress : '');
+      dispatchData( 'beneficiaryaccountname' , (data.beneficiaryaccountname) ? data.beneficiaryaccountname : '');
+      dispatchData( 'accountnumber' , (data.accountnumber) ? data.accountnumber : '');
+
+      dispatchData( 'isEditbtn' , true);
+      dispatchData( 'bankid' , data.id);
     }
   
     const onDelete = (data) => {
@@ -282,7 +335,7 @@ const CustomerCreationBankDetails = () => {
                     placeholder="Enter IFSC Code"
                     name="ifsccode"
                     value={ifsccodeValue}
-                    onChange={(e) => {ifsccodeChangeHandler(e); getBank(e)}}
+                    onChange={(e) => {ifsccodeChangeHandler(e); getBank(e); ifsccodeChangeHandler_store(e);}}
                     onBlur={ifsccodeBlurHandler}
                   />
                   {ifsccodeHasError && (
@@ -310,7 +363,7 @@ const CustomerCreationBankDetails = () => {
                     placeholder="Enter Bank Name "
                     name="bankname"
                     value={banknameValue}
-                    onChange={banknameChangeHandler}
+                    onChange={(e) => {banknameChangeHandler(e); banknameChangeHandler_store(e)}}
                     onBlur={banknameBlurHandler}
                   />
                   {banknameHasError && (
@@ -337,7 +390,7 @@ const CustomerCreationBankDetails = () => {
                     placeholder="Enter Bank Address"
                     name="bankaddress"
                     value={bankaddressValue}
-                    onChange={(e) => {bankaddressChangeHandler(e); validateInputLength(e.target.value)}}
+                    onChange={(e) => {bankaddressChangeHandler(e); validateInputLength(e.target.value); bankaddressChangeHandler_store(e)}}
                     onBlur={bankaddressBlurHandler}
                     rows="3"
                     maxLength="255"
@@ -366,7 +419,7 @@ const CustomerCreationBankDetails = () => {
                     placeholder="Enter Beneficiary Account Name"
                     name="beneficiaryaccountname"
                     value={beneficiaryaccountnameValue}
-                    onChange={beneficiaryaccountnameChangeHandler}
+                    onChange={(e) => {beneficiaryaccountnameChangeHandler(e); beneficiaryaccountnameChangeHandler_store(e);}}
                     onBlur={beneficiaryaccountnameBlurHandler}
                  
                     />
@@ -391,7 +444,7 @@ const CustomerCreationBankDetails = () => {
                     placeholder="Enter Account Number"
                     name="accountnumber"
                     value={accountnumberValue}
-                    onChange={accountnumberChangeHandler}
+                    onChange={(e) => {accountnumberChangeHandler(e); accountnumberChangeHandler_store(e);}}
                     onBlur={accountnumberBlurHandler}
                     />
                   {accountnumberHasError && (
@@ -428,6 +481,7 @@ const CustomerCreationBankDetails = () => {
                 className="btn  btn-outline-dark rounded-pill mx-3"
                 onClick={resetform}
                 disabled={isDatasending}
+                type="reset"
               >
                 Clear
               </button>
