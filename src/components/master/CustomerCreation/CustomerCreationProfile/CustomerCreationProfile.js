@@ -28,14 +28,15 @@ import { bankDetailsActions } from "../store/BankDetailsSlice";
 
 
 
-const isNotEmpty = (value) => value.trim() !== "";
+// const isNotEmpty = (value) => value.trim() !== "";
+const isNotEmpty = (value) => {return true};
 const isEmail = (value) => value.includes("@");
 const isNotNull = (value) => {
-  if (value === null) {
-    return false;
-  } else if (value === "") {
-    return false;
-  }
+  // if (value === null) {
+  //   return false;
+  // } else if (value === "") {
+  //   return false;
+  // }
   return true;
 };
 
@@ -371,7 +372,7 @@ const CustomerCreationProfile = () => {
       !(cust_name && cust_name.pan)                   && setpanValue(savedData.pan===null? "":savedData.pan);
       !(cust_name && cust_name.mobile)                && setmobilenoValue(savedData.mobile_no=== null ? "": savedData.mobile_no);
       // setcurrentyrdateValue(savedData.current_year_date)
-      !(cust_name && cust_name.email)                 && setemailValue(savedData.email);
+      !(cust_name && cust_name.email)                 && setemailValue(savedData.email===null ? "": savedData.email);
       !(cust_name && cust_name.gstregistered)         && setgstReg((savedData.gst_no===null || savedData.gst_registered === "no") ? "no" : "yes");
       !(cust_name && cust_name.gstregistered)         && ((savedData.gst_no===null || savedData.gst_registered === "no") ? handleGST(true, '') : handleGST(false, savedData.gst_no));
 
@@ -379,6 +380,7 @@ const CustomerCreationProfile = () => {
       // savedData.gst_no === null ? setgstnoValue("") :  setgstnoValue(savedData.gst_no)
      
       // setpopulationyrdataValue(savedData.population_year_data)
+     
       !(cust_name && cust_name.address) && setaddressValue(savedData.address === null ? "" : savedData.address);
       !(cust_name && cust_name.website) && setwebsiteValue(savedData.website ===null ? "": savedData.website);
     }
@@ -435,6 +437,9 @@ const CustomerCreationProfile = () => {
       return;
     }
 
+    if(!cust_name){   
+      return
+    }
     (cust_name && cust_name.customername) && setcustomernameValue(cust_name.customername);
     (cust_name && cust_name.pincode)      && setpincodeValue(cust_name.pincode);
     (cust_name && cust_name.address)      && setaddressValue(cust_name.address);
