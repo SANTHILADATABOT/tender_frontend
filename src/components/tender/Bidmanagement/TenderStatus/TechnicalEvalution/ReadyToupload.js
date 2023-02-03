@@ -71,7 +71,7 @@ const ReadyToUpload = (props) => {
                                 <div className="col-auto">
                                     <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
                                         <p className="text-truncate" title={props.file.name}>
-                                            <span className='text-secondary'>File : </span> {props.file.name}
+                                         <span className='text-secondary'>{props.file.name && "File :"} </span> {props.file.name}
                                         </p>
                                         <p><span className='text-secondary'>Size : </span><span>({props.file.size/1000} KB)</span>
                                       

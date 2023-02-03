@@ -1,8 +1,8 @@
 import axios from "axios";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useRef, useState, useEffect } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
-import useInputValidation from "../../../../hooks/useInputValidation";
+import useInputValidation from "../../../../hooks/useInputValidation_copy";
 import { isNotEmpty } from "../../../CommonFunctions/CommonFunctions";
 import ReadyToUpload from "./ReadyToupload";
 import styles from "./UploadDocTechnicalEvalution.module.css";
@@ -10,13 +10,14 @@ import Swal from "sweetalert2";
 import LockCard from "../../../../UI/LockCard";
 import PreLoader from "../../../../UI/PreLoader";
 import AcceptedBidders from "./AcceptedBidders";
-
+import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 
 const TechnicalEvalution = () => {
   const [file, setFile] = useState(null);
   const [isDatasending, setdatasending] = useState(false);
-  const [FetchLoading, setFetchLoading] = useState(false);
+  const [FetchLoading, setFetchLoading] = useState(true);
   const [isEditbtn, setisEditbtn] = useState(false);
+  const [isEdited, setisEdited] = useState(false);
   const [UploadDocId, setUploadDocId] = useState(null);
   const [dragover, setdragover] = useState(false);
   const [progress, setProgressCompleted] = useState(0);
@@ -28,19 +29,23 @@ const TechnicalEvalution = () => {
   const { id } = useParams();
   const { server1: baseUrl } = useBaseUrl();
   const [input, setInput] = useState({});
-  
-  // Evaluation Date
-  const {
-    value: DateValue,
-    isValid: DateIsValid,
-    hasError: DateHasError,
-    valueChangeHandler: DateChangeHandler,
-    inputBlurHandler: DateBlurHandler,
-    setInputValue: setDateValue,
-    reset: resetDate,
-  } = useInputValidation(isNotEmpty);
 
- 
+  
+
+  const [DateValue, setDateValue]=useState("");
+  const [DateHasError, setDateHasError]=useState("");
+  function DateChangeHandler(e)
+  {
+    setDateValue(e.target.value);
+    if(!e.target.value ){
+      setDateHasError(true);
+    }
+    else{
+      setDateHasError(false);
+      setisEdited(true);
+    }
+    
+  }
 
   const onDragEnter = () => {
     wrapperRef.current.classList.add(styles["dragover"]);
@@ -55,6 +60,7 @@ const TechnicalEvalution = () => {
   const onDrop = () => wrapperRef.current.classList.remove(styles["dragover"]);
 
   const onFileDrop = (e) => {
+    setisEdited(true);
     const newFile = e.target.files[0];
 
     let filetypes = newFile.type;
@@ -81,26 +87,92 @@ const TechnicalEvalution = () => {
     },
   };
 
+  function getTechEvalutionList() {
+    if (bidManageMainId) {
+      try{
+      axios
+        .get(`${baseUrl}/api/tenderstatus/techevaluation/${bidManageMainId}`)
+        .then((res) => {
+          if (res.status === 200) {
+            axios({url: `${baseUrl}/api/tenderstatus/techevaluation/download/${bidManageMainId}`,
+            method: 'GET',
+            responseType: 'blob', // important
+          }).then((response)=>{
+            setisEditbtn(true);
+            setFile(response.data);
+          });
+          setUploadDocId(res.data.mainId);
+            setDateValue(res.data.date);
+            res.data.result.map((bidders) => {
+              setInput((prev) => {
+                return {
+                  ...prev,
+                  [bidders.competitorId]: {
+                    [bidders.competitorId + "status"]: bidders.qualifiedStatus,
+                    [bidders.competitorId + "reason"]: bidders.reason
+                      ? bidders.reason
+                      : "",
+                  },
+                };
+              });
+            });
+          }
+        })
+        .then(()=>{
+            setFetchLoading(false);
+        });
+      }
+      catch(exception)
+      {
+        setFetchLoading(false);
+        console.log(exception);
+      }
+    }
+    formIsValid=false;
+  };
+  
+
+  //Get List of Competitors who are involved for Technical evaluation
+  useEffect(() => {
+    setFetchLoading(true);
+    getTechEvalutionList();
+  }, [bidManageMainId]);
+
+  useEffect(() => {
+    if(isEdited)
+    setisEdited(true)  
+  }, [DateValue, file]);
+  
+
   const resetform = () => {
-    resetDate();
+    setDateValue("");
     setFile(null);
+    //have to reset input with loop
+    Object.keys(input).forEach(key => {
+      setInput((prev) => {
+            return {
+              ...prev, [key]: {[`${key}status`]:"", [`${key}reason`]:""}
+          };
+        });
+      });
+    
     setisEditbtn(false);
     setUploadDocId(null);
   };
-
+  
   let formIsValid = false;
 
-  if (DateIsValid && file !== null) {
+  if (DateValue && file !== null) {
     formIsValid = true;
   }
-console.log("input",input);
+
   const postData = (data) => {
     axios
       .post(`${baseUrl}/api/tenderstatus/techevaluation`, data, config)
       .then((resp) => {
         if (resp.data.status === 200) {
-          ref.current.getDocList();
-          resetform();
+          // ref.current.getDocList();
+          // resetform();
           toastSuccess(resp.data.message);
         } else if (resp.data.status === 400) {
           toastError(resp.data.message);
@@ -121,7 +193,7 @@ console.log("input",input);
   const putData = (data, UploadDocId) => {
     axios
       .post(
-        `${baseUrl}/api/tenderstatus/tectevaluation/${UploadDocId}`,
+        `${baseUrl}/api/tenderstatus/techevaluation/${UploadDocId}`,
         data,
         config
       )
@@ -157,19 +229,7 @@ console.log("input",input);
     }
 
     const formdata = new FormData();
-    // var inputArray=[];
-    // var map = new Map();
-    // Object.entries(input).forEach(entry => {
-    //   const [key, value] = entry;
-    //   map.set(key,value);
-    // });
-    // // Object.entries(input).forEach(entry => {
-    // //   const [key, value] = entry;
-    // //   for()
-    // //   inputArray.push([key, value]=entry);
-    // //   // console.log(key, value);
-    // // });
-    // console.log(map);
+
     let data = {
       date: DateValue,
       file: file,
@@ -177,83 +237,43 @@ console.log("input",input);
       tokenid: localStorage.getItem("token"),
       bid_creation_mainid: id,
     };
+    if(UploadDocId)
+    { data._method = "PUT";
+  }
 
     if (file instanceof Blob) {
       data.file = new File([file], file.name);
     }
 
-//for (let previewKey in data[dataKey]) {
- // formData.append(`preview[${previewKey}]`, data[dataKey][previewKey]);
-//}
-
     for (var key in data) {
-      if(key==="input")
-      {
-        for (var key1 in data[key])
-        {
-          for (var key2 in data[key][key1])
-          {
-            if(key2.includes("status"))
-            {
+      if (key === "input") {
+        for (var key1 in data[key]) {
+          for (var key2 in data[key][key1]) {
+            if (key2.includes("status")) {
               formdata.append(`input[${key1}][status]`, data[key][key1][key2]);
-            }
-            else if(key2.includes("reason"))
-            {
+            } else if (key2.includes("reason")) {
               formdata.append(`input[${key1}][reason]`, data[key][key1][key2]);
             }
           }
-          // formdata.append(`input[${key1}]`, data[key][key1]);
         }
-      }
-      else{
-      formdata.append(key, data[key]);
+      } else {
+        formdata.append(key, data[key]);
       }
     }
-
-    console.log("formdata",formdata);
-    // for (var key in input) {
-    //   for (var key1 in input[key]){
-    //     formdata.append(key1, input[key][key1]);
-    //   }    
-    // };
+console.log("id", id);console.log("UploadDocId === null", UploadDocId === null);console.log("UploadDocId !== null", UploadDocId !== null);console.log("!isEditbtn",!isEditbtn);console.log("isEditbtn",isEditbtn);
 
     if (id && UploadDocId === null && !isEditbtn) {
-
       postData(formdata);
     } else if (id && UploadDocId !== null && isEditbtn) {
-      // postData(formdata)
       putData(formdata, UploadDocId);
     }
   };
 
-  const editHandler = (item) => {
-    setFetchLoading(true);
-    setisEditbtn(true);
-    setUploadDocId(item.id);
-
-    axios({
-      url: `${baseUrl}/api/download/prebidqueriesdocs/${item.id}`,
-      method: "GET",
-      responseType: "blob", // important
-    }).then((response) => {
-      if (response.status === 200) {
-        response.data.name = item.file_original_name;
-        setFile(response.data);
-        setDateValue(item.date);
-      } else {
-        alert("Unable to Process Now!");
-      }
-      setFetchLoading(false);
-    });
-  };
-  // console.log("File : ", file);
-
-  const inputHandler = (id, e) => {
-    e.persist();
-    // setInput({});
-  };
-
- 
+ console.log("setisEdited",isEdited);
+ console.log("formIsValid",formIsValid);
+ console.log("isDatasending",isDatasending);
+ console.log("FetchLoading",FetchLoading);
+//  {(!formIsValid || isDatasending || FetchLoading) && !isEdited}
   return (
     <LockCard locked={!id}>
       <PreLoader loading={FetchLoading}>
@@ -275,7 +295,7 @@ console.log("input",input);
                     name="Date"
                     value={DateValue}
                     onChange={DateChangeHandler}
-                    onBlur={DateBlurHandler}
+                    // onBlur={DateBlurHandler}
                     disabled={false}
                   />
                   {DateHasError && (
@@ -299,17 +319,6 @@ console.log("input",input);
                       file={file}
                       clearFile={() => setFile(null)}
                     />
-                    {/* <div className={`border-primary d-flex flex-column align-items-center justify-content-center   bg-gray-200 ${styles.height_of_dropbox} ${styles.boderradius__dropbox} ${styles.dashed} ${styles.drop_file_input} `}
-                                        ref={wrapperRef}
-                                        onDragEnter={onDragEnter}
-                                        onDragLeave={onDragLeave}
-                                        onDrop={onDrop}
-                                    >
-                                        <p className="display-4 mb-0"><i className='fas fa-cloud-upload-alt text-primary '></i></p>
-                                        {!dragover && <p className="mt-0">Drag & Drop an document or Click</p>}
-                                        {dragover && <p className="mt-0">Drop the document</p>}
-                                        <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/* " onChange={onFileDrop} />
-                                    </div> */}
                   </div>
                 </div>
               </div>
@@ -355,7 +364,10 @@ console.log("input",input);
               <div className="row ">
                 <div className="col-lg-12 text-dark font-weight-bold">
                   <AcceptedBidders
-                    bidManageMainId={bidManageMainId} input={input} setInput={setInput} 
+                    bidManageMainId={bidManageMainId}
+                    input={input}
+                    setInput={setInput}
+                    setisEdited={setisEdited}
                   />
                 </div>
               </div>
@@ -385,7 +397,7 @@ console.log("input",input);
                       ? "btn btn-outline-primary rounded-pill px-4"
                       : "btn btn-primary rounded-pill px-4"
                   }
-                  disabled={!formIsValid || isDatasending || FetchLoading}
+                  disabled={(formIsValid || isDatasending || FetchLoading) && !isEdited}
                 >
                   {isDatasending && (
                     <span className="spinner-border spinner-border-sm mr-2"></span>
@@ -406,7 +418,6 @@ console.log("input",input);
           </div>
         </form>
       </PreLoader>
-      {/* <DocListTechnicalEvalution ref={ref} BidCreationId={id} onEdit={editHandler} /> */}
     </LockCard>
   );
 };
