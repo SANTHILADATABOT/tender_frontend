@@ -19,6 +19,7 @@ const AcceptedBidders = (props) => {
         )
         .then((response) => {
           if (response.status === 200) {
+
             response.data.bidders.map((bidders) => {
               props.setInput((prev) => {
                 return {
@@ -30,6 +31,7 @@ const AcceptedBidders = (props) => {
               };
               });
             });
+
             setAcceptedBidders(response.data.bidders);
           }
         });
@@ -57,9 +59,11 @@ const AcceptedBidders = (props) => {
       // return {      
       //     ...prev, ["id"] :id,
       //     [e.target.name]: e.target.value,
+
       // };
     });
   };
+
 
   return (
     <Fragment>
