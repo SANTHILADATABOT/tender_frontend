@@ -33,9 +33,9 @@ const AcceptedBidders = (props) => {
               }})  
             }
           );
-           console.log("input",input);
+          //  console.log("input",input);
             // setStateArray(inputArray);
-            console.log(response.data.bidders);
+            // console.log(response.data.bidders);
             setAcceptedBidders(response.data.bidders);
           }
         });
@@ -79,7 +79,7 @@ const AcceptedBidders = (props) => {
       //   },
       });
     }
-    console.log("input", input);
+    // console.log("input", input);
   
   // const createForm = () => {
   //   setFromList(resultList);

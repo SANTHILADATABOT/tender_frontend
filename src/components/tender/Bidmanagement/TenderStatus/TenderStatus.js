@@ -6,6 +6,7 @@ import { useOutletContext, useParams } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
+import FinancialEvalution from "./FinancialEvalution/FinancialEvalution";
 
 const TenderStatus = () => {
   usePageTitle("Update Bids Management");
@@ -135,6 +136,26 @@ const errorUpdate = () =>{
         <div className="collapse" id="technicalEvaluation">
           <div className="card-header">
             <TechnicalEvalution />
+          </div>
+        </div>
+      </div>
+
+      {/* Financial Evaluation Form */}
+      <div className="card mb-2  ">
+        <a
+          href="#financialevaluation"
+          className="d-block card-header py-3 bg-white "
+          data-toggle="collapse"
+          role="button"
+          aria-expanded="true"
+          aria-controls="financialevaluation"
+        >
+          <h6 className="m-0 font-weight-bold text-dark">FINANCIAL EVALUATION</h6>
+        </a>
+        {/* Card Content - Collapse */}
+        <div className="collapse" id="financialevaluation">
+          <div className="card-header">
+            <FinancialEvalution />
           </div>
         </div>
       </div>
