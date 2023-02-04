@@ -90,25 +90,14 @@ const TechnicalEvalution = () => {
   function getTechEvalutionList() {
     if (bidManageMainId) {
       try{
-      axios
-        .get(`${baseUrl}/api/tenderstatus/techevaluation/${bidManageMainId}`)
+      axios({url : `${baseUrl}/api/tenderstatus/techevaluation/${bidManageMainId}`, method: 'GET', headers: {   //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },})
         .then((res) => {
-          
-          if (res.status === 200) {
-            axios({url: `${baseUrl}/api/tenderstatus/techevaluation/download/${bidManageMainId}`,
-            method: 'GET',
-            responseType: 'blob', // important
-            headers: {   //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Expires': '0',
-            },
-          }).then((response)=>{
-            response.data.name = res.data.filename;
-            setisEditbtn(true);
-            setFile(response.data);
-          });
-          setUploadDocId(res.data.mainId);
+          if (res.data.status === 200) {
+            setUploadDocId(res.data.mainId);
             setDateValue(res.data.date);
             res.data.result.map((bidders) => {
               setInput((prev) => {
@@ -123,6 +112,33 @@ const TechnicalEvalution = () => {
                 };
               });
             });
+            axios({url: `${baseUrl}/api/tenderstatus/techevaluation/download/${bidManageMainId}`,
+            method: 'GET',
+            responseType: 'blob', // important
+            headers: {   //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+              'Expires': '0',
+            },
+          }).then((response)=>{
+
+            if(response.status===200)
+            {
+            response.data.name = res.data.filename;
+            setisEditbtn(true);
+            setFile(response.data );
+            }
+            else{
+              setisEditbtn(false);
+              setFile(null);
+            }
+          });
+        }
+        else if (res.data.status === 404) {
+          {
+            setisEditbtn(false);
+            setFile(null);
+          }          
           }
         })
         .then(()=>{
@@ -284,7 +300,7 @@ const TechnicalEvalution = () => {
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
                   <label htmlFor="Date" className="pr-3">
-                    Evaluation Date :
+                    Evaluation Date <span className="text-danger">&nbsp;*&nbsp;</span>: 
                   </label>
                 </div>
                 <div className="col-lg-8">
@@ -313,7 +329,7 @@ const TechnicalEvalution = () => {
               <div className="inputgroup col-lg-6 mb-4">
                 <div className="row ">
                   <div className="col-lg-4 text-dark font-weight-bold">
-                    <label htmlFor="customername">Document Upload :</label>
+                    <label htmlFor="customername">Document Upload <span className="text-danger">&nbsp;*&nbsp;</span>:</label>
                   </div>
                   <div className="col-lg-8">
                     <ReadyToUpload
