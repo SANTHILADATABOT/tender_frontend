@@ -432,6 +432,7 @@ const BidCreation = () => {
           label: data.nameOfCustomer,
         };
         setulb(ulbvalue);
+        // setState(data.stateId);
       }
     });
   };
