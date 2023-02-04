@@ -19,7 +19,6 @@ const AcceptedBidders = (props) => {
         )
         .then((response) => {
           if (response.status === 200) {
-
             response.data.bidders.map((bidders) => {
               props.setInput((prev) => {
                 return {
@@ -31,7 +30,6 @@ const AcceptedBidders = (props) => {
               };
               });
             });
-
             setAcceptedBidders(response.data.bidders);
           }
            setFetchLoading(false);
@@ -69,6 +67,8 @@ const AcceptedBidders = (props) => {
         }
     });
   };
+  props.setisEdited(true);
+}
 
   return (
     <Fragment>
