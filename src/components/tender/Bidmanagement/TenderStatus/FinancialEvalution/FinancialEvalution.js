@@ -58,8 +58,8 @@ const FinancialEvalution = () => {
         {value : '1', label : 'Cubic Metric Ton'}
     ]
 
-    console.log(input);
-    console.log(input[3]?.unit);
+    // console.log(input);
+    // console.log(input[3]?.unit);
 
     
 

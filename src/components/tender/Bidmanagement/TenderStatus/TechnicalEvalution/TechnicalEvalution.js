@@ -93,11 +93,18 @@ const TechnicalEvalution = () => {
       axios
         .get(`${baseUrl}/api/tenderstatus/techevaluation/${bidManageMainId}`)
         .then((res) => {
+          
           if (res.status === 200) {
             axios({url: `${baseUrl}/api/tenderstatus/techevaluation/download/${bidManageMainId}`,
             method: 'GET',
             responseType: 'blob', // important
+            headers: {   //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+              'Expires': '0',
+            },
           }).then((response)=>{
+            response.data.name = res.data.filename;
             setisEditbtn(true);
             setFile(response.data);
           });
@@ -199,8 +206,6 @@ const TechnicalEvalution = () => {
       )
       .then((resp) => {
         if (resp.data.status === 200) {
-          ref.current.getDocList();
-          resetform();
           toastSuccess(resp.data.message);
         } else if (resp.data.status === 400) {
           toastError(resp.data.message);
@@ -260,7 +265,6 @@ const TechnicalEvalution = () => {
         formdata.append(key, data[key]);
       }
     }
-console.log("id", id);console.log("UploadDocId === null", UploadDocId === null);console.log("UploadDocId !== null", UploadDocId !== null);console.log("!isEditbtn",!isEditbtn);console.log("isEditbtn",isEditbtn);
 
     if (id && UploadDocId === null && !isEditbtn) {
       postData(formdata);
@@ -269,10 +273,7 @@ console.log("id", id);console.log("UploadDocId === null", UploadDocId === null);
     }
   };
 
- console.log("setisEdited",isEdited);
- console.log("formIsValid",formIsValid);
- console.log("isDatasending",isDatasending);
- console.log("FetchLoading",FetchLoading);
+
 //  {(!formIsValid || isDatasending || FetchLoading) && !isEdited}
   return (
     <LockCard locked={!id}>
