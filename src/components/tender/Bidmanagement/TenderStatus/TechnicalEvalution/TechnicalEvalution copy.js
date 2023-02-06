@@ -29,6 +29,7 @@ const TechnicalEvalution = () => {
   const { server1: baseUrl } = useBaseUrl();
   const [input, setInput] = useState({});
   
+
   // Evaluation Date
   const {
     value: DateValue,
@@ -93,15 +94,19 @@ const TechnicalEvalution = () => {
   if (DateIsValid && file !== null) {
     formIsValid = true;
   }
-console.log("input",input);
+
   const postData = (data) => {
     axios
-      .post(`${baseUrl}/api/tenderstatus/techevaluation`, data, config)
+      .post(`${baseUrl}/api/bidcreation/prebidqueries/docupload`, data, config)
       .then((resp) => {
         if (resp.data.status === 200) {
           ref.current.getDocList();
           resetform();
           toastSuccess(resp.data.message);
+          // resetall()
+          //   navigate("/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
+          //   myRef.current.scrollIntoView({ behavior: 'smooth' })
+          // window.history.replaceState({},"Bid Creation", "/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
         } else if (resp.data.status === 400) {
           toastError(resp.data.message);
         } else {
@@ -121,7 +126,7 @@ console.log("input",input);
   const putData = (data, UploadDocId) => {
     axios
       .post(
-        `${baseUrl}/api/tenderstatus/tectevaluation/${UploadDocId}`,
+        `${baseUrl}/api/bidcreation/prebidqueries/docupload/${UploadDocId}`,
         data,
         config
       )
@@ -157,23 +162,10 @@ console.log("input",input);
     }
 
     const formdata = new FormData();
-    // var inputArray=[];
-    // var map = new Map();
-    // Object.entries(input).forEach(entry => {
-    //   const [key, value] = entry;
-    //   map.set(key,value);
-    // });
-    // // Object.entries(input).forEach(entry => {
-    // //   const [key, value] = entry;
-    // //   for()
-    // //   inputArray.push([key, value]=entry);
-    // //   // console.log(key, value);
-    // // });
-    // console.log(map);
+
     let data = {
       date: DateValue,
       file: file,
-      input: input,
       tokenid: localStorage.getItem("token"),
       bid_creation_mainid: id,
     };
@@ -182,43 +174,11 @@ console.log("input",input);
       data.file = new File([file], file.name);
     }
 
-//for (let previewKey in data[dataKey]) {
- // formData.append(`preview[${previewKey}]`, data[dataKey][previewKey]);
-//}
-
     for (var key in data) {
-      if(key==="input")
-      {
-        for (var key1 in data[key])
-        {
-          for (var key2 in data[key][key1])
-          {
-            if(key2.includes("status"))
-            {
-              formdata.append(`input[${key1}][status]`, data[key][key1][key2]);
-            }
-            else if(key2.includes("reason"))
-            {
-              formdata.append(`input[${key1}][reason]`, data[key][key1][key2]);
-            }
-          }
-          // formdata.append(`input[${key1}]`, data[key][key1]);
-        }
-      }
-      else{
       formdata.append(key, data[key]);
-      }
     }
 
-    console.log("formdata",formdata);
-    // for (var key in input) {
-    //   for (var key1 in input[key]){
-    //     formdata.append(key1, input[key][key1]);
-    //   }    
-    // };
-
     if (id && UploadDocId === null && !isEditbtn) {
-
       postData(formdata);
     } else if (id && UploadDocId !== null && isEditbtn) {
       // postData(formdata)

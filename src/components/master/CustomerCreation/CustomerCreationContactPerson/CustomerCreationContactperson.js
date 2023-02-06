@@ -220,12 +220,19 @@ const CustomerCreationContactPerson = () => {
   }
 
   let formIsValid = false;
-
+  // f (
+  //   contactpersonIsValid &&
+  //   designationIsValid &&
+  //   emailIsValid &&
+  //   mobileIsValid
+  // ) {
+  //   formIsValid = true;
+  // }
   if (
-    contactpersonIsValid &&
-    designationIsValid &&
-    emailIsValid &&
-    mobileIsValid
+    contactpersonValue ||
+    designationValue ||
+    emailValue ||
+    mobileValue
   ) {
     formIsValid = true;
   }

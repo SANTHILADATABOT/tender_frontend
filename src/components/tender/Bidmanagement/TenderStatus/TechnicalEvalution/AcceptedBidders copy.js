@@ -7,7 +7,7 @@ import PreLoader from "../../../../UI/PreLoader";
 const AcceptedBidders = (props) => {
   const [acceptedBidders, setAcceptedBidders] = useState([]);
   const { server1: baseUrl } = useBaseUrl();
-  // const [input, setInput] = useState({});
+  const [input, setInput] = useState({});
   const [FetchLoading, setFetchLoading] = useState(false);
 
   useEffect(() => {
@@ -19,19 +19,18 @@ const AcceptedBidders = (props) => {
         )
         .then((response) => {
           if (response.status === 200) {
-
             response.data.bidders.map((bidders) => {
-              props.setInput((prev) => {
+              setInput((prev) => {
                 return {
                   ...prev,
                   [bidders.competitorId]: {
                     [bidders.competitorId + "status"]: "",
-                    [bidders.competitorId + "reason"]: "",
+                    reason: "",
                   },
-              };
+                };
               });
             });
-
+            console.log("input", input);
             setAcceptedBidders(response.data.bidders);
           }
         });
@@ -48,7 +47,7 @@ const AcceptedBidders = (props) => {
 
   const textInputHandler = (id, e) => {
     e.persist();
-    props.setInput((prev) => {
+    setInput((prev) => {
       return {
         ...prev,
         [id]: {
@@ -56,14 +55,9 @@ const AcceptedBidders = (props) => {
           [e.target.name]: e.target.value,
         },
       };
-      // return {      
-      //     ...prev, ["id"] :id,
-      //     [e.target.name]: e.target.value,
-
-      // };
     });
   };
-
+  console.log("input", input);
 
   return (
     <Fragment>
@@ -88,11 +82,11 @@ const AcceptedBidders = (props) => {
                   name={item.competitorId + "status"}
                   value="qualified"
                   checked={
-                    props.input &&
-                    props.input[item.competitorId] &&
-                    props.input[item.competitorId][item.competitorId + "status"] &&
-                    (props.input[item.competitorId][item.competitorId + "status"]
-                      ? props.input[item.competitorId][
+                    input &&
+                    input[item.competitorId] &&
+                    input[item.competitorId][item.competitorId + "status"] &&
+                    (input[item.competitorId][item.competitorId + "status"]
+                      ? input[item.competitorId][
                           item.competitorId + "status"
                         ] === "qualified"
                       : false)
@@ -115,11 +109,11 @@ const AcceptedBidders = (props) => {
                   name={item.competitorId + "status"}
                   value="not qualified"
                   checked={
-                    props.input &&
-                    props.input[item.competitorId] &&
-                    props.input[item.competitorId][item.competitorId + "status"] &&
-                    (props.input[item.competitorId][item.competitorId + "status"]
-                      ? props.input[item.competitorId][
+                    input &&
+                    input[item.competitorId] &&
+                    input[item.competitorId][item.competitorId + "status"] &&
+                    (input[item.competitorId][item.competitorId + "status"]
+                      ? input[item.competitorId][
                           item.competitorId + "status"
                         ] === "not qualified"
                       : false)
@@ -131,7 +125,7 @@ const AcceptedBidders = (props) => {
                 Not Qualified
               </label>
             </div>
-            {props.input[item.competitorId][item.competitorId + "status"]==="not qualified" &&
+            {input[item.competitorId][item.competitorId + "status"]==="not qualified" &&
             <div className="col-lg-4 text-left row">
               <div className="col-lg-3">
                 <label>Reason :</label>
@@ -139,9 +133,9 @@ const AcceptedBidders = (props) => {
               <div className="col-lg-9">
                 <textarea
                   className="form-control"
-                  name= {item.competitorId + "reason"}
+                  name="reason"
                   rows="2"
-                  value={props.input[item.competitorId]?.[item.competitorId +"reason"]}
+                  value={input[item.competitorId]?.reason}
                   onChange={(event) =>
                     textInputHandler(item.competitorId, event)
                   }
