@@ -7,7 +7,6 @@ import PreLoader from "../../../../UI/PreLoader";
 const AcceptedBidders = (props) => {
   const [acceptedBidders, setAcceptedBidders] = useState([]);
   const { server1: baseUrl } = useBaseUrl();
-  // const [input, setInput] = useState({});
   const [FetchLoading, setFetchLoading] = useState(false);
 
   useEffect(() => {
