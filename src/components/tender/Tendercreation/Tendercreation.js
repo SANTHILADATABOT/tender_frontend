@@ -108,7 +108,9 @@ const Tendercreation = () => {
   };
 
   const inputHandlerForSelect = (value, action) => {
-    
+    console.log("Value", value);
+    console.log("Action", action);
+
     setInput({
       ...input,
       [action.name]: value,

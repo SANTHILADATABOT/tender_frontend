@@ -15,7 +15,9 @@ const useImageStoragePath = () => {
         shofile : baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/siteHandOverDocumet/',//Bit Management Work Order form
         commnunicationfile : baseUrl+'/uploads/BidManagement/WorkOrder/CommunicationFiles/',//Bit Management Work Order form
         letterofacceptence : baseUrl+'/uploads/BidManagement/WorkOrder/LetterOfAcceptence/Document/',//Bit Management Work Order form
-        
+        techEval: baseUrl+'/uploads/BidManagement/techevaluation/',//Bit Management Tender Status Tech Evaluation form
+
+
         //----- Uncomment when build App ----
         // qcFile : baseUrl+'/public/uploads/competitor/qc/',
         // woFile : baseUrl+'/public/uploads/competitor/woFile/',
@@ -28,7 +30,7 @@ const useImageStoragePath = () => {
         // shofile : baseUrl+'/public/uploads/BidManagement/WorkOrder/WorkOrder/siteHandOverDocumet/',//Bit Management Work Order form
         // commnunicationfile : baseUrl+'/public/uploads/BidManagement/WorkOrder/CommunicationFiles/',//Bit Management Work Order form
         // letterofacceptence : baseUrl+'/public/uploads/BidManagement/WorkOrder/LetterOfAcceptence/Document/',//Bit Management Work Order form
-    }
+        // techEval: baseUrl+'/public/uploads/BidManagement/techevaluation/',
 }
-
+}
 export {useImageStoragePath};
