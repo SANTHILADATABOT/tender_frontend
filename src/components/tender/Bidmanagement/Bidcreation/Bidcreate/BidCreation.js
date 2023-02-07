@@ -425,7 +425,9 @@ const BidCreation = () => {
     axios.get(`${baseUrl}/api/tendercreation/${tenderid}`).then((resp) => {
       if (resp.data.tender) {
         let data = resp.data.tender;
+        console.log(resp.data.tender)
         setNITdateValue(data.nitdate);
+        setState(data.stateId);
         setcustomernameValue(data.nameOfCustomer);
         let ulbvalue = {
           value: data.customername,
@@ -828,7 +830,8 @@ const BidCreation = () => {
                     onBlur={stateBlurHandler}
                     value={stateValue}
                     isLoading={StateOptions.isLoading}
-                    isDisabled={ id ?true:false}
+                    // isDisabled={ id ? true : false}
+                    isDisabled={true}
                   ></Select>
                   {stateHasError && (
                     <div className="pt-1">
