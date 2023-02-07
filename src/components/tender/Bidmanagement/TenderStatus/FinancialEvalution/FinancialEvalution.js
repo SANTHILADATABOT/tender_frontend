@@ -105,10 +105,15 @@ const FinancialEvalution = () => {
 
         // setLeastList((prev) => {
 
+
         //     prev[index] = {
         //         ... prev[index],
         //         isDisabled : !prev[index].isDisabled
         //     } 
+
+    // console.log(input);
+    // console.log(input[3]?.unit);
+
 
         //   return  [
         //         ...prev,

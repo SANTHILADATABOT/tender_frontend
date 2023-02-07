@@ -27,11 +27,8 @@ const CommunicationFilesList = (props) => {
         columns: [
             { data: 'sl_no' },
             { data: 'date' },
-            { data: 'from' },
-            { data: 'to' },
-            
             // { data: 'remark' },
-            { data: 'refrenceno' },
+            { data: 'comfile' },
             { data: 'buttons' },
         ],
     })
@@ -77,9 +74,7 @@ const CommunicationFilesList = (props) => {
             <tr>
               <th scope="col">#</th>
               <th scope="col">Date</th>
-              <th scope="col">From</th>
-              <th scope="col">To</th>
-              <th scope="col">Refrence No</th>
+              <th scope="col">Document</th>
               <th scope="col">Action</th>
             </tr>
           </thead>

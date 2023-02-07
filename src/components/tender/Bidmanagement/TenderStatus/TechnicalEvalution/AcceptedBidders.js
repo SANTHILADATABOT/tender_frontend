@@ -7,7 +7,6 @@ import PreLoader from "../../../../UI/PreLoader";
 const AcceptedBidders = (props) => {
   const [acceptedBidders, setAcceptedBidders] = useState([]);
   const { server1: baseUrl } = useBaseUrl();
-  // const [input, setInput] = useState({});
   const [FetchLoading, setFetchLoading] = useState(false);
 
   useEffect(() => {
@@ -19,7 +18,6 @@ const AcceptedBidders = (props) => {
         )
         .then((response) => {
           if (response.status === 200) {
-
             response.data.bidders.map((bidders) => {
               props.setInput((prev) => {
                 return {
@@ -31,11 +29,11 @@ const AcceptedBidders = (props) => {
               };
               });
             });
-
             setAcceptedBidders(response.data.bidders);
           }
+           setFetchLoading(false);
         });
-        setFetchLoading(false);
+        
     } catch (e) {
       setFetchLoading(false);
       Swal.fire({
@@ -45,6 +43,7 @@ const AcceptedBidders = (props) => {
       });
     }
   }, [props.bidManageMainId]);
+  
 
   const textInputHandler = (id, e) => {
     e.persist();
@@ -56,18 +55,23 @@ const AcceptedBidders = (props) => {
           [e.target.name]: e.target.value,
         },
       };
-      // return {      
-      //     ...prev, ["id"] :id,
-      //     [e.target.name]: e.target.value,
+    });
+//to reset reason
 
-      // };
+    if(e.target.name===(id+"status") && e.target.value==="qualified")
+    {
+      props.setInput((prev) => {
+        return {
+          ...prev, [id] : {...prev[id], [`${id}reason`]:""}
+        }
     });
   };
-
+  props.setisEdited(true);
+}
 
   return (
     <Fragment>
-      <PreLoader loading={FetchLoading}>
+      
       {acceptedBidders.map((item) => {
         return (
           <div className="row mb-2" key={item.competitorId}>
@@ -151,7 +155,7 @@ const AcceptedBidders = (props) => {
           </div>
         );
       })}
-      </PreLoader>
+
     </Fragment>
   );
 };
