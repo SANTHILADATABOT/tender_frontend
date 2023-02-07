@@ -12,7 +12,7 @@ import PreLoader from "../../../../UI/PreLoader";
 import AcceptedBidders from "./AcceptedBidders";
 import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 
-const TechnicalEvalution = () => {
+const TechnicalEvalution = (props) => {
   const [file, setFile] = useState(null);
   const [isDatasending, setdatasending] = useState(false);
   const [FetchLoading, setFetchLoading] = useState(true);
@@ -197,6 +197,7 @@ const TechnicalEvalution = () => {
           // ref.current.getDocList();
           // resetform();
           toastSuccess(resp.data.message);
+          props.reloadFunction();
         } else if (resp.data.status === 400) {
           toastError(resp.data.message);
         } else {
@@ -223,12 +224,14 @@ const TechnicalEvalution = () => {
       .then((resp) => {
         if (resp.data.status === 200) {
           toastSuccess(resp.data.message);
+          props.reloadFunction();
         } else if (resp.data.status === 400) {
           toastError(resp.data.message);
         } else {
           toastError("Unable to update");
         }
         setdatasending(false);
+
       })
       .catch((err) => {
         Swal.fire({

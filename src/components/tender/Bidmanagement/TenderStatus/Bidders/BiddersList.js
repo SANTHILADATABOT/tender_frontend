@@ -58,14 +58,16 @@ const BiddersList = (props) => {
 
   const selectChangeHandler = (id, e) => {
     // value, action
-    // console.log("Value", id);
-    // console.log("Action", e);
+    console.log("Value", id);
+    console.log("Action", e);
     // console.log("compList", props.compList);
-    if (id.value !== "") {
+    
       var objIndex = e.name.split("compId");
       let inpIndex = objIndex[1];
       //  let compList = props.compList;
       console.log(objIndex);
+      if(id)
+      {
       props.setInput((prev) => {
         return {
           ...prev,
@@ -79,7 +81,18 @@ const BiddersList = (props) => {
           //
         };
       });
-
+    }
+    else{
+      props.setInput((prev) => {
+        return {
+          ...prev,
+          [inpIndex]: {
+            ...prev[inpIndex],
+            compId: null            
+          },
+        };
+      });
+    }
 
       // props.setCompList((prev) => {return {...prev, [props.compList]: props.compList.find((x)=> ) })} 
       // props.compList.find((x)=>
@@ -94,15 +107,25 @@ const BiddersList = (props) => {
       //       }))
       // props.setCompList(
 
-      props.setCompList((prev) => {
-        return {
-          ...prev,
-          [inpIndex]: {
-            ...prev[inpIndex],
-            ["compId".isdisabled]: true,
-          },
-        }
-      })
+      if(id ===null)
+      {
+        let tempObj = props.input[inpIndex].compId;
+  
+                let index = props.compList.findIndex(option => option.value === tempObj.value)
+        
+                let compListArr = props.compList;
+                compListArr[index] = { ...props.compList[index], isdisabled: false }
+                props.setCompList(compListArr)
+
+      }
+      else {
+
+        let index = props.compList.findIndex(option => option.value === id.value)
+      
+        let dubObj = props.compList;
+      dubObj[index]= {...dubObj[index], isdisabled: true}
+      props.setCompList(dubObj);
+      }
 
 
 
@@ -116,7 +139,7 @@ const BiddersList = (props) => {
       //     }
          
       //   }
-       }
+       
       //  );
 
 
