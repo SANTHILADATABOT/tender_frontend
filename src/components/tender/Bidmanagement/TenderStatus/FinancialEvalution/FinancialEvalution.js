@@ -1,15 +1,16 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
+import { useOutletContext, useParams } from "react-router-dom"
 import Select from "react-select";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import LockCard from "../../../../UI/LockCard"
 import PreLoader from "../../../../UI/PreLoader";
+import Swal from "sweetalert2";
 
 
 
 
-const FinancialEvalution = () => {
+const FinancialEvalution = (props) => {
 
     const { id } = useParams();
     const [FetchLoading, setFetchLoading] = useState(false);
@@ -20,20 +21,141 @@ const FinancialEvalution = () => {
     const [leastList, setLeastList] = useState([]);
     const [isEditbtn, setisEditbtn] = useState(false);
     const [isDatasending, setdatasending] = useState(false);
-    const [formId, setFormId] = useState(0);
+    const [AddorUpdateForm, setAddorUpdateForm] = useState('add')
+    const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
+        useOutletContext();
 
 
 
     useEffect(() => {
         getTechnicalEvalutionList();
+
         getUnitList()
     }, [])
 
+    // useEffect(() => {
+    //     if(input && Object.keys(input).length > 0){
+
+    //         let data = {}
+    //         let sorted = {}
+    //         for (const property in input) {
+    //             if(input[property]?.amt){
+    //                 data[property] = { amt : input[property]?.amt}
+    //             }
+    //         }
+
+          
+    //         if(Object.keys(data).length > 0){
+
+    //             let result = Object.entries(data).sort((a, b) => a[1].amt - b[1].amt);
+
+    //             result.forEach((value,index) => {
+    //                 console.log(value)
+    //                 data[value[0]] = {
+    //                     ... data[value[0]],
+    //                     least : 'L'+(index+1)
+    //                 }
+    //             })
+    //         }
+
+    //         console.log(data)
+    //     }
+    // }, [input])
+
     const getTechnicalEvalutionList = () => {
-        axios.get(`${baseUrl}/api/technicalevalution/qualifiedlist`).then((resp) => {
+        setFetchLoading(true)
+        axios.get(`${baseUrl}/api/technicalevalution/qualifiedlist/${id}`).then((resp) => {
             if (resp.status === 200) {
-                setqualifiedList(resp.data.qualifiedList)
+                setqualifiedList(resp.data.qualifiedList);
                 generateLeastList(resp.data.qualifiedList.length);
+                let qualifiedList = resp.data.qualifiedList;
+                (qualifiedList.length > 0) ? getAlreadySavedFinancialEvalutionData(qualifiedList) :  setFetchLoading(false)
+
+            }else{
+                setFetchLoading(false)
+            }
+        })
+    }
+
+    const isAlreadyStored = (qualifiedList, storedFinEvalList) => {
+        setFetchLoading(true)
+        // console.log(qualifiedList);
+        // console.log(storedFinEvalList);
+
+        qualifiedList.forEach((value, index) => {
+            let storedFindata = storedFinEvalList.find((x) => x.techsubId === value.id);
+            if (storedFindata) {
+
+                // console.log(storedFindata)
+                if (storedFindata.unit) {
+                    setInput((prev) => {
+                        return {
+                            ...prev,
+                            [storedFindata.techsubId]: {
+                                ...prev[storedFindata.techsubId],
+                                unit: storedFindata.unit
+                            },
+                        }
+                    })
+                }
+
+
+                if (storedFindata.amt) {
+                    setInput((prev) => {
+                        return {
+                            ...prev,
+                            [storedFindata.techsubId]: {
+                                ...prev[storedFindata.techsubId],
+                                amt: storedFindata.amt
+                            },
+                        }
+                    })
+                }
+
+                if (storedFindata.least) {
+                    setInput((prev) => {
+                        return {
+                            ...prev,
+                            [storedFindata.techsubId]: {
+                                ...prev[storedFindata.techsubId],
+                                least: storedFindata.least
+                            },
+                        }
+                    })
+                }
+
+                setInput((prev) => {
+                    return {
+                        ...prev,
+                        [storedFindata.techsubId]: {
+                            ...prev[storedFindata.techsubId],
+                            updateId: storedFindata.id
+                        },
+                    }
+                })
+
+
+            }
+        })
+        setFetchLoading(false)
+    }
+
+    const getAlreadySavedFinancialEvalutionData = (qualifiedList) => {
+        setFetchLoading(true)
+        axios.get(`${baseUrl}/api/financialevaluation/getstoreddata/${id}`).then((resp) => {
+            if (resp.status === 200) {
+                if (resp.data.storedFinEvalList.length > 0) {
+                    // if(Array.isArray(resp.data.qualifiedList)){
+                    //     qualifiedList.forEach(isAlreadyStored)
+                    // }
+                    setisEditbtn(true)
+                    setAddorUpdateForm('update')
+                    isAlreadyStored(qualifiedList, resp.data.storedFinEvalList)
+                }else{
+                    setFetchLoading(false)
+                }
+            }else{
+                setFetchLoading(false)
             }
         })
     }
@@ -48,6 +170,7 @@ const FinancialEvalution = () => {
         setLeastList(leastListArr)
         // console.log(leastListArr)
     }
+
 
     const getUnitList = () => {
         axios.get(`${baseUrl}/api/unitmasters/getUnitList`).then((resp) => {
@@ -82,13 +205,35 @@ const FinancialEvalution = () => {
                 ...prev,
                 [techsubid]: {
                     ...prev[techsubid],
-                    amt: e.target.value
+                    amt: +e.target.value
                 }
             }
         })
     }
 
     const leastChangeHandler = (selectedOptions, techsubid) => {
+
+        if(selectedOptions === null){
+            if(input[techsubid]){
+                let preSelectedValue = input[techsubid].least;
+
+                let index = leastList.findIndex(option => option.value === preSelectedValue)
+        
+                let leastListArr = leastList;
+                leastListArr[index] = { ...leastList[index], isDisabled: false }
+                setLeastList(leastListArr)
+            }
+        }
+        // else{
+        //         let index = leastList.findIndex(option => option.value === selectedOptions.value)
+            
+        //         let leastListArr = leastList;
+        //         leastListArr[index] = { ...leastList[index], isDisabled: true }
+
+        //         setLeastList(leastListArr)
+        // }
+     
+
         setInput((prev) => {
             return {
                 ...prev,
@@ -99,62 +244,98 @@ const FinancialEvalution = () => {
             }
         })
 
-        // let index = leastList.findIndex(option => option.value === selectedOptions.value)
-        // console.log(index)
-
-
-        // setLeastList((prev) => {
-
-
-        //     prev[index] = {
-        //         ... prev[index],
-        //         isDisabled : !prev[index].isDisabled
-        //     } 
-
-    // console.log(input);
-    // console.log(input[3]?.unit);
-
-
-        //   return  [
-        //         ...prev,
-        //     ]
-        // })
-
     }
-    
+
+
+    useEffect(() => {
+        if(input && Object.keys(input).length> 0){
+            for (const key in input) {
+
+                if(input[key].least){
+                    // console.log(input[key].least)
+                    let index = leastList.findIndex(option => option.value === input[key].least)
+            
+                    let leastListArr = leastList;
+                    leastListArr[index] = { ...leastList[index], isDisabled: true }
+
+                    setLeastList(leastListArr)
+                }
+            }
+        }
+    },[input])
+
+    const filterLeast = (e, techsubId) => {
+        // console.log(input)
+    }
+
     const resetform = () => {
         setInput({})
+        generateLeastList(qualifiedList.length)
     }
 
     let formIsValid = false;
 
-    if(qualifiedList.length > 0){
-        if(Object.keys(input).length > 0){
+    if (qualifiedList.length > 0) {
+        if (Object.keys(input).length > 0) {
 
-            for(const key in input){
+            for (const key in input) {
 
-                for (const key1 in input[key]){
-                    if(input[key][key1]){
+                for (const key1 in input[key]) {
+                    if (input[key][key1]) {
                         formIsValid = true;
                         break;
                     }
                 }
 
-                if(formIsValid){
+                if (formIsValid) {
                     break;
                 }
-             
+
             }
         }
     }
 
     const postData = (data) => {
-        // console.log(data)
+        axios.post(`${baseUrl}/api/financialevaluation`, data).then((resp) => {
+            // console.log(resp.data)
+            if (resp.status === 200 && resp.data.status === 'success') {
+                toastSuccess(resp.data.msg);
+                props.reloadFunction()
+            } else {
+                toastError("Unable to submit!");
+            }
+            setdatasending(false);
+        }).catch((err) => {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+            });
+            setdatasending(false);
+        });
+
 
     }
 
-    const putData = () => {
-
+    const putData = (data) => {
+        setdatasending(true);
+        axios.post(`${baseUrl}/api/financialevaluation`, data).then((resp) => {
+            // console.log(resp.data)
+            if (resp.status === 200 && resp.data.status === 'success') {
+                toastSuccess('Updated Successfully');
+                props.reloadFunction()
+            } else {
+                toastError("Unable to submit!");
+            }
+            setdatasending(false);
+        }).catch((err) => {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+            });
+            setdatasending(false);
+        });
     }
 
     const submitHandler = (e) => {
@@ -163,24 +344,24 @@ const FinancialEvalution = () => {
         setdatasending(true);
 
         if (!formIsValid) {
-          setdatasending(false);
-          return;
+            setdatasending(false);
+            return;
         }
 
         let data = {
-            finEvaluation : input,
+            finEvaluation: input,
             tokenid: localStorage.getItem("token"),
-            
+            bidid: id
+
         }
 
-        if (formId === 0) {
+        if (AddorUpdateForm === 'add') {
             postData(data);
-        } else if (formId > 0) {
+        } else if (AddorUpdateForm === 'update') {
             putData(data);
         }
     }
 
-    // console.log(input)
     return (
         <LockCard locked={!id}>
             <PreLoader loading={FetchLoading}>
@@ -211,7 +392,7 @@ const FinancialEvalution = () => {
                                     placeholder=""
                                     name="amt"
                                     value={input ? ((input[item.id]?.amt) ? input[item.id].amt : '') : ''}
-                                    onChange={(e) => amtchangehandler(e, item.id)}
+                                    onChange={(e) =>{ amtchangehandler(e, item.id) ; }}
                                 />
                             </div>
                             <div className="col-md-3">
@@ -240,7 +421,7 @@ const FinancialEvalution = () => {
                                     ? "btn btn-outline-primary rounded-pill px-4"
                                     : "btn btn-primary rounded-pill px-4"
                             }
-                            onClick = {submitHandler}
+                            onClick={submitHandler}
                             disabled={!formIsValid || isDatasending || FetchLoading}
                         >
                             {isDatasending && (
@@ -257,7 +438,7 @@ const FinancialEvalution = () => {
                                     ? "btn btn-outline-primary rounded-pill px-4"
                                     : "btn btn-primary rounded-pill px-4"
                             }
-                            onClick = {submitHandler}
+                            onClick={submitHandler}
                             disabled={!formIsValid || isDatasending || FetchLoading}
                         >
                             {isDatasending && (

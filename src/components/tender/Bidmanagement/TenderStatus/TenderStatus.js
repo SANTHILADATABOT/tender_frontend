@@ -17,6 +17,7 @@ const TenderStatus = () => {
     const [loading,setLoading]=useState();
     let tokenId = localStorage.getItem("token");
     const { id } = useParams();
+    const [seed, setSeed] = useState(1);
 
     useEffect(() => {
         getBidders();
@@ -83,6 +84,10 @@ const errorUpdate = () =>{
       });
 }
 
+
+const reloadFunction = () => {
+    setSeed(Math.random());
+}
 
   return (
     <div className="formContent">
@@ -155,7 +160,7 @@ const errorUpdate = () =>{
         {/* Card Content - Collapse */}
         <div className="collapse" id="financialevaluation">
           <div className="card-header">
-            <FinancialEvalution />
+            <FinancialEvalution key={seed} reloadFunction={reloadFunction}/>
           </div>
         </div>
       </div>
