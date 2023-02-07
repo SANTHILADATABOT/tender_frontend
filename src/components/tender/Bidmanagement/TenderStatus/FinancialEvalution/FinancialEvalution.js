@@ -149,7 +149,7 @@ const FinancialEvalution = () => {
     }
 
     const postData = (data) => {
-        console.log(data)
+        // console.log(data)
 
     }
 
@@ -180,7 +180,7 @@ const FinancialEvalution = () => {
         }
     }
 
-    console.log(input)
+    // console.log(input)
     return (
         <LockCard locked={!id}>
             <PreLoader loading={FetchLoading}>

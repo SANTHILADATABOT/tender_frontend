@@ -22,7 +22,7 @@ const Bidders = () => {
   let tokenId = localStorage.getItem("token");
   const { server1: baseUrl } = useBaseUrl();
   const [hasError, setHasError] = useState(false);
-
+  
   useEffect(() => {
     //get the no of bidders
     // getBidders();
@@ -65,7 +65,7 @@ const Bidders = () => {
           return {
             ...prev,
             [i]: {
-              compId: null,
+              compId: [null],
               status: "",
               reason: "",
             },
@@ -230,6 +230,7 @@ const Bidders = () => {
               input={input}
               setInput={setInput}
               isEdited={edit}
+              setCompList={setCompList}
             />
           </div>
 

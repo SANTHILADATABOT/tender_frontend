@@ -159,3 +159,43 @@ alt="No Image"
     </div>
   </div>
 )}
+
+ {/* <div className="inputgroup col-lg-6 mb-4">
+            <div className="row align-items-center font-weight-bold">
+              <div className="col-lg-4 text-dark">
+                <label>Document Upload</label>
+              </div>
+              <div className="col-lg-8">
+                <div
+                  className="dashed border-primary height_of_dropbox boderradius__dropbox d-flex flex-column align-items-center justify-content-center  drop-file-input bg-gray-200"
+                  ref={wrapperRef}
+                  onDragEnter={onDragEnter}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
+                >
+                  <p className="display-4 mb-0">
+                    <i className="fas fa-cloud-upload-alt text-primary "></i>
+                  </p>
+                  {!dragover && (
+                    <p className="mt-0">Drag & Drop an document or Click</p>
+                  )}
+                  {dragover && <p className="mt-0">Drop the document</p>}
+                  <input
+                    type="file"
+                    value=""
+                    className="h-100 w-100 position-absolute top-50 start-50 pointer "
+                    onChange={onFileDrop}
+                  />
+                </div>
+              </div>
+            </div>
+          </div> */}
+
+            {/* <div className="inputgroup col-lg-6 mb-4">
+            <div className="row align-items-center font-weight-bold">
+              <div className="col-lg-4 text-dark">Upload File</div>
+              <div className="col-lg-8">
+                <UploadFiles />
+              </div>
+            </div>
+          </div> */}

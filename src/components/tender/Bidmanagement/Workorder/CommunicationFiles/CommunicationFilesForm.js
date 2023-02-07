@@ -2,7 +2,7 @@ import { usePageTitle } from "../../../../hooks/usePageTitle";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useState, useEffect, useRef, Fragment } from "react";
-import { useParams, useNavigate,Link} from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
@@ -12,6 +12,7 @@ import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 import CollapseCard from "../../../../UI/CollapseCard";
 import "./UploadDoc.css";
 import Select from "react-select";
+import { Alert } from "bootstrap";
 
 //Medium Options
 const options = [
@@ -53,16 +54,16 @@ const CommunicationFilesForm = () => {
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { commnunicationfile: filePath } = useImageStoragePath();
   const [isPdfFile, setIsPdfFile] = useState(false);
-  const [array,setArray] = useState([]);
+  const [array, setArray] = useState([]);
   const [num, setNum] = useState(0);
-  const [ImgaeList, setImgList] =useState ([]);
+  const [ImgaeList, setImgList] = useState([]);
   //  const navigate = useNavigate();
   const [hasError, setHasError] = useState(initialValue);
- 
+
   useEffect(() => {
     getCompFilesList();
-    setNum("wrk-"+Math.floor(100000 + Math.random() * 900000));
-    
+    setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
+
   }, []);
   useEffect(() => {
     imageList();
@@ -100,102 +101,124 @@ const CommunicationFilesForm = () => {
   const del_image = (e, id) => {
 
     e.preventDefault();
-    axios.get(`${baseUrl}/api/workorder/creation/communicationfiledelete/${id}`).then(res=>{
-                if(res.data.status === 200)
-                {
-     
-                  imageList();
-                   }
-    
-    
+    axios.get(`${baseUrl}/api/workorder/creation/communicationfiledelete/${id}`).then(res => {
+      if (res.data.status === 200) {
+
+        imageList();
+      }
+
+
     });
-    
-    
-    
-         }
-  const openInNewTab = (url,id) => {
- 
-    onmouseover= window.open('http://192.168.1.29:8000/WorkOrderCommunicationFiles/'+id,'','height=550,width=800,scrollbars=yes,left=320,top=120,toolbar=no,location=no,directories=no,status=no,menubar=no');
- return false; 
+
+
+
+  }
+  const openInNewTab = (url, id) => {
+
+    onmouseover = window.open('http://192.168.1.29:8000/uploads/BidManagement/WorkOrder/CommunicationFiles/' + id, '', 'height=550,width=800,scrollbars=yes,left=320,top=120,toolbar=no,location=no,directories=no,status=no,menubar=no');
+    return false;
   };
-  var FILELIST ='';
+  var FILELIST = '';
   const imageList = (e) => {
-    
+
     let sub_id = document.getElementById('rand_no').value;
     const datatosend = {
       sub_id: sub_id,
     };
-    axios.post(`${baseUrl}/api/workorder/creation/communicationfileUploadlist/`,datatosend).then(res=>{
-  
-      if(res.data.status==200)
-              {
-                setImgList(res.data.list);
-                // window.location.href = "/admin/bill-upload/"+sub_id;
+    axios.post(`${baseUrl}/api/workorder/creation/communicationfileUploadlist/`, datatosend).then(res => {
 
-              }
-           
-         
-      });
-     
-  
+      if (res.data.status == 200) {
+        setImgList(res.data.list);
+        // window.location.href = "/admin/bill-upload/"+sub_id;
+
+      }
+
+
+    });
+
+
   }
   FILELIST =
-  ImgaeList.map( (item,index) => {
-        let  imageurl="http://192.168.1.29:8000/WorkOrderCommunicationFiles/"+item.comfile;
-            return (
-            <>
+    ImgaeList.map((item, index) => {
+      let imageurl = '';
+      if (item.filetype == 'pdf') {
+        imageurl = "assets/icons/pdf_logo.png";
+      }
+      else if (item.filetype == 'docx' || item.filetype == 'doc') {
+        imageurl = "assets/icons/doc-icon.png";
+      } else if (item.filetype == 'jpeg' || item.filetype == 'jpg' || item.filetype == 'png' || item.filetype == 'img') {
+        imageurl = "http://192.168.1.29:8000/uploads/BidManagement/WorkOrder/CommunicationFiles/" + item.comfile;
+      }
+      else {
+        imageurl = "assets/icons/excelicon.png";
+      }
+
+      return (
+        <>
 
 
-                {/* <tr>
+          {/* <tr>
                 <td>{index+1}</td> */}
-                    <Link onClick={(url) => openInNewTab(url, item.comfile)}  >
-                    <img src={imageurl} alt="" className="imageprev rounded-circle pointer" width="85" height='85' /></Link>&nbsp;<span
-                className="rounded-circle pointer fa fa-close text-danger h4 closebtn"
-                onClick={ (e) => del_image(e, item.id) }
-              >
-                &nbsp;
-              </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-     
-                   {/* <td>
+          <Link onClick={(url) => openInNewTab(url, item.comfile)}  >
+            <img src={imageurl} alt="" className="imageprev rounded-circle pointer" width="85" height='85' /></Link>&nbsp;<span
+              className="rounded-circle pointer fa fa-close text-danger h4 closebtn"
+              onClick={(e) => del_image(e, item.id)}
+            >
+            &nbsp;
+          </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          {/* <td>
                         <button type="button"  onClick={ (e) => del_image(e, item.id) } className="btn btn-danger btn-sm">Delete</button>
                     </td> */}
-                {/* </tr> */}
-                   
-             </>
-            )
-        });
+          {/* </tr> */}
+
+        </>
+      )
+    });
 
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
- 
+
   const onFileDrop = (e) => {
 
     // console.log("e.target.files",e.target.files);
- 
+
     imageList();
 
     let file = e.target.files[0];
     //  let file=e.target.files[0]
-let sub_id = document.getElementById('rand_no').value;
+    let sub_id = document.getElementById('rand_no').value;
     // let formData = new FormData();
     // formData.append('file', file);
     // console.log("Image FIles",formData);
     // console.log("Image FIles1",file);
+    if (input.date == '') {
 
-  
+      Swal.fire({
+        icon: "error",
+        title: "Communication Files",
+        text: "Date Is Empty",
+        confirmButtonColor: "#5156ed",
+      }).then(function () {
+        setLoading(false);
+        setIsBtnClicked(false);
+      });
+      return false;
+    }
+
     //  let file=e.target.files[0]
     let tokenId = localStorage.getItem("token");
     if (
-      input.date !== "" &&
-      id !== "" &&
-      input.refrence_no !== "" &&
-      input.from !== "" &&
-      input.to !== "" &&
-      input.subject !== "" &&
-      input.medium.value !== "" &&
-      input.med_refrence_no !== "" &&
+      input.date !== "" ||
+      id !== "" ||
+      input.refrence_no !== "" ||
+      input.from !== "" ||
+      input.to !== "" ||
+      input.subject !== "" ||
+      input.medium.value !== "" ||
+      input.med_refrence_no !== "" ||
       tokenId !== ""
-    ){
+    ) {
       const datatosend = {
         date: input.date,
         refrenceno: input.refrence_no,
@@ -204,38 +227,36 @@ let sub_id = document.getElementById('rand_no').value;
         subject: input.subject,
         medium: input.medium.value,
         medrefrenceno: input.med_refrence_no,
-       
+
         sub_id: sub_id,
         tokenid: tokenId,
         bidid: id,
         file: file,
         tokenId: tokenId,
       };
-  
       const formdata = new FormData();
-  
+
       for (var key in datatosend) {
         formdata.append(key, datatosend[key]);
       }
       // let formData = new FormData();
       // formData.append('file', file);
-      axios.post(`${baseUrl}/api/workorder/creation/communicationfileUpload/`,formdata).then(res=>{
-  
-        if(res.data.status==200)
-                {
-                 
-                  // window.location.href = "/admin/bill-upload/"+sub_id;
-                  imageList();
-                }
-             
-           
-        });
-  
-  
+      axios.post(`${baseUrl}/api/workorder/creation/communicationfileUpload/`, formdata).then(res => {
 
-    } 
-    else{
-      
+        if (res.data.status == 200) {
+
+          // window.location.href = "/admin/bill-upload/"+sub_id;
+          imageList();
+        }
+
+
+      });
+
+
+
+    }
+    else {
+
       Swal.fire({
         icon: "error",
         title: "Communication Files",
@@ -245,39 +266,39 @@ let sub_id = document.getElementById('rand_no').value;
         setLoading(false);
         setIsBtnClicked(false);
       });
-    
+
     }
- 
 
 
-//   console.log("setFileArray before",setFileArray);
 
-//     if(e.target.files[0]){
-     
-//         setFileArray.push([...setFileArray,e.target.files[0]]);
-//     // setArray(oldArray => [...oldArray,e.target.files[0]]);
-      
-   
-     
-    
-//     }  
+    //   console.log("setFileArray before",setFileArray);
 
-//     console.log("files len",setFileArray.length);
-//     console.log("setFileArray after",setFileArray);
+    //     if(e.target.files[0]){
 
-// let perv=[];
-//     for (let i = 0; i < e.target.files.length; i++) {
-//       perv.push(URL.createObjectURL(e.target.files[i]));
-//     }
-   
+    //         setFileArray.push([...setFileArray,e.target.files[0]]);
+    //     // setArray(oldArray => [...oldArray,e.target.files[0]]);
 
-//     setSelectedFiles(e.target.files);
-//     setImagePreviews((previousImages) => previousImages.concat(perv));
-    
-   
-//     // setProgressInfos({ val: [images] });
-    
-//     setMessage([]);
+
+
+
+    //     }  
+
+    //     console.log("files len",setFileArray.length);
+    //     console.log("setFileArray after",setFileArray);
+
+    // let perv=[];
+    //     for (let i = 0; i < e.target.files.length; i++) {
+    //       perv.push(URL.createObjectURL(e.target.files[i]));
+    //     }
+
+
+    //     setSelectedFiles(e.target.files);
+    //     setImagePreviews((previousImages) => previousImages.concat(perv));
+
+
+    //     // setProgressInfos({ val: [images] });
+
+    //     setMessage([]);
   }
     ;
   var IMG = 'TEST';
@@ -323,7 +344,7 @@ let sub_id = document.getElementById('rand_no').value;
 
   //check Form is Valid or not
   useEffect(() => {
-    if (input.date !== "" ) {
+    if (input.date !== "") {
       setFormIsValid(true);
     } else {
       setFormIsValid(false);
@@ -383,14 +404,14 @@ let sub_id = document.getElementById('rand_no').value;
       subject: data.subject,
       med_refrence_no: data.med_refrenceno,
     });
-  setNum(data.randomno);
-  setTimeout(() => {
+    setNum(data.randomno);
+    setTimeout(() => {
 
-    imageList();
+      imageList();
 
-}, 1000);
-  
-console.log(data);
+    }, 1000);
+
+
     // var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     // var img_url = data.comfile.match(pattern);
     // var splited = img_url[0].split(".");
@@ -422,7 +443,7 @@ console.log(data);
   };
 
   const onDelete = (data) => {
-    console.log("Data", data);
+
     Swal.fire({
       text: `Are You sure, to delete ?`,
       icon: "warning",
@@ -512,15 +533,15 @@ console.log(data);
 
     let tokenId = localStorage.getItem("token");
     if (
-      input.date !== "" &&
-      id !== "" &&
-      input.refrence_no !== "" &&
-      input.from !== "" &&
-      input.to !== "" &&
-      input.subject !== "" &&
-      input.medium.value !== "" &&
-      input.med_refrence_no !== "" &&
-      tokenId !== "" 
+      input.date !== "" ||
+      id !== "" ||
+      input.refrence_no !== "" ||
+      input.from !== "" ||
+      input.to !== "" ||
+      input.subject !== "" ||
+      input.medium.value !== "" ||
+      input.med_refrence_no !== "" ||
+      tokenId !== ""
     ) {
       const datatosend = {
         date: input.date,
@@ -549,7 +570,7 @@ console.log(data);
           formdata
         )
         .then((resp) => {
-          console.log(resp.data);
+
           if (resp.data.status === 200) {
             Swal.fire({
               icon: "success",
@@ -561,15 +582,15 @@ console.log(data);
               setLoading(false);
               setIsBtnClicked(false);
             });
-         
-         //1998
-         setNum("wrk-"+Math.floor(100000 + Math.random() * 900000));
+
+            //1998
+            setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
             setTimeout(() => {
 
-            imageList();
+              imageList();
 
-        }, 1000);
-        
+            }, 1000);
+
           } else if (resp.data.status === 404) {
             Swal.fire({
               icon: "error",
@@ -602,14 +623,14 @@ console.log(data);
     let tokenId = localStorage.getItem("token");
 
     if (
-      input.date !== "" &&
-      id !== "" &&
-      input.refrence_no !== "" &&
-      input.from !== "" &&
-      input.to !== "" &&
-      input.subject !== "" &&
-      input.medium.value !== "" &&
-      input.med_refrence_no !== "" &&
+      input.date !== "" ||
+      id !== "" ||
+      input.refrence_no !== "" ||
+      input.from !== "" ||
+      input.to !== "" ||
+      input.subject !== "" ||
+      input.medium.value !== "" ||
+      input.med_refrence_no !== "" ||
       tokenId !== ""
     ) {
       //When Image is not changed on update
@@ -642,14 +663,14 @@ console.log(data);
                 resetForm();
                 setPreviewForEdit("");
               });
-           
-              setNum("wrk-"+Math.floor(100000 + Math.random() * 900000));
+
+              setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
               setTimeout(() => {
-  
-              imageList();
-  
-          }, 1000);
-           
+
+                imageList();
+
+              }, 1000);
+
             } else if (resp.data.status === 404) {
               Swal.fire({
                 icon: "error",
@@ -694,7 +715,7 @@ console.log(data);
         for (var key in datatosend) {
           formdata.append(key, datatosend[key]);
         }
-       
+
         axios
           .post(
             `${baseUrl}/api/workorder/creation/communicationfiles/${input.commId}`,
@@ -758,17 +779,17 @@ console.log(data);
     }
   };
   const removeImgHandler = (e) => {
-     
+
     // setFile("");
     // setPreviewObjURL("");
     // setImages("");
     const s = imagePreviews.filter((img) => img !== e);
     setImagePreviews(s);
-    
-    
-    };
 
-    
+
+  };
+
+
   return (
     <Fragment>
       <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>
@@ -777,7 +798,7 @@ console.log(data);
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="date">Date</label>
+                  <label htmlFor="date">Date</label><span style={{ color: 'red' }} > * </span>
                 </div>
                 <div className="col-lg-8">
                   <input
@@ -943,7 +964,7 @@ console.log(data);
                       value={input.med_refrence_no}
                       onChange={textInputHandler}
                     />
-                   
+
                     {hasError.med_refrence_no ? (
                       <div className="pt-1">
                         <span className="text-danger font-weight-normal">
@@ -957,45 +978,7 @@ console.log(data);
                 </div>
               </div>
             </div>
-            {/* <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label>Document Upload</label>
-              </div>
-              <div className="col-lg-8">
-                <div
-                  className="dashed border-primary height_of_dropbox boderradius__dropbox d-flex flex-column align-items-center justify-content-center  drop-file-input bg-gray-200"
-                  ref={wrapperRef}
-                  onDragEnter={onDragEnter}
-                  onDragLeave={onDragLeave}
-                  onDrop={onDrop}
-                >
-                  <p className="display-4 mb-0">
-                    <i className="fas fa-cloud-upload-alt text-primary "></i>
-                  </p>
-                  {!dragover && (
-                    <p className="mt-0">Drag & Drop an document or Click</p>
-                  )}
-                  {dragover && <p className="mt-0">Drop the document</p>}
-                  <input
-                    type="file"
-                    value=""
-                    className="h-100 w-100 position-absolute top-50 start-50 pointer "
-                    onChange={onFileDrop}
-                  />
-                </div>
-              </div>
-            </div>
-          </div> */}
 
-            {/* <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">Upload File</div>
-              <div className="col-lg-8">
-                <UploadFiles />
-              </div>
-            </div>
-          </div> */}
             <div className="inputgroup col-lg-6 mb-4 ">
               <div className="row align-items-center">
                 <div className="col-lg-4 text-dark font-weight-bold pt-1">
@@ -1031,17 +1014,17 @@ console.log(data);
 
             <div className="inputgroup col-lg-6 mb-4 ">
               <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold pt-1">
-                
+                <div className="col-lg-4 text-dark font-weight-bold pt-1">
+
                   <input type='hidden' id='rand_no' name='rand_no' value={num} />
                 </div>
                 <div className="col-lg-8">
-              
+
                   {/* <img src={previewObjURL} /> */}
-                  
+
                   {/* for edit */}
 
-                  
+
 
                   {/* {hasError.remark && (
                   <div className="pt-1">
@@ -1053,9 +1036,9 @@ console.log(data);
                 </div>
               </div>
             </div>
-           
-            
-             {/* <thead className="text-center bg-success  text-white">
+
+
+            {/* <thead className="text-center bg-success  text-white">
             <tr>
               <th scope="col">#</th>
               
@@ -1063,18 +1046,18 @@ console.log(data);
               <th scope="col">remove Preview</th>
             </tr>
           </thead> */}
-          
-          {imagePreviews && (
-  <div className='bg-E4E0E0
+
+            {imagePreviews && (
+              <div className='bg-E4E0E0
    col-lg-8' >
-  {FILELIST}
-  </div>
-  )}
+                {FILELIST}
+              </div>
+            )}
 
 
 
 
-          {/* {
+            {/* {
 imagePreviews.map((img, i) => {
    
  return (
@@ -1105,10 +1088,10 @@ alt="No Image"
        })
        
        }  */}
-                
-      
-     
-         
+
+
+
+
           </div>
           <div className="row text-center">
             <div className="col-12">
