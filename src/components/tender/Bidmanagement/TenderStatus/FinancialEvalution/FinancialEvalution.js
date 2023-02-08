@@ -64,6 +64,7 @@ const FinancialEvalution = (props) => {
 
     const getTechnicalEvalutionList = () => {
         setFetchLoading(true)
+        try{
         axios.get(`${baseUrl}/api/technicalevalution/qualifiedlist/${id}`).then((resp) => {
             if (resp.status === 200) {
                 setqualifiedList(resp.data.qualifiedList);
@@ -72,9 +73,16 @@ const FinancialEvalution = (props) => {
                 (qualifiedList.length > 0) ? getAlreadySavedFinancialEvalutionData(qualifiedList) :  setFetchLoading(false)
 
             }else{
+                console.log("ex");
                 setFetchLoading(false)
             }
         })
+    }
+    catch(ex){
+        setFetchLoading(false)
+        console.log("b;mfldmbs;lk");
+
+    }
     }
 
     const isAlreadyStored = (qualifiedList, storedFinEvalList) => {

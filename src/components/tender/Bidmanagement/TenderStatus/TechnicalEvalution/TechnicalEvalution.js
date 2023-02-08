@@ -23,7 +23,7 @@ const TechnicalEvalution = (props) => {
   const [progress, setProgressCompleted] = useState(0);
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
     useOutletContext();
-
+  const [notHasValue, setNotHasValue] = useState(true);
   const wrapperRef = useRef(null);
   const ref = useRef();
   const { id } = useParams();
@@ -127,15 +127,18 @@ const TechnicalEvalution = (props) => {
             response.data.name = res.data.filename;
             setisEditbtn(true);
             setFile(response.data );
+            setNotHasValue (false);
             }
             else{
               setisEditbtn(false);
               setFile(null);
+              setNotHasValue (true);
             }
           });
         }
         else if (res.data.status === 404) {
           {
+            setNotHasValue (true);
             setisEditbtn(false);
             setFile(null);
           }          
@@ -148,6 +151,7 @@ const TechnicalEvalution = (props) => {
       catch(exception)
       {
         setFetchLoading(false);
+        setNotHasValue (true);
         console.log(exception);
       }
     }
@@ -295,7 +299,7 @@ const TechnicalEvalution = (props) => {
 
 //  {(!formIsValid || isDatasending || FetchLoading) && !isEdited}
   return (
-    <LockCard locked={!id}>
+    <LockCard locked={!id || notHasValue }>
       <PreLoader loading={FetchLoading}>
         <form onSubmit={submitHandler} encType="multipart/form-data">
           <div className="row align-items-baseline">
@@ -388,6 +392,7 @@ const TechnicalEvalution = (props) => {
                     input={input}
                     setInput={setInput}
                     setisEdited={setisEdited}
+                    setNotHasValue={setNotHasValue}
                   />
                 </div>
               </div>

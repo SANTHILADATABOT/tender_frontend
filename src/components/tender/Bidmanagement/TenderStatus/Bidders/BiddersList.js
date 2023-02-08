@@ -1,12 +1,13 @@
-import axios from "axios";
-import { useBaseUrl } from "../../../../hooks/useBaseUrl";
-import Swal from "sweetalert2";
-import { useState, Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import Select from "react-select";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
+import { useOutletContext } from "react-router-dom";
+
 
 const BiddersList = (props) => {
-
+  const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
+  useOutletContext();
+  
   const textInputHandler = (e) => {
     e.persist();
 
@@ -14,7 +15,7 @@ const BiddersList = (props) => {
     let index;
     if (
       e.target.name.includes("status") &&
-      (e.target.value === "accepted" || e.target.value === "rejected")
+      (e.target.value === "approved" || e.target.value === "rejected")
     ) {
       splitstring = e.target.name.split("status");
       index = splitstring[1];
@@ -27,8 +28,9 @@ const BiddersList = (props) => {
           },
         };
       });
+      props.setIsEdited(true);
 
-      if (e.target.value === "accepted") {
+      if (e.target.value === "approved") {
         props.setInput((prev) => {
           return {
             ...prev,
@@ -48,11 +50,8 @@ const BiddersList = (props) => {
           },
         };
       });
-    }
-
-    //to reset reason
-
-    // props.setisEdited(true);
+      props.setIsEdited(true);
+    }   
   };
 
   const selectChangeHandler = (id, e) => {
@@ -72,6 +71,7 @@ const BiddersList = (props) => {
           },
         };
       });
+      props.setIsEdited(true);
     } else {
       props.setInput((prev) => {
         return {
@@ -90,7 +90,6 @@ const BiddersList = (props) => {
       let index = props.compList.findIndex(
         (option) => option.value === tempObj.value
       );
-
       let compListArr = props.compList;
       compListArr[index] = { ...props.compList[index], isdisabled: false };
       props.setCompList(compListArr);
@@ -103,88 +102,111 @@ const BiddersList = (props) => {
       dubObj[index] = { ...dubObj[index], isdisabled: true };
       props.setCompList(dubObj);
     }
+    props.setIsEdited(true);
   };
 
-  const results = [];
-
-  Object.keys(props.input).forEach((key) => {
-    results.push(
-      <div className="row col-lg-12 mb-2" key={key} >
-        <div className="col-lg-2 text-dark font-weight-bold text-left mt-2">
-          <label>Name of Bidder {parseInt(key) + 1}</label>
-        </div>
-        <div className="col-lg-3 text-dark text-left">
-          <Select
-            name={"compId" + key}
-            id={"compId" + key}
-            isSearchable="true"
-            isClearable="false"
-            options={props.compList}
-            onChange={(event, selectedOptions) => {
-              selectChangeHandler(event, selectedOptions);
-            }}
-            value={props.input[key]["compId"]}
-            isOptionDisabled={(option) => option.isdisabled}
-            isLoading={props.compListLoading}
-            // isDisabled={ id ?true:false}
-          ></Select>
-        </div>
-        <div className="col-lg-3 text-left row ml-3">
-          <div className="col-lg-5 mt-2 ">
-            <label
-              className="form-check-label pointer"
-              htmlFor={"statusaccepted" + key}
-            >
-              <input
-                className="form-check-input"
-                type="radio"
-                onChange={(event) => textInputHandler(event)}
-                name={"status" + key}
-                id={"statusaccepted" + key}
-                value="accepted"
-              />
-              <span className="text-dark font-weight-bold">Accepted</span>
-            </label>
-          </div>
-
-          <div className="col-lg-5 mt-2">
-            <label
-              className="form-check-label pointer"
-              htmlFor={"statusrejected" + key}
-            >
-              <input
-                className="form-check-input"
-                type="radio"
-                onChange={(event) => textInputHandler(event)}
-                name={"status" + key}
-                id={"statusrejected" + key}
-                value="rejected"
-              />
-              <span className="text-dark font-weight-bold">Rejected</span>
-            </label>
-          </div>
-        </div>
-        {props.input[key]["status"] === "rejected" && (
-          <div className="col-lg-4 text-dark text-left row mb-2  form-outline">
-            <div className="col-lg-3">
-              <label className="form-check-label mt-2 text-dark font-weight-bold">
-                Reason :
-              </label>
-            </div>
-            <div className="col-lg-9">
-              <textarea
-                className="form-control "
-                name={"reason" + key}
-                rows="2"
-                value={props.input[key]["reason"]}
-                onChange={(event) => textInputHandler(event)}
-              />
-            </div>
-          </div>
-        )}
+  let results = [];
+useEffect(() => {
+  if(props.bidders>props.compList.length)
+  {
+    // toastError("No of Bidders is higher than No of Competitors");
+    toastError("Only "+ `${props.compList.length}`+" Competitors are Available..!")
+    props.setBidders("");
+  } 
+}, [props.bidders]);
+ 
+Object.keys(props.input).forEach((key) => {
+  results.push(
+    <div className="row col-lg-12 mb-2" key={key} >
+      <div className="col-lg-2 text-dark font-weight-bold text-left mt-2">
+        <label>Name of Bidder {parseInt(key) + 1}</label>
       </div>
-    );
-  });
+      <div className="col-lg-3 text-dark text-left">
+        <Select
+          name={"compId" + key}
+          id={"compId" + key}
+          isSearchable="true"
+          isClearable="false"
+          options={props.compList}
+          onChange={(event, selectedOptions) => {
+            selectChangeHandler(event, selectedOptions);
+          }}
+          value={props.input[key]["compId"]}
+          isOptionDisabled={(option) => option.isdisabled}
+          isLoading={props.compListLoading}
+          // isDisabled={ id ?true:false}
+        ></Select>
+      </div>
+      <div className="col-lg-3 text-left row ml-3">
+        <div className="col-lg-5 mt-2 ">
+          <label
+            className="form-check-label pointer"
+            htmlFor={"statusapproved" + key}
+          >
+            <input
+              className="form-check-input"
+              type="radio"
+              onChange={(event) => textInputHandler(event)}
+              name={"status" + key}
+              id={"statusapproved" + key}
+              value="approved"
+              checked={props.input &&
+                props.input[key] &&
+                props.input[key]["status"] &&
+                (props.input[key]["status"]
+                  ? props.input[key]["status"] === "approved"
+                  : false)
+              }
+            />
+            <span className="text-dark font-weight-bold">Approved</span>
+          </label>
+        </div>
+
+        <div className="col-lg-5 mt-2">
+          <label
+            className="form-check-label pointer"
+            htmlFor={"statusrejected" + key}
+          >
+            <input
+              className="form-check-input"
+              type="radio"
+              onChange={(event) => textInputHandler(event)}
+              name={"status" + key}
+              id={"statusrejected" + key}
+              value="rejected"
+              checked={props.input &&
+                props.input[key] &&
+                props.input[key]["status"] &&
+                (props.input[key]["status"]
+                  ? props.input[key]["status"] === "rejected"
+                  : false)
+              }
+            />
+            <span className="text-dark font-weight-bold">Rejected</span>
+          </label>
+        </div>
+      </div>
+      {props.input[key]["status"] === "rejected" && (
+        <div className="col-lg-4 text-dark text-left row mb-2  form-outline">
+          <div className="col-lg-3">
+            <label className="form-check-label mt-2 text-dark font-weight-bold">
+              Reason :
+            </label>
+          </div>
+          <div className="col-lg-9">
+            <textarea
+              className="form-control "
+              name={"reason" + key}
+              rows="2"
+              value={props.input[key]["reason"]}
+              onChange={(event) => textInputHandler(event)}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+});
 
   return <Fragment>{results}</Fragment>;
 };

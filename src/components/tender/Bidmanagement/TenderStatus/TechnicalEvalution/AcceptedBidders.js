@@ -30,8 +30,10 @@ const AcceptedBidders = (props) => {
               });
             });
             setAcceptedBidders(response.data.bidders);
+            props.setNotHasValue (false);
           }
            setFetchLoading(false);
+          
         });
         
     } catch (e) {

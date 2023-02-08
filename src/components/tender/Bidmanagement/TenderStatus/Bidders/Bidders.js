@@ -5,6 +5,7 @@ import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import BiddersList from "./BiddersList";
+import PreLoader from "../../../../UI/PreLoader";
 
 const Bidders = () => {
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
@@ -14,31 +15,77 @@ const Bidders = () => {
 
   const [bidders, setBidders] = useState("");
   const [compList, setCompList] = useState([]);
+  const [fetchedData, setFetchedData] = useState([]);
   const [input, setInput] = useState([]);
   const [edit, setEdit] = useState(false);
+  const [isEdited, setIsEdited] = useState(false);
   const [loading, setLoading] = useState(false);
   const [compListLoading, setCompListLoading] = useState(false);
+  const [FetchLoading, setFetchLoading] = useState(true);
   const [isBtnClicked, setIsBtnClicked] = useState(false);
   const [formIsValid, setFormIsValid] = useState(false);
   let tokenId = localStorage.getItem("token");
   const { server1: baseUrl } = useBaseUrl();
   const [hasError, setHasError] = useState(false);
   
+  
   useEffect(() => {
     //get the no of bidders
-    // getBidders();
     getCompetitorList();
   }, []);
 
+  useEffect(() => {
+    //get the no of bidders
+    getBidders();
+  }, [bidManageMainId]);
+
+
+  //set Fetched Data into input While loading if Bid Id has value 
+  useEffect(() => {
+  if(edit && fetchedData.length >0)
+  {
+    fetchedData.map((bidders,index) => {
+    setInput((prev) => {
+      return {
+        ...prev,
+        [index]:
+        {"compId": compList.find((x)=> x.value === bidders.competitorId ?  {value : x.value, label: x.label, } : null), 
+          "status": bidders.acceptedStatus,
+          "reason": bidders.reason
+            ? bidders.reason
+            : "",
+        },
+      };
+    });
+    let Compindex = compList.findIndex(
+      (option) => option.value === bidders.competitorId
+    );
+    let compListArr = compList;
+      compListArr[Compindex] = { ...compList[Compindex], isdisabled: true };
+      setCompList(compListArr);
+  })
+   setFetchLoading(false);
+}
+  }, [bidders]);
+
+ 
   const getBidders = () => {
+    setFetchLoading(true);
+    if(bidManageMainId)
+    {
     axios
-      .get(`${baseUrl}/api/tenderstatus/${bidManageMainId}`)
+      .get(`${baseUrl}/api/tenderstatusbidders/${bidManageMainId}`)
       .then((response) => {
         if (response.data.status === 200) {
-          setBidders(response.data.bidders);
-          setEdit(true);
+           setBidders(response.data.bidders.length > 0 ? response.data.bidders.length : "");
+           if(response.data.bidders.length > 0){
+           setFetchedData(response.data.bidders);
+           setEdit(true);
+           }
         }
-      });
+        });
+    }
+   
   };
 
   const getCompetitorList = () => {
@@ -46,6 +93,8 @@ const Bidders = () => {
     axios.get(`${baseUrl}/api/tenderstatus/complist`).then((resp) => {
       if (resp.data.status === 200) {
         setCompList(resp.data.compList);
+        // setCompListCopy(resp.data.compList);
+        
       } else {
         toastError(resp.data.message);
       }
@@ -62,7 +111,15 @@ const Bidders = () => {
       e.target.value <= 20 &&
       e.target.value > 0
     ) {
+      getCompetitorList();
       //to create input state based in user input
+      if(bidders>compList.length)
+      {
+        // toastError("No of Bidders is higher than No of Competitors");
+        toastError("Only "+ `${compList.length}`+" Competitors are Available..!")
+        setBidders("");
+      }
+      else{
       for (let i = 0; i < e.target.value; i++) {
         setInput((prev) => {
           return {
@@ -74,7 +131,7 @@ const Bidders = () => {
             },
           };
         });
-      }
+      }}
       setFormIsValid(true);
       setHasError(false);
     } else {
@@ -90,28 +147,17 @@ const Bidders = () => {
     setIsBtnClicked(true);
     // let tokenId = localStorage.getItem("token");
     const datatosend = {
-      bidid: bidManageMainId,
+      bidid: parseInt(bidManageMainId),
       input: input,
       tokenId: localStorage.getItem("token"),
     };
-
-    // for (var key in input) {
-    //   for (var key1 in input[key]) {
-    //     if (key1.includes("status")) {
-    //       datatosend.append(`input[${key1}][status]`, input[key][key1][key2]);
-    //     } else if (key2.includes("reason")) {
-    //       datatosend.append(`input[${key1}][reason]`, input[key][key1][key2]);
-    //     }
-    //   }
-    // }
-
-
     if (
-      datatosend.bidid !== null &&
-      datatosend.bidders !== null &&
+      datatosend.bidid !== null ||
+      datatosend.bidders !== null ||
+      datatosend.input !==null ||
       datatosend.tokenId !== null
     ) {
-      axios.post(`${baseUrl}/api/tenderstatus`, datatosend).then((resp) => {
+      axios.post(`${baseUrl}/api/tenderstatusbidders`, datatosend).then((resp) => {
         if (resp.data.status === 200) {
           Swal.fire({
             icon: "success",
@@ -154,17 +200,18 @@ const Bidders = () => {
     setIsBtnClicked(true);
     let tokenId = localStorage.getItem("token");
     const datatosend = {
-      bidid: bidManageMainId,
-      bidders: bidders,
-      tokenId: tokenId,
+      bidid: parseInt(bidManageMainId),
+      input: input,
+      tokenId: localStorage.getItem("token"),
     };
     if (
-      datatosend.bidid !== null &&
-      datatosend.bidders !== null &&
+      datatosend.bidid !== null ||
+      datatosend.bidders !== null ||
+      datatosend.input !==null ||
       datatosend.tokenId !== null
     ) {
       axios
-        .put(`${baseUrl}/api/tenderstatus/${bidManageMainId}`, datatosend)
+        .put(`${baseUrl}/api/tenderstatusbidders/${bidManageMainId}`, datatosend)
         .then((resp) => {
           if (resp.data.status === 200) {
             Swal.fire({
@@ -204,6 +251,7 @@ const Bidders = () => {
 
   return (
     <Fragment>
+      <PreLoader loading={FetchLoading}>
       <div className="card-body mr-n5">
         <form>
           <div className="row align-items-center col-lg-12">
@@ -243,9 +291,12 @@ const Bidders = () => {
               compList={compList}
               input={input}
               setInput={setInput}
-              isEdited={edit}
+              edit={edit}
+              setIsEdited={setIsEdited}
               setCompList={setCompList}
               compListLoading= {compListLoading}
+              bidders={bidders}
+              setBidders={setBidders}
             />
           </div>
 
@@ -254,7 +305,7 @@ const Bidders = () => {
             <div className="col-lg-2">
               <button
                 className="btn btn-primary"
-                disabled={!formIsValid || isBtnClicked === true}
+                disabled={(!formIsValid || isBtnClicked === true) && isEdited === false}
                 onClick={!edit ? submitHandler : updateHandler}
               >
                 {!edit
@@ -270,6 +321,7 @@ const Bidders = () => {
           </div>
         </form>
       </div>
+      </PreLoader>
     </Fragment>
   );
 };
