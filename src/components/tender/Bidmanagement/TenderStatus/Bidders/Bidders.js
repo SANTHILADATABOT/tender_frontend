@@ -17,6 +17,7 @@ const Bidders = () => {
   const [input, setInput] = useState([]);
   const [edit, setEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [compListLoading, setCompListLoading] = useState(false);
   const [isBtnClicked, setIsBtnClicked] = useState(false);
   const [formIsValid, setFormIsValid] = useState(false);
   let tokenId = localStorage.getItem("token");
@@ -41,6 +42,7 @@ const Bidders = () => {
   };
 
   const getCompetitorList = () => {
+    setCompListLoading(true);
     axios.get(`${baseUrl}/api/tenderstatus/complist`).then((resp) => {
       if (resp.data.status === 200) {
         setCompList(resp.data.compList);
@@ -48,6 +50,7 @@ const Bidders = () => {
         toastError(resp.data.message);
       }
     });
+    setCompListLoading(false);
   };
 
   const textInputHandler = (e) => {
@@ -85,12 +88,23 @@ const Bidders = () => {
     e.preventDefault();
     setLoading(true);
     setIsBtnClicked(true);
-    let tokenId = localStorage.getItem("token");
+    // let tokenId = localStorage.getItem("token");
     const datatosend = {
       bidid: bidManageMainId,
-      bidders: bidders,
-      tokenId: tokenId,
+      input: input,
+      tokenId: localStorage.getItem("token"),
     };
+
+    // for (var key in input) {
+    //   for (var key1 in input[key]) {
+    //     if (key1.includes("status")) {
+    //       datatosend.append(`input[${key1}][status]`, input[key][key1][key2]);
+    //     } else if (key2.includes("reason")) {
+    //       datatosend.append(`input[${key1}][reason]`, input[key][key1][key2]);
+    //     }
+    //   }
+    // }
+
 
     if (
       datatosend.bidid !== null &&
@@ -231,6 +245,7 @@ const Bidders = () => {
               setInput={setInput}
               isEdited={edit}
               setCompList={setCompList}
+              compListLoading= {compListLoading}
             />
           </div>
 

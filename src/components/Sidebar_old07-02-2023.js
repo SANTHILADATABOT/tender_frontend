@@ -49,7 +49,7 @@ function Sidebar() {
         <Link className="nav-link" to="/tender">
           {/*<i className="fas fa-fw fa-tachometer-alt" />*/}
           <i className="fa fa-laptop"></i>
-          <span className="ml-1">Dashboard</span>
+          <span className="font-weight-bold ml-1">Dashboard</span>
         </Link>
       </li>
 {/* $$$$ */}

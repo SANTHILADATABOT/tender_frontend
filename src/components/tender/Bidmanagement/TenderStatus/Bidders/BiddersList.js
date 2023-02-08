@@ -6,7 +6,6 @@ import Select from "react-select";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
 
 const BiddersList = (props) => {
-  const [selectedOption, setSelectedOption] = useState([]);
 
   const textInputHandler = (e) => {
     e.persist();
@@ -57,17 +56,11 @@ const BiddersList = (props) => {
   };
 
   const selectChangeHandler = (id, e) => {
-    // value, action
-    console.log("Value", id);
-    console.log("Action", e);
-    // console.log("compList", props.compList);
-    
-      var objIndex = e.name.split("compId");
-      let inpIndex = objIndex[1];
-      //  let compList = props.compList;
-      console.log(objIndex);
-      if(id)
-      {
+    // (value, action ) => (id, e)
+
+    var objIndex = e.name.split("compId");
+    let inpIndex = objIndex[1];
+    if (id) {
       props.setInput((prev) => {
         return {
           ...prev,
@@ -77,89 +70,46 @@ const BiddersList = (props) => {
               x.value === id.value ? { value: id.value, label: id.label } : null
             ),
           },
-          //compId: id.value},
-          //
         };
       });
-    }
-    else{
+    } else {
       props.setInput((prev) => {
         return {
           ...prev,
           [inpIndex]: {
             ...prev[inpIndex],
-            compId: null            
+            compId: null,
           },
         };
       });
     }
 
-      // props.setCompList((prev) => {return {...prev, [props.compList]: props.compList.find((x)=> ) })} 
-      // props.compList.find((x)=>
-      //   x.value === id.value
-      //     ? props.setCompList((prev) => {
-      //       console.log("True");
-      //         return ({ ...prev,  [x.isdisabled] : true })}
-      //       )
-      //     : props.setCompList((prev) => {
-      //       console.log("False");
-      //         return { ...prev, [x.isdisabled] : false };
-      //       }))
-      // props.setCompList(
+    if (id === null) {
+      let tempObj = props.input[inpIndex].compId;
 
-      if(id ===null)
-      {
-        let tempObj = props.input[inpIndex].compId;
-  
-                let index = props.compList.findIndex(option => option.value === tempObj.value)
-        
-                let compListArr = props.compList;
-                compListArr[index] = { ...props.compList[index], isdisabled: false }
-                props.setCompList(compListArr)
+      let index = props.compList.findIndex(
+        (option) => option.value === tempObj.value
+      );
 
-      }
-      else {
+      let compListArr = props.compList;
+      compListArr[index] = { ...props.compList[index], isdisabled: false };
+      props.setCompList(compListArr);
+    } else {
+      let index = props.compList.findIndex(
+        (option) => option.value === id.value
+      );
 
-        let index = props.compList.findIndex(option => option.value === id.value)
-      
-        let dubObj = props.compList;
-      dubObj[index]= {...dubObj[index], isdisabled: true}
+      let dubObj = props.compList;
+      dubObj[index] = { ...dubObj[index], isdisabled: true };
       props.setCompList(dubObj);
-      }
-
-
-
-      // for (const i of props.compList) {
-      //   console.log("i.value === id.value", i.value === id.value)
-      //   if (i.value === id.value) {
-      //     console.log("i", i)
-      //     props.setCompList((prev)=>{ return({
-      //       ...prev, [i] :{ ...prev[i], isdisabled : true}})
-      //     })
-      //     }
-         
-      //   }
-       
-      //  );
-
-
-      console.log("compList", props.compList);
-      // props.setCompList((prev)=>{return{...prev, props.compList.find((x)=> x.value === id.value ? true: false)}});
-
-      // setSelectedOption((prev)=>{return{
-      //   ...prev, inpIndex: id.value
-      // }})
-      // selectedOption.push(id.value);
-      // console.log("Selec ",selectedOption);
     }
+  };
 
-
-  console.log("Props.input", props.input);
   const results = [];
 
   Object.keys(props.input).forEach((key) => {
     results.push(
-      <div className="row col-lg-12" key={key}>
+      <div className="row col-lg-12 mb-2" key={key} >
         <div className="col-lg-2 text-dark font-weight-bold text-left mt-2">
           <label>Name of Bidder {parseInt(key) + 1}</label>
         </div>
@@ -175,7 +125,7 @@ const BiddersList = (props) => {
             }}
             value={props.input[key]["compId"]}
             isOptionDisabled={(option) => option.isdisabled}
-            //   isLoading={StateOptions.isLoading}
+            isLoading={props.compListLoading}
             // isDisabled={ id ?true:false}
           ></Select>
         </div>
@@ -214,22 +164,24 @@ const BiddersList = (props) => {
             </label>
           </div>
         </div>
-        <div className="col-lg-4 text-dark text-left row mb-2  form-outline">
-          <div className="col-lg-3">
-            <label className="form-check-label mt-2 text-dark font-weight-bold">
-              Reason :
-            </label>
+        {props.input[key]["status"] === "rejected" && (
+          <div className="col-lg-4 text-dark text-left row mb-2  form-outline">
+            <div className="col-lg-3">
+              <label className="form-check-label mt-2 text-dark font-weight-bold">
+                Reason :
+              </label>
+            </div>
+            <div className="col-lg-9">
+              <textarea
+                className="form-control "
+                name={"reason" + key}
+                rows="2"
+                value={props.input[key]["reason"]}
+                onChange={(event) => textInputHandler(event)}
+              />
+            </div>
           </div>
-          <div className="col-lg-9">
-            <textarea
-              className="form-control "
-              name={"reason" + key}
-              rows="2"
-              value={props.input[key]["reason"]}
-              onChange={(event) => textInputHandler(event)}
-            />
-          </div>
-        </div>
+        )}
       </div>
     );
   });
