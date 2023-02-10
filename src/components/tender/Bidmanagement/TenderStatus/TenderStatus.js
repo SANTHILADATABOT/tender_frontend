@@ -1,12 +1,13 @@
 import { usePageTitle } from "../../../hooks/usePageTitle";
 import Bidders from "./Bidders/Bidders";
 import TechnicalEvalution from "./TechnicalEvalution/TechnicalEvalution";
-import { useState, useEffect} from "react";
+import { useState, useEffect, Fragment} from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import FinancialEvalution from "./FinancialEvalution/FinancialEvalution";
+import StatusModal from "./StatusModal";
 
 const TenderStatus = () => {
   usePageTitle("Update Bids Management");
@@ -18,6 +19,8 @@ const TenderStatus = () => {
     let tokenId = localStorage.getItem("token");
     const { id } = useParams();
     const [seed, setSeed] = useState(1);
+    const [tenderStatus, settenderStatus] = useState(null)
+    const [FetchLoading, setFetchLoading] = useState(false)
 
     useEffect(() => {
         getBidders();
@@ -26,8 +29,20 @@ const TenderStatus = () => {
     useEffect(() => {
       if(id) {
           setBidManagementMainId(id)
+          checkTenderStatus()
       }
     } , [])
+
+    const checkTenderStatus = () => {
+      setFetchLoading(true)
+      axios.get(`${baseUrl}/api/bigmanagement/tenderstatus/status/${id}`).then((resp) => {
+        if(resp.data.status === 200){
+          console.log(resp.data.BidManagementTenderOrBidStaus)
+          settenderStatus(resp.data.BidManagementTenderOrBidStaus.status);
+        }
+        setFetchLoading(false)
+      })
+    }
 
 
     const getBidders = () =>
@@ -90,6 +105,7 @@ const reloadFunction = () => {
 }
 
   return (
+    <Fragment>
     <div className="formContent">
       {!bidManageMainId && (
         <div className="loading">
@@ -169,23 +185,46 @@ const reloadFunction = () => {
       <div className="row mt-5">
         <div className="col-lg-6">
             
-          <label className="border border-info rounded-lg px-5 py-2 text-info font-weight-bolder h6">
+          {/* <label className="border border-info rounded-lg px-5 py-2 text-info font-weight-bolder h6">
           {status === "Completed" ? "Tender Completed" 
           : status === "Cancelled" ? "Tender Cancelled" : "If Tender Cancelled Click Here"}
-          </label>
+          </label> */}
+
+          <button className={`btn 
+            ${tenderStatus === 'Cancel' && 'btn-danger'}
+            ${tenderStatus==='Retender' && 'btn-warning'}
+            ${!tenderStatus && 'btn-outline-info'}
+            `}
+            data-toggle="modal"
+            data-target="#tenderStatusModal"
+            disabled= {FetchLoading}
+          >
+            {FetchLoading && (
+                <span className="spinner-border spinner-border-sm mr-2"></span>
+            )}
+            {FetchLoading && 'Fetching Status'}
+            {tenderStatus==='Cancel' && 'Cancelled'}
+            {tenderStatus==='Retender' && 'Retender'}
+            {(!tenderStatus && !FetchLoading) && 'Cancel/Retender'}
+
+
+          </button>
         </div>
+
         <div className="col-lg-6"> 
-          <button 
+          {/* <button 
                 className="btn btn-primary rounded-lg px-5 py-2 text-white h6 float-right"
                 onClick={status === "Pending" ? updateTenderStatus : errorUpdate }
-                disabled={ status === "Pending" | status === undefined ? false : true }
+                disabled={ (status === "Pending" || status === undefined) ? false : true }
                 style={status !== "Pending" ? {display: 'none'} : {display: 'block'}}
                 >{status === undefined | 
                 status === "Pending" ? "Cancel" : "" } 
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
+    <StatusModal  checkTenderStatus={checkTenderStatus}/>
+    </Fragment>
   );
 };
 
