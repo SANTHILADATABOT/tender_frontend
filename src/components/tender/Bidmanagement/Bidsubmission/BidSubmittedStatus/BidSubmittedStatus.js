@@ -68,7 +68,7 @@ const BidSubmittedStatus = () => {
 
         let filetypes = newFile.type
 
-        if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetypes.split('/')[0] === "image") {
+        if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"  || filetypes === "application/zip" || filetypes.split('/')[0] === "image") {
             setFile(newFile);
         } else {
             alert("File format not supported. Upload pdf, doc, docx and images only")
@@ -325,7 +325,7 @@ const BidSubmittedStatus = () => {
                                         <p className="display-4 mb-0"><i className='fas fa-cloud-upload-alt text-primary '></i></p>
                                         {!dragover && <p className="mt-0">Drag & Drop an document or Click</p>}
                                         {dragover && <p className="mt-0">Drop the document</p>}
-                                        <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/* " onChange={onFileDrop} />
+                                        <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/zip, image/* " onChange={onFileDrop} />
                                     </div>
                                 </div>
                             </div>
