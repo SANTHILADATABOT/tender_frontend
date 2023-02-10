@@ -121,7 +121,7 @@ const reloadFunction = () => {
 
 
         {/* Biddres Form */}
-      <div className="card mb-2  ">
+      <div className="card shadow mb-2  ">
         <a
           href="#bidders"
           className="d-block card-header py-3 bg-white "
@@ -142,7 +142,7 @@ const reloadFunction = () => {
 
 
       {/* Technical Evaluation Form */}
-      <div className="card mb-2  ">
+      <div className="card shadow mb-2  ">
         <a
           href="#technicalEvaluation"
           className="d-block card-header py-3 bg-white "
@@ -162,7 +162,7 @@ const reloadFunction = () => {
       </div>
 
       {/* Financial Evaluation Form */}
-      <div className="card mb-2  ">
+      <div className="card shadow mb-2  ">
         <a
           href="#financialevaluation"
           className="d-block card-header py-3 bg-white "
