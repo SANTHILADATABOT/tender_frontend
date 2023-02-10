@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import BiddersList from "./BiddersList";
 import PreLoader from "../../../../UI/PreLoader";
 
-const Bidders = () => {
+const Bidders = (props) => {
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
     useOutletContext();
 
@@ -42,13 +42,16 @@ const Bidders = () => {
 
   //set Fetched Data into input While loading if Bid Id has value 
   useEffect(() => {
+    
   if(edit && fetchedData.length >0)
   {
+    setFetchLoading(true);
     fetchedData.map((bidders,index) => {
+      
     setInput((prev) => {
       return {
         ...prev,
-        [index]:
+        [bidders.id]:
         {"compId": compList.find((x)=> x.value === bidders.competitorId ?  {value : x.value, label: x.label, } : null), 
           "status": bidders.acceptedStatus,
           "reason": bidders.reason
@@ -85,7 +88,7 @@ const Bidders = () => {
         }
         });
     }
-   
+    setFetchLoading(false);
   };
 
   const getCompetitorList = () => {
@@ -120,6 +123,8 @@ const Bidders = () => {
         setBidders("");
       }
       else{
+        if(!edit && fetchedData.length===0)
+        {
       for (let i = 0; i < e.target.value; i++) {
         setInput((prev) => {
           return {
@@ -132,6 +137,8 @@ const Bidders = () => {
           };
         });
       }}
+    }
+  
       setFormIsValid(true);
       setHasError(false);
     } else {
@@ -159,6 +166,7 @@ const Bidders = () => {
     ) {
       axios.post(`${baseUrl}/api/tenderstatusbidders`, datatosend).then((resp) => {
         if (resp.data.status === 200) {
+          props.reloadFunction();
           Swal.fire({
             icon: "success",
             title: "Tender Status / Bidders",
@@ -214,6 +222,7 @@ const Bidders = () => {
         .put(`${baseUrl}/api/tenderstatusbidders/${bidManageMainId}`, datatosend)
         .then((resp) => {
           if (resp.data.status === 200) {
+            props.reloadFunction();
             Swal.fire({
               icon: "success",
               title: "Tender Status / Bidders",
@@ -272,6 +281,7 @@ const Bidders = () => {
                     name="bidders"
                     value={bidders}
                     onChange={textInputHandler}
+                    disabled={fetchedData}
                   />
 
                   {hasError && (
@@ -297,6 +307,7 @@ const Bidders = () => {
               compListLoading= {compListLoading}
               bidders={bidders}
               setBidders={setBidders}
+              fetchedData={fetchedData}
             />
           </div>
 

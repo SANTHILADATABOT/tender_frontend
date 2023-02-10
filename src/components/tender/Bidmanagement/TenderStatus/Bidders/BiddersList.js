@@ -2,6 +2,7 @@ import { Fragment, useEffect } from "react";
 import Select from "react-select";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
 import { useOutletContext } from "react-router-dom";
+import PreLoader from "../../../../UI/PreLoader";
 
 
 const BiddersList = (props) => {
@@ -61,13 +62,21 @@ const BiddersList = (props) => {
     let inpIndex = objIndex[1];
     if (id) {
       props.setInput((prev) => {
+        // return {
+        //   ...prev,
+        //   [inpIndex]: {
+        //     ...prev[inpIndex],
+        //     compId: props.compList.find((x) =>
+        //       x.value === id.value ? { value: id.value, label: id.label } : null
+        //     ),
+        //   },
+        // };
         return {
           ...prev,
           [inpIndex]: {
-            ...prev[inpIndex],
             compId: props.compList.find((x) =>
               x.value === id.value ? { value: id.value, label: id.label } : null
-            ),
+            ), status: "", reason : ""
           },
         };
       });
@@ -107,21 +116,23 @@ const BiddersList = (props) => {
 
   let results = [];
 useEffect(() => {
-  if(props.bidders>props.compList.length)
+  if(props.bidders>props.compList.length && !props.fetchedData)
   {
     // toastError("No of Bidders is higher than No of Competitors");
     toastError("Only "+ `${props.compList.length}`+" Competitors are Available..!")
     props.setBidders("");
   } 
 }, [props.bidders]);
- 
-Object.keys(props.input).forEach((key) => {
+
+
+
+Object.keys(props.input).forEach((key,index) => {
   results.push(
     <div className="row col-lg-12 mb-2" key={key} >
       <div className="col-lg-2 text-dark font-weight-bold text-left mt-2">
-        <label>Name of Bidder {parseInt(key) + 1}</label>
+        <label>Name of Bidder {index + 1}</label>
       </div>
-      <div className="col-lg-3 text-dark text-left">
+      <div className= {props.fetchedData ? "col-lg-3 text-dark text-left font-weight-bold":"col-lg-3 text-dark text-left"}>
         <Select
           name={"compId" + key}
           id={"compId" + key}
@@ -134,7 +145,7 @@ Object.keys(props.input).forEach((key) => {
           value={props.input[key]["compId"]}
           isOptionDisabled={(option) => option.isdisabled}
           isLoading={props.compListLoading}
-          // isDisabled={ id ?true:false}
+          isDisabled={ props.fetchedData}
         ></Select>
       </div>
       <div className="col-lg-3 text-left row ml-3">
@@ -206,9 +217,9 @@ Object.keys(props.input).forEach((key) => {
       )}
     </div>
   );
-});
-
-  return <Fragment>{results}</Fragment>;
+})
+ 
+  return <Fragment><PreLoader loading={props.compListLoading}>{results}</PreLoader></Fragment>;
 };
 
 export default BiddersList;

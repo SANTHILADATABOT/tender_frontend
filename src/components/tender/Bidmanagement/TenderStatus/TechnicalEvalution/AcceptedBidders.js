@@ -7,11 +7,13 @@ import PreLoader from "../../../../UI/PreLoader";
 const AcceptedBidders = (props) => {
   const [acceptedBidders, setAcceptedBidders] = useState([]);
   const { server1: baseUrl } = useBaseUrl();
-  const [FetchLoading, setFetchLoading] = useState(false);
+  // const [FetchLoading, //setFetchLoading] = useState(false);
 
   useEffect(() => {
     try {
-      setFetchLoading(true);
+      // //setFetchLoading(true);
+      if(props.bidManageMainId)
+      {
       axios
         .get(
           `${baseUrl}/api/bidmanagement/tenderstatus/acceptedbidders/${props.bidManageMainId}`
@@ -26,18 +28,16 @@ const AcceptedBidders = (props) => {
                     [bidders.competitorId + "status"]: "",
                     [bidders.competitorId + "reason"]: "",
                   },
-              };
+                };
               });
             });
             setAcceptedBidders(response.data.bidders);
-            props.setNotHasValue (false);
           }
-           setFetchLoading(false);
-          
+          // //setFetchLoading(false);
         });
-        
+      }
     } catch (e) {
-      setFetchLoading(false);
+      //setFetchLoading(false);
       Swal.fire({
         icon: "error",
         title: "Unable to Load Data",
@@ -45,8 +45,14 @@ const AcceptedBidders = (props) => {
       });
     }
   }, [props.bidManageMainId]);
-  
 
+  useEffect(()=>{
+    if (Object.keys(acceptedBidders).length > 0) {
+      props.setNotHasValue(false);
+    }
+  
+  },[acceptedBidders])
+  
   const textInputHandler = (id, e) => {
     e.persist();
     props.setInput((prev) => {
@@ -58,22 +64,21 @@ const AcceptedBidders = (props) => {
         },
       };
     });
-//to reset reason
+    //to reset reason
 
-    if(e.target.name===(id+"status") && e.target.value==="qualified")
-    {
+    if (e.target.name === id + "status" && e.target.value === "qualified") {
       props.setInput((prev) => {
         return {
-          ...prev, [id] : {...prev[id], [`${id}reason`]:""}
-        }
-    });
+          ...prev,
+          [id]: { ...prev[id], [`${id}reason`]: "" },
+        };
+      });
+    }
+    props.setisEdited(true);
   };
-  props.setisEdited(true);
-}
 
   return (
     <Fragment>
-      
       {acceptedBidders.map((item) => {
         return (
           <div className="row mb-2" key={item.competitorId}>
@@ -96,8 +101,12 @@ const AcceptedBidders = (props) => {
                   checked={
                     props.input &&
                     props.input[item.competitorId] &&
-                    props.input[item.competitorId][item.competitorId + "status"] &&
-                    (props.input[item.competitorId][item.competitorId + "status"]
+                    props.input[item.competitorId][
+                      item.competitorId + "status"
+                    ] &&
+                    (props.input[item.competitorId][
+                      item.competitorId + "status"
+                    ]
                       ? props.input[item.competitorId][
                           item.competitorId + "status"
                         ] === "qualified"
@@ -123,8 +132,12 @@ const AcceptedBidders = (props) => {
                   checked={
                     props.input &&
                     props.input[item.competitorId] &&
-                    props.input[item.competitorId][item.competitorId + "status"] &&
-                    (props.input[item.competitorId][item.competitorId + "status"]
+                    props.input[item.competitorId][
+                      item.competitorId + "status"
+                    ] &&
+                    (props.input[item.competitorId][
+                      item.competitorId + "status"
+                    ]
                       ? props.input[item.competitorId][
                           item.competitorId + "status"
                         ] === "not qualified"
@@ -137,27 +150,32 @@ const AcceptedBidders = (props) => {
                 Not Qualified
               </label>
             </div>
-            {props.input[item.competitorId][item.competitorId + "status"]==="not qualified" &&
-            <div className="col-lg-4 text-left row">
-              <div className="col-lg-3">
-                <label>Reason :</label>
+            {props.input[item.competitorId][item.competitorId + "status"] ===
+              "not qualified" && (
+              <div className="col-lg-4 text-left row">
+                <div className="col-lg-3">
+                  <label>Reason :</label>
+                </div>
+                <div className="col-lg-9">
+                  <textarea
+                    className="form-control"
+                    name={item.competitorId + "reason"}
+                    rows="2"
+                    value={
+                      props.input[item.competitorId]?.[
+                        item.competitorId + "reason"
+                      ]
+                    }
+                    onChange={(event) =>
+                      textInputHandler(item.competitorId, event)
+                    }
+                  />
+                </div>
               </div>
-              <div className="col-lg-9">
-                <textarea
-                  className="form-control"
-                  name= {item.competitorId + "reason"}
-                  rows="2"
-                  value={props.input[item.competitorId]?.[item.competitorId +"reason"]}
-                  onChange={(event) =>
-                    textInputHandler(item.competitorId, event)
-                  }
-                />
-              </div>
-            </div>}
+            )}
           </div>
         );
       })}
-
     </Fragment>
   );
 };

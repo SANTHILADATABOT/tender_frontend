@@ -119,7 +119,7 @@ const reloadFunction = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="bidders">
           <div className="card-header">
-            <Bidders />
+            <Bidders key={seed} reloadFunction={reloadFunction}/>
           </div>
         </div>
       </div>

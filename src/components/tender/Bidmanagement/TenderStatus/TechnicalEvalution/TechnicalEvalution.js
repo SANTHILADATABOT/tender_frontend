@@ -97,6 +97,8 @@ const TechnicalEvalution = (props) => {
       },})
         .then((res) => {
           if (res.data.status === 200) {
+            
+            
             setUploadDocId(res.data.mainId);
             setDateValue(res.data.date);
             res.data.result.map((bidders) => {
@@ -112,6 +114,11 @@ const TechnicalEvalution = (props) => {
                 };
               });
             });
+            if(Object.keys(res.data.result).length>0)
+            {
+              setNotHasValue(false);
+            }
+            
             axios({url: `${baseUrl}/api/tenderstatus/techevaluation/download/${bidManageMainId}`,
             method: 'GET',
             responseType: 'blob', // important
@@ -127,18 +134,16 @@ const TechnicalEvalution = (props) => {
             response.data.name = res.data.filename;
             setisEditbtn(true);
             setFile(response.data );
-            setNotHasValue (false);
+            
             }
             else{
               setisEditbtn(false);
               setFile(null);
-              setNotHasValue (true);
             }
           });
         }
         else if (res.data.status === 404) {
           {
-            setNotHasValue (true);
             setisEditbtn(false);
             setFile(null);
           }          
@@ -151,7 +156,7 @@ const TechnicalEvalution = (props) => {
       catch(exception)
       {
         setFetchLoading(false);
-        setNotHasValue (true);
+        setNotHasValue(true);
         console.log(exception);
       }
     }
@@ -295,7 +300,6 @@ const TechnicalEvalution = (props) => {
       putData(formdata, UploadDocId);
     }
   };
-
 
 //  {(!formIsValid || isDatasending || FetchLoading) && !isEdited}
   return (
