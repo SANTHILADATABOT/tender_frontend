@@ -214,7 +214,7 @@ const FinancialEvalution = (props) => {
   };
 
   const leastChangeHandler = (selectedOptions, techsubid) => {
-    if (selectedOptions === null) {
+   
       if (input[techsubid]) {
         let preSelectedValue = input[techsubid].least;
 
@@ -226,7 +226,7 @@ const FinancialEvalution = (props) => {
         leastListArr[index] = { ...leastList[index], isDisabled: false };
         setLeastList(leastListArr);
       }
-    }
+    
     // else{
     //         let index = leastList.findIndex(option => option.value === selectedOptions.value)
 
@@ -262,6 +262,10 @@ const FinancialEvalution = (props) => {
           setLeastList(leastListArr);
         }
       }
+
+      leastList.forEach((item,index) => {
+
+      })
     }
   }, [input]);
 
