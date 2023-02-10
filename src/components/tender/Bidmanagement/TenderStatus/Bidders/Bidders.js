@@ -219,7 +219,7 @@ const Bidders = (props) => {
       datatosend.tokenId !== null
     ) {
       axios
-        .put(`${baseUrl}/api/tenderstatusbidders/${bidManageMainId}`, datatosend)
+        .post(`${baseUrl}/api/tenderstatusbidders/${bidManageMainId}?_method=PUT`, datatosend)
         .then((resp) => {
           if (resp.data.status === 200) {
             props.reloadFunction();
