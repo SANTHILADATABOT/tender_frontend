@@ -11,8 +11,9 @@ import LockCard from "../../../../UI/LockCard";
 import PreLoader from "../../../../UI/PreLoader";
 import AcceptedBidders from "./AcceptedBidders";
 import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
-
+import Select from "react-select";
 const TechnicalEvalution = (props) => {
+  var competid = "";
   const [file, setFile] = useState(null);
   const [isDatasending, setdatasending] = useState(false);
   const [FetchLoading, setFetchLoading] = useState(true);
@@ -20,10 +21,16 @@ const TechnicalEvalution = (props) => {
   const [isEdited, setisEdited] = useState(false);
   const [UploadDocId, setUploadDocId] = useState(null);
   const [dragover, setdragover] = useState(false);
+  const [leastcount, setleastcount] = useState("L1");
+  const [competitorid, setcompetitorid] = useState("");
+
   const [progress, setProgressCompleted] = useState(0);
+  const [leastbidder, setleastbidder] = useState([]);
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
     useOutletContext();
-  const [notHasValue, setNotHasValue] = useState(true);
+  const [idvalue, setidvalue] = useState([]);
+  const [notHasList, setNotHasList] = useState(true);
+
   const wrapperRef = useRef(null);
   const ref = useRef();
   const { id } = useParams();
@@ -31,9 +38,20 @@ const TechnicalEvalution = (props) => {
   const [input, setInput] = useState({});
 
   const [DateValue, setDateValue] = useState("");
+  const [Description, setDescription] = useState("");
+
   const [DateHasError, setDateHasError] = useState("");
   function DateChangeHandler(e) {
     setDateValue(e.target.value);
+    if (!e.target.value) {
+      setDateHasError(true);
+    } else {
+      setDateHasError(false);
+      setisEdited(true);
+    }
+  }
+  function desChangeHandler(e) {
+    setDescription(e.target.value);
     if (!e.target.value) {
       setDateHasError(true);
     } else {
@@ -69,7 +87,9 @@ const TechnicalEvalution = (props) => {
     ) {
       setFile(newFile);
     } else {
-      alert("File format not suppoted. Upload pdf, doc, docx and images only");
+      toastError(
+        "File format not suppoted. Upload pdf, doc, docx and images only"
+      );
     }
   };
 
@@ -86,7 +106,7 @@ const TechnicalEvalution = (props) => {
     if (bidManageMainId) {
       try {
         axios({
-          url: `${baseUrl}/api/tenderstatus/techevaluation/${bidManageMainId}`,
+          url: `${baseUrl}/api/tenderstatus/awardcontract/${bidManageMainId}`,
           method: "GET",
           headers: {
             //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
@@ -98,28 +118,28 @@ const TechnicalEvalution = (props) => {
           .then((res) => {
             if (res.data.status === 200) {
               setUploadDocId(res.data.mainId);
-              setDateValue(res.data.date ? res.data.date : "");
+              setDateValue(res.data.date);
+              let des = res.data.description;
+              setDescription(des);
+              competid = res.data.competitorId;
+              setcompetitorid(res.data.competitorId);
               setisEditbtn(true);
-              res.data.result.map((bidders) => {
-                setInput((prev) => {
-                  return {
-                    ...prev,
-                    [bidders.competitorId]: {
-                      [bidders.competitorId + "status"]:
-                        bidders.qualifiedStatus ? bidders.qualifiedStatus: "",
-                      [bidders.competitorId + "reason"]: bidders.reason
-                        ? bidders.reason
-                        : "",
-                    },
-                  };
-                });
-              });
-              if (Object.keys(res.data.result).length > 0) {
-                setNotHasValue(false);
-              }
-
+              SelectList();
+              // res.data.result.map((bidders) => {
+              //   setInput((prev) => {
+              //     return {
+              //       ...prev,
+              //       [bidders.competitorId]: {
+              //         [bidders.competitorId + "status"]: bidders.qualifiedStatus,
+              //         [bidders.competitorId + "reason"]: bidders.reason
+              //           ? bidders.reason
+              //           : "",
+              //       },
+              //     };
+              //   });
+              // });
               axios({
-                url: `${baseUrl}/api/tenderstatus/techevaluation/download/${bidManageMainId}`,
+                url: `${baseUrl}/api/tenderstatus/awardontract/download/${bidManageMainId}`,
                 method: "GET",
                 responseType: "blob", // important
                 headers: {
@@ -133,16 +153,14 @@ const TechnicalEvalution = (props) => {
                   response.data.name = res.data.filename;
                   setisEditbtn(true);
                   setFile(response.data);
-                } else if (UploadDocId || response.status === 204) {
-                  setisEditbtn(true);
-                  setFile(null);
                 } else {
-                  setisEditbtn(false);
+                  // setisEditbtn(false);
                   setFile(null);
                 }
               });
             } else if (res.data.status === 404) {
               {
+                SelectList();
                 setisEditbtn(false);
                 setFile(null);
               }
@@ -153,7 +171,6 @@ const TechnicalEvalution = (props) => {
           });
       } catch (exception) {
         setFetchLoading(false);
-        setNotHasValue(true);
         console.log(exception);
       }
     }
@@ -164,7 +181,68 @@ const TechnicalEvalution = (props) => {
   useEffect(() => {
     setFetchLoading(true);
     getTechEvalutionList();
+
+    // get least compiteator
+    setTimeout(() => {}, 5000);
   }, [bidManageMainId]);
+  const SelectList = () => {
+    if (bidManageMainId) {
+      axios({
+        url: `${baseUrl}/api/tenderstatus/financialevaluation/getleastbidder/${bidManageMainId}`,
+        method: "GET",
+
+        headers: {
+          //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }).then((response) => {
+        if (response.status === 200) {
+          setleastbidder(response.data.bidders);
+
+          if (response.data.bidders.length > 0) {
+            setNotHasList(false);
+          }
+
+          response.data.bidders.map((option, index) => {
+            if (competid) {
+              if (option.competitorId == competid) {
+                setleastcount(option.least);
+                setidvalue(option.competitorId);
+              }
+            } else {
+              if (option.least === "L1") {
+                // document.getElementById("com_id2").setAttribute("value",option.competitorId);
+                let cid = option.competitorId;
+                setidvalue(cid);
+              }
+            }
+            if (!option.least) {
+              setNotHasList(true);
+            }
+          });
+        }
+      });
+    }
+  };
+  //select option for bidders
+
+  const SettingLeast = (least) => {
+    setleastcount(least);
+  };
+  const OnSelect = (option, least) => {
+    let id = option.value;
+    setleastcount(least);
+    setidvalue(id);
+  };
+  const leastbidder_options = leastbidder.map((option, index) => {
+    return {
+      label: option.compName,
+      value: option.competitorId,
+      key: option.least,
+    };
+  });
 
   useEffect(() => {
     if (isEdited) setisEdited(true);
@@ -194,34 +272,37 @@ const TechnicalEvalution = (props) => {
   }
 
   const postData = (data) => {
-    axios
-      .post(`${baseUrl}/api/tenderstatus/techevaluation`, data, config)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          // ref.current.getDocList();
-          // resetform();
-          toastSuccess(resp.data.message);
-          props.reloadFunction();
-        } else if (resp.data.status === 400) {
-          toastError(resp.data.message);
-        } else {
-          toastError("Unable to upload the document");
-        }
-        setdatasending(false);
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
+    try {
+      axios
+        .post(`${baseUrl}/api/tenderstatus/awardcontract`, data, config)
+        .then((resp) => {
+          if (resp.data.status === 200) {
+            // ref.current.getDocList();
+            // resetform();
+            toastSuccess(resp.data.message);
+            props.reloadFunction();
+          } else if (resp.data.status === 400) {
+            toastError(resp.data.message);
+          } else {
+            toastError("Unable to upload the document");
+          }
+          setdatasending(false);
         });
-        setdatasending(false);
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
       });
+      setdatasending(false);
+    }
   };
   const putData = (data, UploadDocId) => {
+    // try{
+
     axios
       .post(
-        `${baseUrl}/api/tenderstatus/techevaluation/${UploadDocId}`,
+        `${baseUrl}/api/tenderstatus/awardcontract/${UploadDocId}`,
         data,
         config
       )
@@ -234,33 +315,38 @@ const TechnicalEvalution = (props) => {
         } else {
           toastError("Unable to update");
         }
-        setdatasending(false);
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
-        });
+
         setdatasending(false);
       });
+
+    // }catch(err){
+    //     Swal.fire({
+    //       icon: "error",
+    //       title: "Oops...",
+    //       text: "Something went wrong!",
+    //     });
+    //     setdatasending(false);
+    //   };
   };
 
+  let comid = "";
   const submitHandler = (e) => {
     e.preventDefault();
     setdatasending(true);
 
-    if (!formIsValid) {
-      setdatasending(false);
-      return;
-    }
+    //     if (!formIsValid) {
+    //       setdatasending(false);
+    //       return;
+    //     }
 
     const formdata = new FormData();
+    // formdata.append('file', file[0]);
 
     let data = {
       date: DateValue,
-      file: file,
-      input: input,
+      // file: formdata,
+      competitorId: idvalue,
+      description: Description,
       tokenid: localStorage.getItem("token"),
       bid_creation_mainid: id,
     };
@@ -288,6 +374,8 @@ const TechnicalEvalution = (props) => {
       }
     }
 
+    // postData(data);
+
     if (id && UploadDocId === null && !isEditbtn) {
       postData(formdata);
     } else if (id && UploadDocId !== null && isEditbtn) {
@@ -297,7 +385,7 @@ const TechnicalEvalution = (props) => {
 
   //  {(!formIsValid || isDatasending || FetchLoading) && !isEdited}
   return (
-    <LockCard locked={!id || notHasValue}>
+    <LockCard locked={!id || notHasList}>
       <PreLoader loading={FetchLoading}>
         <form onSubmit={submitHandler} encType="multipart/form-data">
           <div className="row align-items-baseline">
@@ -305,7 +393,41 @@ const TechnicalEvalution = (props) => {
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
                   <label htmlFor="Date" className="pr-3">
-                    Evaluation Date{" "}
+                    Contract Awarded To{" "}
+                    <span className="text-danger">&nbsp;*&nbsp;</span>:
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <Select
+                    name="contractaward"
+                    id="contractaward"
+                    options={leastbidder_options}
+                    isSearchable="true"
+                    isClearable="true"
+                    //   value={input.medium}
+                    value={leastbidder_options.filter(
+                      (leastbidder_options) =>
+                        leastbidder_options.key == leastcount
+                    )}
+                    onChange={(leastbidder_options) =>
+                      OnSelect(leastbidder_options, leastbidder_options.key)
+                    }
+                  ></Select>
+                  {DateHasError && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-normal">
+                        Date is required
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="inputgroup col-lg-6 mb-4 ">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="Date" className="pr-3">
+                    Contract Awarded Date{" "}
                     <span className="text-danger">&nbsp;*&nbsp;</span>:
                   </label>
                 </div>
@@ -383,19 +505,34 @@ const TechnicalEvalution = (props) => {
                 <div className="col-lg-6">&nbsp;</div>
               </div>
             )}
+            <div className="inputgroup col-lg-6 mb-4 "></div>
 
-            {/* List Competitors */}
-
-            <div className="inputgroup col-lg-12 mb-4">
-              <div className="row ">
-                <div className="col-lg-12 text-dark font-weight-bold">
-                  <AcceptedBidders
-                    bidManageMainId={bidManageMainId}
-                    input={input}
-                    setInput={setInput}
-                    setisEdited={setisEdited}
-                    setNotHasValue={setNotHasValue}
-                  />
+            <div className="inputgroup col-lg-6 mb-4 ">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="Date" className="pr-3">
+                    AOC Description{" "}
+                    <span className="text-danger">&nbsp;*&nbsp;</span>:
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <textarea
+                    name="description"
+                    id="description"
+                    className="form-control"
+                    maxLength="255"
+                    rows="4"
+                    cols="60"
+                    value={Description}
+                    onChange={desChangeHandler}
+                  ></textarea>
+                  {DateHasError && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-normal">
+                        Date is required
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

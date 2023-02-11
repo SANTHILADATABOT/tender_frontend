@@ -425,7 +425,7 @@ const BidCreation = () => {
     axios.get(`${baseUrl}/api/tendercreation/${tenderid}`).then((resp) => {
       if (resp.data.tender) {
         let data = resp.data.tender;
-        console.log(resp.data.tender)
+        // console.log(resp.data.tender)
         setNITdateValue(data.nitdate);
         setState(data.stateId);
         setcustomernameValue(data.nameOfCustomer);
