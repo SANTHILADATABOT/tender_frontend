@@ -82,7 +82,9 @@ const CompetitorCompanyQualityCertificatesForm = () => {
       setProgressCompleted(percentCompleted);
     },
   };
-
+// console.log("doctype",doctype);
+// console.log("filetype",file.type);
+// console.log("maxImageSize",maxImageSize);
   useEffect(() => {
     if (file && file.size > maxImageSize) {
       Swal.fire({
@@ -97,7 +99,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     } else if (file && !doctype.includes(file.type)) {
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File Type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {

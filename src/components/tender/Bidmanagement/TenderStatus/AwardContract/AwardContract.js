@@ -9,8 +9,6 @@ import styles from "./UploadDocTechnicalEvalution.module.css";
 import Swal from "sweetalert2";
 import LockCard from "../../../../UI/LockCard";
 import PreLoader from "../../../../UI/PreLoader";
-import AcceptedBidders from "./AcceptedBidders";
-import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 import Select from "react-select";
 const TechnicalEvalution = (props) => {
   var competid = "";

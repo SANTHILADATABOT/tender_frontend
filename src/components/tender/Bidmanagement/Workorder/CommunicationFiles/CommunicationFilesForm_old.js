@@ -3,6 +3,7 @@ import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFile
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
@@ -11,6 +12,7 @@ import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 import CollapseCard from "../../../../UI/CollapseCard";
 import "./UploadDoc.css";
 import Select from "react-select";
+import { Alert } from "bootstrap";
 
 //Medium Options
 const options = [
@@ -40,7 +42,7 @@ const CommunicationFilesForm = () => {
   const [loading, setLoading] = useState(false);
   const [commFilesList, setCommFilesList] = useState([]);
   const [isBtnClicked, setIsBtnClicked] = useState(false);
-  const [previewObjURL, setPreviewObjURL] = useState("");
+  const [previewObjURL, setPreviewObjURL] = useState([]);
   const [progress, setProgressCompleted] = useState(0);
   const [dragover, setdragover] = useState(false);
   const wrapperRef = useRef(null);
@@ -52,13 +54,20 @@ const CommunicationFilesForm = () => {
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { commnunicationfile: filePath } = useImageStoragePath();
   const [isPdfFile, setIsPdfFile] = useState(false);
-  const [ImgaeList, setImgList] = useState([]);
+  const [array, setArray] = useState([]);
   const [num, setNum] = useState(0);
+  const [ImgaeList, setImgList] = useState([]);
   //  const navigate = useNavigate();
   const [hasError, setHasError] = useState(initialValue);
+
   useEffect(() => {
     getCompFilesList();
     setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
+
+  }, []);
+  useEffect(() => {
+    imageList();
+    console.log();
   }, []);
 
   const onDragEnter = () => {
@@ -72,104 +81,122 @@ const CommunicationFilesForm = () => {
   };
 
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
+
+  // const onFileDrop = (e) => {
+  //   const newFile = e.target.files[0];
+  //   if(e.target.files[0]){
+  //   var splited = newFile.name.split(".");
+  //   if(splited[1]==="pdf")
+  //   {setIsPdfFile(true);}
+  //   else{setIsPdfFile(false);}
+  //   }
+  //   if (newFile) {
+
+  //     setFile(newFile);
+  //     setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
+  //     if (previewForEdit) {
+  //       setPreviewForEdit("");
+  //     }
+  //   }
+  // };
   const del_image = (e, id) => {
+
     e.preventDefault();
-    axios
-      .get(`${baseUrl}/api/workorder/creation/communicationfiledelete/${id}`)
-      .then((res) => {
-        if (res.data.status === 200) {
-          imageList();
-        }
-      });
-  };
+    axios.get(`${baseUrl}/api/workorder/creation/communicationfiledelete/${id}`).then(res => {
+      if (res.data.status === 200) {
+
+        imageList();
+      }
+
+
+    });
+
+
+
+  }
   const openInNewTab = (url, id) => {
-    onmouseover = window.open(
-      "http://192.168.1.29:8000/uploads/BidManagement/WorkOrder/CommunicationFiles/" +
-        id,
-      "",
-      "height=550,width=800,scrollbars=yes,left=320,top=120,toolbar=no,location=no,directories=no,status=no,menubar=no"
-    );
+
+    onmouseover = window.open('http://192.168.1.29:8000/uploads/BidManagement/WorkOrder/CommunicationFiles/' + id, '', 'height=550,width=800,scrollbars=yes,left=320,top=120,toolbar=no,location=no,directories=no,status=no,menubar=no');
     return false;
   };
-
-  let FILELIST = [];
-
+  var FILELIST = '';
   const imageList = (e) => {
-    let sub_id = document.getElementById("randno").value;
+
+    let sub_id = document.getElementById('randno').value;
     const datatosend = {
       sub_id: sub_id,
     };
-    axios
-      .post(
-        `${baseUrl}/api/workorder/creation/communicationfileUploadlist/`,
-        datatosend
+    axios.post(`${baseUrl}/api/workorder/creation/communicationfileUploadlist/`, datatosend).then(res => {
+
+      if (res.data.status == 200) {
+        setImgList(res.data.list);
+        // window.location.href = "/admin/bill-upload/"+sub_id;
+
+      }
+
+
+    });
+
+
+  }
+  FILELIST =
+    ImgaeList.map((item, index) => {
+      let imageurl = '';
+      if (item.filetype == 'pdf') {
+        imageurl = "assets/icons/pdf_logo.png";
+      }
+      else if (item.filetype == 'docx' || item.filetype == 'doc') {
+        imageurl = "assets/icons/doc-icon.png";
+      } else if (item.filetype == 'jpeg' || item.filetype == 'jpg' || item.filetype == 'png' || item.filetype == 'img') {
+        imageurl = "http://192.168.1.29:8000/uploads/BidManagement/WorkOrder/CommunicationFiles/" + item.comfile;
+      }
+      else {
+        imageurl = "assets/icons/excelicon.png";
+      }
+
+      return (
+        <>
+        
+          {/* <tr>
+                <td>{index+1}</td> */}
+          <Link onClick={(url) => openInNewTab(url, item.comfile)}  >
+            <img src={imageurl} alt="" className="imageprev rounded-circle pointer" width="85" height='85' /></Link>&nbsp;<span
+              className="rounded-circle pointer fa fa-close text-danger h4 closebtn"
+              onClick={(e) => del_image(e, item.id)}
+            >
+            &nbsp;
+          </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          {/* <td>
+                        <button type="button"  onClick={ (e) => del_image(e, item.id) } className="btn btn-danger btn-sm">Delete</button>
+                    </td> */}
+          {/* </tr> */}
+        </>
+
+
+
+       
       )
-      .then((res) => {
-        if (res.data.status == 200) {
-          setImgList(res.data.list);
-          // window.location.href = "/admin/bill-upload/"+sub_id;
-        }
-      });
-  };
-  var imageurl = "";
-  console.log("iMGlIST :", ImgaeList);
+    });
 
-  FILELIST = ImgaeList.map((item, index) => {
-    if (item.filetype == "pdf") {
-      imageurl = "assets/icons/pdf_logo.png";
-    } else if (item.filetype == "docx" || item.filetype == "doc") {
-      imageurl = "assets/icons/doc-icon.png";
-    } else if (
-      item.filetype == "jpeg" ||
-      item.filetype == "jpg" ||
-      item.filetype == "png" ||
-      item.filetype == "img"
-    ) {
-      imageurl =
-        "http://192.168.1.29:8000/uploads/BidManagement/WorkOrder/CommunicationFiles/" +
-        item.comfile;
-    } else {
-      imageurl = "assets/icons/excelicon.png";
-    }
-
-    return (
-      <div className="col-lg-2 mb-2 card border-left-info ml-4">
-        <div className=" text-center card-body row" key={+index + 1}>
-          <div className="col-lg-10">
-          <Link onClick={(url) => openInNewTab(url, item.comfile)}>
-            <img
-              src={imageurl}
-              alt=""
-              className="imageprev rounded-circle pointer"
-              width="85"
-              height="85"
-            />
-          </Link></div>
-          <div 
-            className="pointer fa fa-close text-danger h4 closebtn col-lg-2 mt-4"
-            key={+index + 1}
-            onClick={(e) => del_image(e, item.id)}
-          ></div>
-        </div>
-        </div>
-    );
-  });
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
 
   const onFileDrop = (e) => {
+
     // console.log("e.target.files",e.target.files);
 
     imageList();
 
     let file = e.target.files[0];
     //  let file=e.target.files[0]
-    let sub_id = document.getElementById("randno").value;
+    let sub_id = document.getElementById('randno').value;
     // let formData = new FormData();
     // formData.append('file', file);
     // console.log("Image FIles",formData);
     // console.log("Image FIles1",file);
-    if (input.date == "") {
+    if (input.date == '') {
+
       Swal.fire({
         icon: "error",
         title: "Communication Files",
@@ -217,18 +244,22 @@ const CommunicationFilesForm = () => {
       }
       // let formData = new FormData();
       // formData.append('file', file);
-      axios
-        .post(
-          `${baseUrl}/api/workorder/creation/communicationfileUpload/`,
-          formdata
-        )
-        .then((res) => {
-          if (res.data.status == 200) {
-            // window.location.href = "/admin/bill-upload/"+sub_id;
-            imageList();
-          }
-        });
-    } else {
+      axios.post(`${baseUrl}/api/workorder/creation/communicationfileUpload/`, formdata).then(res => {
+
+        if (res.data.status == 200) {
+
+          // window.location.href = "/admin/bill-upload/"+sub_id;
+          imageList();
+        }
+
+
+      });
+
+
+
+    }
+    else {
+
       Swal.fire({
         icon: "error",
         title: "Communication Files",
@@ -238,7 +269,10 @@ const CommunicationFilesForm = () => {
         setLoading(false);
         setIsBtnClicked(false);
       });
+
     }
+
+
 
     //   console.log("setFileArray before",setFileArray);
 
@@ -247,7 +281,10 @@ const CommunicationFilesForm = () => {
     //         setFileArray.push([...setFileArray,e.target.files[0]]);
     //     // setArray(oldArray => [...oldArray,e.target.files[0]]);
 
-    //     }
+
+
+
+    //     }  
 
     //     console.log("files len",setFileArray.length);
     //     console.log("setFileArray after",setFileArray);
@@ -257,13 +294,22 @@ const CommunicationFilesForm = () => {
     //       perv.push(URL.createObjectURL(e.target.files[i]));
     //     }
 
+
     //     setSelectedFiles(e.target.files);
     //     setImagePreviews((previousImages) => previousImages.concat(perv));
+
 
     //     // setProgressInfos({ val: [images] });
 
     //     setMessage([]);
-  };
+  }
+    ;
+  var IMG = 'TEST';
+  IMG = images.map((url, i) => {
+    return (
+      <img src={url} alt={"image-" + i} key={i} />
+    )
+  })
 
   var config = {
     onUploadProgress: function (progressEvent) {
@@ -273,6 +319,7 @@ const CommunicationFilesForm = () => {
       setProgressCompleted(percentCompleted);
     },
   };
+
 
   useEffect(() => {
     if (file && file.size > maxImageSize) {
@@ -318,11 +365,12 @@ const CommunicationFilesForm = () => {
           comfile:
             item.filetype === "pdf"
               ? `<embed src="${filePath}` +
-                item.comfile +
-                `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" title="Pdf"/><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="commImg" style="cursor:pointer" title="PDF"></img>`
+              item.comfile
+              +
+              `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" title="Pdf"/><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="commImg" style="cursor:pointer" title="PDF"></img>`
               : `<img src="${filePath}` +
-                item.comfile +
-                `" class="rounded-circle pointer" width="75" height="75" alt="image" id="commImg" style="cursor:pointer" title="Image"></img>`,
+              item.comfile +
+              `" class="rounded-circle pointer" width="75" height="75" alt="image" id="commImg" style="cursor:pointer" title="Image"></img>`,
 
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
@@ -361,8 +409,11 @@ const CommunicationFilesForm = () => {
     });
     setNum(data.randomno);
     setTimeout(() => {
+
       imageList();
+
     }, 1000);
+
 
     // var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     // var img_url = data.comfile.match(pattern);
@@ -383,20 +434,19 @@ const CommunicationFilesForm = () => {
   };
 
   const onPreview = (data) => {
+
     var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     var img_url = data.comfile.match(pattern);
     if (img_url[0]) {
       var splited = img_url[0].split(".");
-      if (splited[1] === "pdf") {
-        setIsPdfFile(true);
-      } else {
-        setIsPdfFile(false);
-      }
+      if (splited[1] === "pdf") { setIsPdfFile(true); }
+      else { setIsPdfFile(false); }
       window.open(filePath + img_url, "_blank");
     }
   };
 
   const onDelete = (data) => {
+
     Swal.fire({
       text: `Are You sure, to delete ?`,
       icon: "warning",
@@ -408,9 +458,7 @@ const CommunicationFilesForm = () => {
     }).then((willDelete) => {
       if (willDelete.isConfirmed) {
         axios
-          .delete(
-            `${baseUrl}/api/workorder/creation/communicationfiles/${data.id}`
-          )
+          .delete(`${baseUrl}/api/workorder/creation/communicationfiles/${data.id}`)
           .then((resp) => {
             if (resp.data.status === 200) {
               Swal.fire({
@@ -452,11 +500,11 @@ const CommunicationFilesForm = () => {
       ...input,
       [e.target.name]: e.target.value,
     });
-    // if (e.target.value === "" || e.target.value === null) {
-    //   setHasError({ ...hasError, [e.target.name]: true });
-    // } else {
-    //   setHasError({ ...hasError, [e.target.name]: false });
-    // }
+    if (e.target.value === "" || e.target.value === null) {
+      setHasError({ ...hasError, [e.target.name]: true });
+    } else {
+      setHasError({ ...hasError, [e.target.name]: false });
+    }
   };
 
   const selectInputHandler = (value, action) => {
@@ -464,12 +512,13 @@ const CommunicationFilesForm = () => {
       ...input,
       [action.name]: value,
     });
-    // if (value === "" || value === null) {
-    //   setHasError({ ...hasError, [action.name]: true });
-    // } else {
-    //   setHasError({ ...hasError, [action.name]: false });
-    // }
+    if (value === "" || value === null) {
+      setHasError({ ...hasError, [action.name]: true });
+    } else {
+      setHasError({ ...hasError, [action.name]: false });
+    }
   };
+
 
   const resetForm = () => {
     setLoading(false);
@@ -509,7 +558,7 @@ const CommunicationFilesForm = () => {
         bidid: id,
         file: file,
         tokenId: tokenId,
-        random: document.getElementById("randno").value,
+        random: document.getElementById('randno').value
       };
 
       const formdata = new FormData();
@@ -524,6 +573,7 @@ const CommunicationFilesForm = () => {
           formdata
         )
         .then((resp) => {
+
           if (resp.data.status === 200) {
             Swal.fire({
               icon: "success",
@@ -539,8 +589,11 @@ const CommunicationFilesForm = () => {
             //1998
             setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
             setTimeout(() => {
+
               imageList();
+
             }, 1000);
+
           } else if (resp.data.status === 404) {
             Swal.fire({
               icon: "error",
@@ -565,6 +618,7 @@ const CommunicationFilesForm = () => {
       });
     }
   };
+
   const updateHandler = (e) => {
     e.preventDefault();
     setLoading(true);
@@ -615,8 +669,11 @@ const CommunicationFilesForm = () => {
 
               setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
               setTimeout(() => {
+
                 imageList();
+
               }, 1000);
+
             } else if (resp.data.status === 404) {
               Swal.fire({
                 icon: "error",
@@ -643,6 +700,7 @@ const CommunicationFilesForm = () => {
       //When Image is changed/reuploaded on update
       else if (previewForEdit === "" && file !== "") {
         const datatosend = {
+
           date: input.date,
           refrenceno: input.refrence_no,
           from: input.from,
@@ -724,13 +782,17 @@ const CommunicationFilesForm = () => {
     }
   };
   const removeImgHandler = (e) => {
+
     // setFile("");
     // setPreviewObjURL("");
     // setImages("");
     const s = imagePreviews.filter((img) => img !== e);
     setImagePreviews(s);
+
+
   };
-  console.log("FILELIST :", FILELIST);
+
+
   return (
     <Fragment>
       <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>
@@ -739,7 +801,7 @@ const CommunicationFilesForm = () => {
             <div className="inputgroup col-lg-6 mb-4">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
-                  <label htmlFor="date">Date</label>
+                  <label htmlFor="date">Date</label><span style={{ color: 'red' }} > * </span>
                 </div>
                 <div className="col-lg-8">
                   <input
@@ -825,7 +887,7 @@ const CommunicationFilesForm = () => {
                     className="form-control"
                     value={input.to}
                     onChange={textInputHandler}
-                    // onBlur={toBlurHandler}
+                  // onBlur={toBlurHandler}
                   />
                   {hasError.to && (
                     <div className="pt-1">
@@ -905,6 +967,7 @@ const CommunicationFilesForm = () => {
                       value={input.med_refrence_no}
                       onChange={textInputHandler}
                     />
+
                     {hasError.med_refrence_no ? (
                       <div className="pt-1">
                         <span className="text-danger font-weight-normal">
@@ -918,50 +981,11 @@ const CommunicationFilesForm = () => {
                 </div>
               </div>
             </div>
-            {/* <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label>Document Upload</label>
-              </div>
-              <div className="col-lg-8">
-                <div
-                  className="dashed border-primary height_of_dropbox boderradius__dropbox d-flex flex-column align-items-center justify-content-center  drop-file-input bg-gray-200"
-                  ref={wrapperRef}
-                  onDragEnter={onDragEnter}
-                  onDragLeave={onDragLeave}
-                  onDrop={onDrop}
-                >
-                  <p className="display-4 mb-0">
-                    <i className="fas fa-cloud-upload-alt text-primary "></i>
-                  </p>
-                  {!dragover && (
-                    <p className="mt-0">Drag & Drop an document or Click</p>
-                  )}
-                  {dragover && <p className="mt-0">Drop the document</p>}
-                  <input
-                    type="file"
-                    value=""
-                    className="h-100 w-100 position-absolute top-50 start-50 pointer "
-                    onChange={onFileDrop}
-                  />
-                </div>
-              </div>
-            </div>
-          </div> */}
 
-            {/* <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">Upload File</div>
-              <div className="col-lg-8">
-                <UploadFiles />
-              </div>
-            </div>
-          </div> */}
             <div className="inputgroup col-lg-6 mb-4 ">
               <div className="row align-items-center">
                 <div className="col-lg-4 text-dark font-weight-bold pt-1">
                   <label htmlFor="cerName"> File Upload</label>
-                  <input type="hidden" id="randno" name="randno" value={num} />
                 </div>
                 <div className="col-lg-8">
                   <div
@@ -980,17 +1004,97 @@ const CommunicationFilesForm = () => {
                     {dragover && <p className="mt-0">Drop the document</p>}
                     <input
                       type="file"
+                      multiple
                       value=""
                       className="h-100 w-100 position-absolute top-50 start-50 pointer "
                       onChange={onFileDrop}
                     />
+
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {imagePreviews && <div className="row">{FILELIST}</div>}
+            <div className="inputgroup col-lg-6 mb-4 ">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold pt-1">
+
+                  <input type='hidden' id='randno' name='randno' value={num} />
+                </div>
+                <div className="col-lg-8">
+
+                  {/* <img src={previewObjURL} /> */}
+
+                  {/* for edit */}
+
+
+
+                  {/* {hasError.remark && (
+                  <div className="pt-1">
+                    <span className="text-danger font-weight-bold">
+                      Enter Valid Amount..!
+                    </span>
+                  </div>
+                )} */}
+                </div>
+              </div>
+            </div>
+
+
+            {/* <thead className="text-center bg-success  text-white">
+            <tr>
+              <th scope="col">#</th>
+              
+              <th scope="col">Image preview</th>
+              <th scope="col">remove Preview</th>
+            </tr>
+          </thead> */}
+
+            {imagePreviews && (
+              <div className='col-lg-8' >
+                {FILELIST}
+              </div>
+            )}
+
+
+
+
+            {/* {
+imagePreviews.map((img, i) => {
+   
+ return (
+    <tr>
+            <td>{i+1}</td>
+            
+            <td><img
+
+className="border border-dark"
+id="previewImg"
+src={!isPdfFile ? img : "assets/icons/pdf_logo.png"}
+alt="No Image"
+        width="75px"
+        height="75px"
+        onClick={() =>
+          window.open(img, "_blank")
+        }
+        title="Click for Preview" 
+  /></td>
+            <td>
+    <span className="fa fa-close text-danger h4 closebtn" onClick={()=>removeImgHandler(img)} ></span>
+              </td>
+               </tr>
+            );
+
+       
+           
+       })
+       
+       }  */}
+
+
+
+
+          </div>
           <div className="row text-center">
             <div className="col-12">
               <button
@@ -1003,8 +1107,8 @@ const CommunicationFilesForm = () => {
                     ? "Adding...."
                     : "Add"
                   : loading === true
-                  ? "Updating...."
-                  : "Update"}
+                    ? "Updating...."
+                    : "Update"}
               </button>
             </div>
           </div>

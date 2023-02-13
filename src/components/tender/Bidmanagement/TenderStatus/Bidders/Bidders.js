@@ -11,7 +11,7 @@ const Bidders = (props) => {
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
     useOutletContext();
 
-  usePageTitle("Competitor Creation");
+  // usePageTitle("Competitor Creation");
 
   const [bidders, setBidders] = useState("");
   const [compList, setCompList] = useState([]);
