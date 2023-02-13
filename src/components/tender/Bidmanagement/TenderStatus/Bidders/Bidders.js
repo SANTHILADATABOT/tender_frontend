@@ -6,6 +6,8 @@ import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import BiddersList from "./BiddersList";
 import PreLoader from "../../../../UI/PreLoader";
+import LockCard from "../../../../UI/LockCard";
+
 
 const Bidders = (props) => {
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
@@ -263,7 +265,8 @@ const Bidders = (props) => {
 
   return (
     <Fragment>
-      <PreLoader loading={FetchLoading}>
+      {/* <LockCard locked={props.tenderStatus==='Cancel'} text="Tender Cancelled" textClass="text-danger font-weight-bold h4"> */}
+      <PreLoader  loading= {props.tenderStatus!=='Cancel' && {FetchLoading}}>
         <div className="card-body mr-n5">
           <form>
             <div className="row align-items-center col-lg-12">
@@ -284,7 +287,7 @@ const Bidders = (props) => {
                       name="bidders"
                       value={bidders}
                       onChange={textInputHandler}
-                      disabled={fetchedData.length > 0}
+                      disabled={fetchedData.length > 0 || props.tenderStatus}
                     />
 
                     {hasError && (
@@ -319,9 +322,8 @@ const Bidders = (props) => {
               <div className="col-lg-2">
                 <button
                   className="btn btn-primary"
-                  disabled={
-                    (!formIsValid || isBtnClicked === true) &&
-                    isEdited === false
+                  disabled={(props.tenderStatus ==='Cancel' || ( !formIsValid || isBtnClicked === true)  &&
+                    isEdited === false)
                   }
                   onClick={!edit ? submitHandler : updateHandler}
                 >
@@ -339,6 +341,7 @@ const Bidders = (props) => {
           </form>
         </div>
       </PreLoader>
+      {/* </LockCard> */}
     </Fragment>
   );
 };

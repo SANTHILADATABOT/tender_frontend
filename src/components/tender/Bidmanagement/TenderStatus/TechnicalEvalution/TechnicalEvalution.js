@@ -305,8 +305,7 @@ const TechnicalEvalution = (props) => {
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
                   <label htmlFor="Date" className="pr-3">
-                    Evaluation Date{" "}
-                    <span className="text-danger">&nbsp;*&nbsp;</span>:
+                    Evaluation Date <span className="text-danger">&nbsp;*&nbsp;</span>:
                   </label>
                 </div>
                 <div className="col-lg-8">
@@ -336,8 +335,7 @@ const TechnicalEvalution = (props) => {
                 <div className="row ">
                   <div className="col-lg-4 text-dark font-weight-bold">
                     <label htmlFor="customername">
-                      Document Upload{" "}
-                      <span className="text-danger">&nbsp;*&nbsp;</span>:
+                      Document Upload<span className="text-danger">&nbsp;*&nbsp;</span>:
                     </label>
                   </div>
                   <div className="col-lg-8">
@@ -353,7 +351,7 @@ const TechnicalEvalution = (props) => {
               <div className="inputgroup col-lg-6 mb-4">
                 <div className="row ">
                   <div className="col-lg-4 text-dark font-weight-bold">
-                    <label htmlFor="customername">Document Upload :</label>
+                    <label htmlFor="customername">Document Upload <span className="text-danger">&nbsp;*&nbsp;</span> :</label>
                   </div>
                   <div className="col-lg-8">
                     <div
@@ -424,7 +422,7 @@ const TechnicalEvalution = (props) => {
                       ? "btn btn-outline-primary rounded-pill px-4"
                       : "btn btn-primary rounded-pill px-4"
                   }
-                  disabled={
+                  disabled={props.tenderStatus==='Cancel' ||
                     (formIsValid || isDatasending || FetchLoading) && !isEdited
                   }
                 >

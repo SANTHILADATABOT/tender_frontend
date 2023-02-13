@@ -191,7 +191,7 @@ const CommunicationFilesForm = () => {
       input.from !== "" ||
       input.to !== "" ||
       input.subject !== "" ||
-      input.medium.value !== "" ||
+      input.medium !== "" ||
       input.med_refrence_no !== "" ||
       tokenId !== ""
     ) {
@@ -201,7 +201,7 @@ const CommunicationFilesForm = () => {
         from: input.from,
         to: input.to,
         subject: input.subject,
-        medium: input.medium.value,
+        medium: input.medium,
         medrefrenceno: input.med_refrence_no,
 
         sub_id: sub_id,
@@ -346,10 +346,11 @@ const CommunicationFilesForm = () => {
 
   const onEdit = (data) => {
     setFile("");
-
+   
+    setInput(initialValue);
     var imgUrl = getImageUrl(data.comfile);
     setFormIsValid(true);
-    setInput({
+    setTimeout(() => { setInput({
       ...input,
       commId: data.id,
       date: data.date,
@@ -359,6 +360,7 @@ const CommunicationFilesForm = () => {
       subject: data.subject,
       med_refrence_no: data.med_refrenceno,
     });
+  }, 500);
     setNum(data.randomno);
     setTimeout(() => {
       imageList();
@@ -493,7 +495,7 @@ const CommunicationFilesForm = () => {
       input.from !== "" ||
       input.to !== "" ||
       input.subject !== "" ||
-      input.medium.value !== "" ||
+      input.medium !== "" ||
       input.med_refrence_no !== "" ||
       tokenId !== ""
     ) {
@@ -503,7 +505,7 @@ const CommunicationFilesForm = () => {
         from: input.from,
         to: input.to,
         subject: input.subject,
-        medium: input.medium.value,
+        medium: input.medium,
         medrefrenceno: input.med_refrence_no,
         tokenid: tokenId,
         bidid: id,
@@ -578,7 +580,7 @@ const CommunicationFilesForm = () => {
       input.from !== "" ||
       input.to !== "" ||
       input.subject !== "" ||
-      input.medium.value !== "" ||
+      input.medium !== "" ||
       input.med_refrence_no !== "" ||
       tokenId !== ""
     ) {
@@ -586,12 +588,12 @@ const CommunicationFilesForm = () => {
       if (previewForEdit !== "" && file === "") {
         const datatosend = {
           date: input.date,
-          refrenceno: input.refrence_no,
-          from: input.from,
-          to: input.to,
-          subject: input.subject,
-          medium: input.medium.value,
-          med_refrenceno: input.med_refrence_no,
+          refrenceno: input.refrence_no ? input.refrence_no.value :"",
+          from: input.from ? input.from :"",
+          to: input.to ? input.to :"",
+          subject: input.subject ? input.subject :"",
+          medium: input.medium ? input.medium :"",
+          med_refrenceno: input.med_refrence_no ? input.med_refrence_no :"",
           tokenid: tokenId,
           bidid: id,
         };
@@ -644,12 +646,12 @@ const CommunicationFilesForm = () => {
       else if (previewForEdit === "" && file !== "") {
         const datatosend = {
           date: input.date,
-          refrenceno: input.refrence_no,
-          from: input.from,
-          to: input.to,
-          subject: input.subject,
-          medium: input.medium.value,
-          med_refrenceno: input.med_refrence_no,
+          refrenceno: input.refrence_no ? input.refrence_no.value :"",
+          from: input.from ? input.from :"",
+          to: input.to ? input.to :"",
+          subject: input.subject ? input.subject :"",
+          medium: input.medium ? input.medium :"",
+          med_refrenceno: input.med_refrence_no ? input.med_refrence_no :"",
           tokenid: tokenId,
           bidid: id,
           file: file,

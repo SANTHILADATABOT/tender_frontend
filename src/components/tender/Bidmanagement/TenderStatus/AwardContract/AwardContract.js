@@ -117,25 +117,13 @@ const TechnicalEvalution = (props) => {
             if (res.data.status === 200) {
               setUploadDocId(res.data.mainId);
               setDateValue(res.data.date);
-              let des = res.data.description;
+              let des = res.data.description ? res.data.description:"";
               setDescription(des);
               competid = res.data.competitorId;
               setcompetitorid(res.data.competitorId);
               setisEditbtn(true);
               SelectList();
-              // res.data.result.map((bidders) => {
-              //   setInput((prev) => {
-              //     return {
-              //       ...prev,
-              //       [bidders.competitorId]: {
-              //         [bidders.competitorId + "status"]: bidders.qualifiedStatus,
-              //         [bidders.competitorId + "reason"]: bidders.reason
-              //           ? bidders.reason
-              //           : "",
-              //       },
-              //     };
-              //   });
-              // });
+             
               axios({
                 url: `${baseUrl}/api/tenderstatus/awardontract/download/${bidManageMainId}`,
                 method: "GET",
@@ -543,7 +531,7 @@ const TechnicalEvalution = (props) => {
                       ? "btn btn-outline-primary rounded-pill px-4"
                       : "btn btn-primary rounded-pill px-4"
                   }
-                  disabled={!formIsValid || isDatasending || FetchLoading}
+                  disabled={ props.tenderStatus ==="Cancel"  || (!formIsValid || isDatasending || FetchLoading)}
                 >
                   {isDatasending && (
                     <span className="spinner-border spinner-border-sm mr-2"></span>
@@ -559,8 +547,8 @@ const TechnicalEvalution = (props) => {
                       ? "btn btn-outline-primary rounded-pill px-4"
                       : "btn btn-primary rounded-pill px-4"
                   }
-                  disabled={
-                    (formIsValid || isDatasending || FetchLoading) && !isEdited
+                  disabled={ props.tenderStatus ==="Cancel"  || 
+                    ((formIsValid || isDatasending || FetchLoading) && !isEdited)
                   }
                 >
                   {isDatasending && (

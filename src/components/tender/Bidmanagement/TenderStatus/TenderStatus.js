@@ -20,12 +20,17 @@ const TenderStatus = () => {
     let tokenId = localStorage.getItem("token");
     const { id } = useParams();
     const [seed, setSeed] = useState(1);
+    const [isAwarded, setIsAwarded] = useState('false');
     const [tenderStatus, settenderStatus] = useState(null)
     const [FetchLoading, setFetchLoading] = useState(false)
 
     useEffect(() => {
-        // getBidders();
-    }, []);
+      if(bidManageMainId)
+      {
+        getTenderAwardedBidder();
+      }
+        
+    }, [bidManageMainId]);
 
     useEffect(() => {
       if(id) {
@@ -40,23 +45,31 @@ const TenderStatus = () => {
         if(resp.data.status === 200){
           // console.log(resp.data.BidManagementTenderOrBidStaus)
           settenderStatus(resp.data.BidManagementTenderOrBidStaus.status);
+        
         }
         setFetchLoading(false)
       })
     }
 
 
-    // const getBidders = () =>
-    // {
-    //   axios.get(`${baseUrl}/api/tenderstatus/getbidder/${bidManageMainId}`).then((response)=>{
+    const getTenderAwardedBidder = () =>
+    {
+      axios.get(`${baseUrl}/api/tenderstatus/awardcontract/${bidManageMainId}`).then((response)=>{
         
-    //     if(response.data.status===200)
-    //     {
-    //       setStatus(response.data.bidders.tenderstatus);
-    //     }
-    //     });  
-    // }
-
+        if(response.data.status===200 && response.data.result.bidid === id)
+        {          
+            // console.log("If",response.data.result);
+            setIsAwarded(true);
+          
+        }
+        else{
+          setIsAwarded(false);
+          // console.log("Else",response.data.result);
+        }
+        });  
+    }
+    
+    
   const updateTenderStatus = () =>{
         setLoading(true);
         let data = {
@@ -105,6 +118,7 @@ const reloadFunction = () => {
     setSeed(Math.random());
 }
 
+
   return (
     <Fragment>
     <div className="formContent">
@@ -136,7 +150,7 @@ const reloadFunction = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="bidders">
           <div className="card-header">
-            <Bidders key={seed} reloadFunction={reloadFunction}/>
+            <Bidders key={seed} reloadFunction={reloadFunction} tenderStatus={tenderStatus}/>
           </div>
         </div>
       </div>
@@ -157,7 +171,7 @@ const reloadFunction = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="technicalEvaluation">
           <div className="card-header">
-            <TechnicalEvalution key={seed} reloadFunction={reloadFunction}/>
+            <TechnicalEvalution key={seed} reloadFunction={reloadFunction} tenderStatus={tenderStatus} />
           </div>
         </div>
       </div>
@@ -177,7 +191,7 @@ const reloadFunction = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="financialevaluation">
           <div className="card-header">
-            <FinancialEvalution key={seed} reloadFunction={reloadFunction}/>
+            <FinancialEvalution key={seed} reloadFunction={reloadFunction} tenderStatus={tenderStatus} />
           </div>
         </div>
       </div>
@@ -198,7 +212,7 @@ const reloadFunction = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="awardcontract">
           <div className="card-header">
-            <AwardContract key={seed} reloadFunction={reloadFunction} />
+            <AwardContract key={seed} reloadFunction={reloadFunction} tenderStatus={tenderStatus} />
           </div>
         </div>
       </div>
@@ -210,7 +224,7 @@ const reloadFunction = () => {
           {status === "Completed" ? "Tender Completed" 
           : status === "Cancelled" ? "Tender Cancelled" : "If Tender Cancelled Click Here"}
           </label> */}
-
+{!isAwarded &&
           <button className={`btn 
             ${tenderStatus === 'Cancel' && 'btn-danger'}
             ${tenderStatus==='Retender' && 'btn-warning'}
@@ -229,7 +243,7 @@ const reloadFunction = () => {
             {(!tenderStatus && !FetchLoading) && 'Cancel/Retender'}
 
 
-          </button>
+          </button> }
         </div>
 
         <div className="col-lg-6"> 
