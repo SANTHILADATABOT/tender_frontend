@@ -193,12 +193,17 @@ const TechnicalEvalution = (props) => {
           if (response.data.bidders.length > 0) {
             setNotHasList(false);
           }
-
+          let i=0;
           response.data.bidders.map((option, index) => {
+            
             if (competid) {
               if (option.competitorId == competid) {
                 setleastcount(option.least);
                 setidvalue(option.competitorId);
+              }
+              if(option.least)
+              {
+                i++;
               }
             } else {
               if (option.least === "L1") {
@@ -207,8 +212,11 @@ const TechnicalEvalution = (props) => {
                 setidvalue(cid);
               }
             }
-            if (!option.least) {
+            if (!option.least && i===0) {
               setNotHasList(true);
+            }
+            else if(i>0){
+              setNotHasList(false);
             }
           });
         }

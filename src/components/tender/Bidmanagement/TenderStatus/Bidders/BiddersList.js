@@ -66,8 +66,7 @@ const BiddersList = (props) => {
         // console.log(rowData)
         let rowData = prev[inpIndex];
         //##to reset isdisabled to false when option has changed
-        console.log(rowData.compId.value);
-        PreviousInputCompId = rowData.compId? rowData.compId.value:"";
+        PreviousInputCompId = rowData?.compId?.value;
         // console.log("PreviousInputCompId",PreviousInputCompId);
         if (PreviousInputCompId) {
           props.compList.forEach((value, index) => {
