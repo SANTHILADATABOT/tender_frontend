@@ -183,8 +183,8 @@ const TechnicalEvalution = (props) => {
       });
     });
 
-    setisEditbtn(false);
-    setUploadDocId(null);
+    // setisEditbtn(false);
+    // setUploadDocId(null);
   };
 
   let formIsValid = false;
@@ -335,7 +335,7 @@ const TechnicalEvalution = (props) => {
                 <div className="row ">
                   <div className="col-lg-4 text-dark font-weight-bold">
                     <label htmlFor="customername">
-                      Document Upload<span className="text-danger">&nbsp;*&nbsp;</span>:
+                      Document Upload :
                     </label>
                   </div>
                   <div className="col-lg-8">
@@ -351,7 +351,7 @@ const TechnicalEvalution = (props) => {
               <div className="inputgroup col-lg-6 mb-4">
                 <div className="row ">
                   <div className="col-lg-4 text-dark font-weight-bold">
-                    <label htmlFor="customername">Document Upload <span className="text-danger">&nbsp;*&nbsp;</span> :</label>
+                    <label htmlFor="customername">Document Upload :</label>
                   </div>
                   <div className="col-lg-8">
                     <div
@@ -423,7 +423,7 @@ const TechnicalEvalution = (props) => {
                       : "btn btn-primary rounded-pill px-4"
                   }
                   disabled={props.tenderStatus==='Cancel' ||
-                    (formIsValid || isDatasending || FetchLoading) && !isEdited
+                    (!formIsValid || isDatasending || FetchLoading) && !isEdited
                   }
                 >
                   {isDatasending && (
