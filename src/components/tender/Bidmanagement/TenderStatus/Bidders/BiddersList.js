@@ -131,7 +131,7 @@ const BiddersList = (props) => {
 
   let results = [];
   useEffect(() => {
-    if (props.bidders > props.compList.length && !props.fetchedData) {
+    if (props.bidders > props.compList.length && props.fetchedData.length===0) {
       // toastError("No of Bidders is higher than No of Competitors");
       toastError(
         "Only " + `${props.compList.length}` + " Competitors are Available..!"
@@ -168,6 +168,7 @@ const BiddersList = (props) => {
             isDisabled={props.fetchedData.length > 0}
           ></Select>
         </div>
+        
         <div className="col-lg-3 text-left row ml-3">
           <div className="col-lg-5 mt-2 ">
             <label

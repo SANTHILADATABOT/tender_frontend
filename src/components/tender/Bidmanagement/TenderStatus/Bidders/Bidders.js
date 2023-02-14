@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import BiddersList from "./BiddersList";
 import PreLoader from "../../../../UI/PreLoader";
 import LockCard from "../../../../UI/LockCard";
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 
 
 const Bidders = (props) => {
@@ -153,6 +154,7 @@ const Bidders = (props) => {
     setLoading(true);
     setIsBtnClicked(true);
     // let tokenId = localStorage.getItem("token");
+    
     const datatosend = {
       bidid: parseInt(bidManageMainId),
       input: input,
@@ -263,10 +265,11 @@ const Bidders = (props) => {
     }
   };
 
+
   return (
     <Fragment>
       {/* <LockCard locked={props.tenderStatus==='Cancel'} text="Tender Cancelled" textClass="text-danger font-weight-bold h4"> */}
-      <PreLoader  loading= {props.tenderStatus!=='Cancel' && {FetchLoading}}>
+      <PreLoader  loading= {FetchLoading}>
         <div className="card-body mr-n5">
           <form>
             <div className="row align-items-center col-lg-12">
@@ -283,11 +286,11 @@ const Bidders = (props) => {
                       type="text"
                       className="form-control"
                       id="bidders"
-                      placeholder="Enter Competitor Strength"
+                      placeholder={compList.length > 0 ? `${compList.length}`+ " Competitor Available": ""}
                       name="bidders"
                       value={bidders}
                       onChange={textInputHandler}
-                      disabled={fetchedData.length > 0 || props.tenderStatus}
+                      disabled={fetchedData.length > 0 || props.tenderStatus || FetchLoading}
                     />
 
                     {hasError && (
