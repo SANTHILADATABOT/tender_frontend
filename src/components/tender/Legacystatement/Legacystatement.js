@@ -118,7 +118,7 @@ function Legacystatement() {
 		  NITdate:FormattedDate(item.nitdate),
 		  quality: (item.quality) ? item.quality.toLocaleString('en-IN') : '',
 		  projectvalue: (item.estprojectvalue) ? item.estprojectvalue.toLocaleString('en-IN') : '',
-		  status:'<span class="font-weight-bold" style="color:orange;">Status</span>',
+		  status:`<span class="font-weight-bold" style="color:orange;">${item.tenderStatus}</span>`,
 		  action:`
 		  <i class="fa fa-print text-info mr-2 h6" style="cursor:pointer; font-size: 1.25rem" title="Print"></i>`,
 		//   <i class="fas fa-edit text-success mx-2 h6" style="cursor:pointer" title="Edit"></i> 
@@ -193,7 +193,7 @@ function Legacystatement() {
 						<div className="card shadow mb-4 pt-2">
 							<div className="card-body">
 								<div className="row d-flex">
-									<div className="col-sm-3 row d-flex align-items-center mb-4">
+									<div className="col-sm-4 row d-flex align-items-center mb-4">
 										<div className="col-lg-3 text-dark font-weight-bold">
 											<label htmlFor="From">From :</label>
 										</div>
@@ -210,7 +210,7 @@ function Legacystatement() {
 											/>
 										</div>
 									</div>
-									<div className="col-sm-3 row d-flex align-items-center mb-4">
+									<div className="col-sm-4 row d-flex align-items-center mb-4">
 										<div className="col-lg-3 text-dark font-weight-bold">
 											<label htmlFor="From">To :</label>
 										</div>
@@ -227,7 +227,7 @@ function Legacystatement() {
 											/>
 										</div>
 									</div>
-									<div className="col-sm-3 row d-flex align-items-center mb-4">
+									<div className="col-sm-4 row d-flex align-items-center mb-4">
 										<div className="col-lg-3 text-dark font-weight-bold">
 											<label htmlFor="Status">Status :</label>
 										</div>
@@ -249,7 +249,7 @@ function Legacystatement() {
 											></Select>
 										</div>
 									</div>
-									<div className="col-sm-3 row d-flex align-items-center mb-4">
+									<div className="col-sm-4 row d-flex align-items-center mb-4">
 										<div className="col-lg-3 text-dark font-weight-bold">
 											<label htmlFor="state">State :</label>
 										</div>
@@ -271,7 +271,7 @@ function Legacystatement() {
 											></Select>
 										</div>
 									</div>
-									<div className="col-sm-3 row d-flex align-items-center mb-4">
+									<div className="col-sm-4 row d-flex align-items-center mb-4">
 										<div className="col-lg-3 text-dark font-weight-bold">
 											<label htmlFor="typeofproject">Type of project :</label>
 										</div>
@@ -293,7 +293,7 @@ function Legacystatement() {
 											></Select>
 										</div>
 									</div>
-									<div className="col-sm-3 row d-flex align-items-center mb-4">
+									<div className="col-sm-4 row d-flex align-items-center mb-4">
 										<div className="col-lg-4 text-dark font-weight-bold">
 											<label htmlFor="typeofcustomer">Type of customer :</label>
 										</div>
@@ -334,7 +334,7 @@ function Legacystatement() {
 											</div>
 										</div>
 									</div>
-									<div className="col-sm-3 row d-flex align-items-center mb-4">
+									<div className="col-sm-4 row d-flex align-items-center mb-4">
 										<div className="col-lg-4 text-dark font-weight-bold">
 											<label htmlFor="tenderparticipation">Tender Participation :</label>
 										</div>
