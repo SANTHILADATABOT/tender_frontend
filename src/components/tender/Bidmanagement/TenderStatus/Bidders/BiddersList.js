@@ -130,15 +130,15 @@ const BiddersList = (props) => {
   };
 
   let results = [];
-  useEffect(() => {
-    if (props.bidders > props.compList.length && props.fetchedData.length===0) {
-      // toastError("No of Bidders is higher than No of Competitors");
-      toastError(
-        "Only " + `${props.compList.length}` + " Competitors are Available..!"
-      );
-      props.setBidders("");
-    }
-  }, [props.bidders]);
+  // useEffect(() => {
+  //   if (props.bidders > props.compList.length && props.fetchedData.length===0) {
+  //     // toastError("No of Bidders is higher than No of Competitors");
+  //     toastError(
+  //       "Only " + `${props.compList.length}` + " Competitors are Available..!"
+  //     );
+  //     props.setBidders("");
+  //   }
+  // }, [props.bidders]);
 
   Object.keys(props.input).forEach((key, index) => {
     results.push(

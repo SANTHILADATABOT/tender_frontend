@@ -9,7 +9,6 @@ import PreLoader from "../../../../UI/PreLoader";
 import LockCard from "../../../../UI/LockCard";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
 
-
 const Bidders = (props) => {
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
     useOutletContext();
@@ -55,7 +54,7 @@ const Bidders = (props) => {
                   ? { value: x.value, label: x.label }
                   : null
               ),
-              status: bidders.acceptedStatus? bidders.acceptedStatus:"",
+              status: bidders.acceptedStatus ? bidders.acceptedStatus : "",
               reason: bidders.reason ? bidders.reason : "",
             },
           };
@@ -108,7 +107,6 @@ const Bidders = (props) => {
 
   const textInputHandler = (e) => {
     setInput(""); //it will reset previously created Set
-    setBidders(e.target.value);
     if (
       e.target.value !== "" &&
       e.target.value.match(/^[0-9]*$/) &&
@@ -117,10 +115,17 @@ const Bidders = (props) => {
     ) {
       getCompetitorList();
       //to create input state based in user input
-      if (bidders > compList.length) {
-        // toastError("No of Bidders is higher than No of Competitors");
+      // console.log(
+      //   "e.target.value > compList.length",
+      //   e.target.value + "-" + compList.length
+      // );
+      if (
+        e.target.value &&
+        compList.length &&
+        e.target.value > compList.length
+      ) {
         toastError(
-          "Only " + `${compList.length}` + " Competitors are Available..!"
+          "Maximum No of Competitors in List is " + `${compList.length}`
         );
         setBidders("");
       } else {
@@ -130,7 +135,7 @@ const Bidders = (props) => {
               return {
                 ...prev,
                 [i]: {
-                  compId: [null],
+                  compId: null,
                   status: "",
                   reason: "",
                 },
@@ -142,6 +147,7 @@ const Bidders = (props) => {
 
       setFormIsValid(true);
       setHasError(false);
+      setBidders(e.target.value);
     } else {
       setBidders("");
       setHasError(true);
@@ -154,7 +160,7 @@ const Bidders = (props) => {
     setLoading(true);
     setIsBtnClicked(true);
     // let tokenId = localStorage.getItem("token");
-    
+
     const datatosend = {
       bidid: parseInt(bidManageMainId),
       input: input,
@@ -265,11 +271,15 @@ const Bidders = (props) => {
     }
   };
 
+  // console.log("fetchedData.length > 0",fetchedData.length > 0)
+  // console.log("props.tenderStatus",props.tenderStatus)
+  // console.log("FetchLoading",FetchLoading)
+  // console.log("bidders",bidders)
 
   return (
     <Fragment>
       {/* <LockCard locked={props.tenderStatus==='Cancel'} text="Tender Cancelled" textClass="text-danger font-weight-bold h4"> */}
-      <PreLoader  loading= {FetchLoading}>
+      <PreLoader loading={FetchLoading}>
         <div className="card-body mr-n5">
           <form>
             <div className="row align-items-center col-lg-12">
@@ -286,11 +296,19 @@ const Bidders = (props) => {
                       type="text"
                       className="form-control"
                       id="bidders"
-                      placeholder={compList.length > 0 ? `${compList.length}`+ " Competitor Available": ""}
+                      placeholder={
+                        compList.length > 0
+                          ? "Competitors in List - " + `${compList.length}`
+                          : ""
+                      }
                       name="bidders"
                       value={bidders}
                       onChange={textInputHandler}
-                      disabled={fetchedData.length > 0 || props.tenderStatus || FetchLoading}
+                      disabled={
+                        fetchedData.length > 0 ||
+                        props.tenderStatus ||
+                        FetchLoading
+                      }
                     />
 
                     {hasError && (
@@ -325,8 +343,10 @@ const Bidders = (props) => {
               <div className="col-lg-2">
                 <button
                   className="btn btn-primary"
-                  disabled={(props.tenderStatus ==='Cancel' || ( !formIsValid || isBtnClicked === true)  &&
-                    isEdited === false)
+                  disabled={
+                    props.tenderStatus === "Cancel" ||
+                    ((!formIsValid || isBtnClicked === true) &&
+                      isEdited === false)
                   }
                   onClick={!edit ? submitHandler : updateHandler}
                 >
