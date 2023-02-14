@@ -37,25 +37,28 @@ const TechnicalEvalution = (props) => {
 
   const [DateValue, setDateValue] = useState("");
   const [Description, setDescription] = useState("");
-
+  const [leastHasError, setLeastHasError] = useState("");
   const [DateHasError, setDateHasError] = useState("");
+  
+
+
   function DateChangeHandler(e) {
     setDateValue(e.target.value);
-    if (!e.target.value) {
-      setDateHasError(true);
-    } else {
-      setDateHasError(false);
+    // if (!e.target.value) {
+    //   setDateHasError(true);
+    // } else {
+    //   setDateHasError(false);
       setisEdited(true);
-    }
+    // }
   }
   function desChangeHandler(e) {
     setDescription(e.target.value);
-    if (!e.target.value) {
-      setDateHasError(true);
-    } else {
-      setDateHasError(false);
+    // if (!e.target.value) {
+    //   setDateHasError(true);
+    // } else {
+    //   setDateHasError(false);
       setisEdited(true);
-    }
+    // }
   }
 
   const onDragEnter = () => {
@@ -116,14 +119,14 @@ const TechnicalEvalution = (props) => {
           .then((res) => {
             if (res.data.status === 200) {
               setUploadDocId(res.data.mainId);
-              setDateValue(res.data.date);
-              let des = res.data.description ? res.data.description:"";
-              setDescription(des);
+              setDateValue(res.data.date? res.data.date :"");
+              let des = res.data.description ? res.data.description : "";
+              setDescription(des?des:"");
               competid = res.data.competitorId;
               setcompetitorid(res.data.competitorId);
               setisEditbtn(true);
               SelectList();
-             
+
               axios({
                 url: `${baseUrl}/api/tenderstatus/awardontract/download/${bidManageMainId}`,
                 method: "GET",
@@ -217,8 +220,17 @@ const TechnicalEvalution = (props) => {
   const SettingLeast = (least) => {
     setleastcount(least);
   };
+
   const OnSelect = (option, least) => {
-    let id = option.value;
+    let id = null;
+
+    if (option && least) {
+     id = option.value;
+     setLeastHasError(false);
+    }
+    else{
+      setLeastHasError(true);
+    }
     setleastcount(least);
     setidvalue(id);
   };
@@ -229,7 +241,7 @@ const TechnicalEvalution = (props) => {
       key: option.least,
     };
   });
-
+  
   useEffect(() => {
     if (isEdited) setisEdited(true);
   }, [DateValue, file]);
@@ -375,15 +387,15 @@ const TechnicalEvalution = (props) => {
       <PreLoader loading={FetchLoading}>
         <form onSubmit={submitHandler} encType="multipart/form-data">
           <div className="row align-items-baseline">
-            <div className="inputgroup col-lg-6 mb-4 ">
-              <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
-                  <label htmlFor="Date" className="pr-3">
-                    Contract Awarded To{" "}
+            <div className="inputgroup col-lg-7 mb-4 ">
+              <div className="row  font-weight-bold">
+                <div className="col-lg-5 text-dark align-items-center">
+                  <label htmlFor="contractaward" className="pt-2">
+                    Contract Awarded To
                     <span className="text-danger">&nbsp;*&nbsp;</span>:
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7 justify-content-md-center">
                   <Select
                     name="contractaward"
                     id="contractaward"
@@ -396,28 +408,31 @@ const TechnicalEvalution = (props) => {
                         leastbidder_options.key == leastcount
                     )}
                     onChange={(leastbidder_options) =>
-                      OnSelect(leastbidder_options, leastbidder_options.key)
+                      leastbidder_options
+                        ? OnSelect(leastbidder_options, leastbidder_options.key)
+                        : OnSelect(null, null)
                     }
                   ></Select>
-                  {DateHasError && (
+                  {leastHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
-                        Date is required
+                        This field is required..!
                       </span>
                     </div>
                   )}
                 </div>
+                <div className="col-lg-1"></div>
               </div>
             </div>
-            <div className="inputgroup col-lg-6 mb-4 ">
-              <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
-                  <label htmlFor="Date" className="pr-3">
-                    Contract Awarded Date{" "}
-                    <span className="text-danger">&nbsp;*&nbsp;</span>:
+            <div className="inputgroup col-lg-5 mb-4 ">
+              <div className="row font-weight-bold">
+                <div className="col-lg-5 text-dark align-items-center">
+                  <label htmlFor="Date"  className="pt-2">
+                    Contract Awarded Date{" "} 
+                    {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */} :
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7 align-items-left">
                   <input
                     type="Date"
                     className="form-control"
@@ -426,16 +441,15 @@ const TechnicalEvalution = (props) => {
                     name="Date"
                     value={DateValue}
                     onChange={DateChangeHandler}
-                    // onBlur={DateBlurHandler}
                     disabled={false}
                   />
-                  {DateHasError && (
+                  {/* {DateHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
-                        Date is required
+                      This field is required..!
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -445,7 +459,7 @@ const TechnicalEvalution = (props) => {
                   <div className="col-lg-4 text-dark font-weight-bold">
                     <label htmlFor="customername">
                       Document Upload{" "}
-                      <span className="text-danger">&nbsp;*&nbsp;</span>:
+                      {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */} :
                     </label>
                   </div>
                   <div className="col-lg-8">
@@ -498,7 +512,7 @@ const TechnicalEvalution = (props) => {
                 <div className="col-lg-4 text-dark">
                   <label htmlFor="Date" className="pr-3">
                     AOC Description{" "}
-                    <span className="text-danger">&nbsp;*&nbsp;</span>:
+                    {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */} :
                   </label>
                 </div>
                 <div className="col-lg-8">
@@ -512,13 +526,13 @@ const TechnicalEvalution = (props) => {
                     value={Description}
                     onChange={desChangeHandler}
                   ></textarea>
-                  {DateHasError && (
+                  {/* {DateHasError && (
                     <div className="pt-1">
                       <span className="text-danger font-weight-normal">
                         Date is required
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -531,7 +545,12 @@ const TechnicalEvalution = (props) => {
                       ? "btn btn-outline-primary rounded-pill px-4"
                       : "btn btn-primary rounded-pill px-4"
                   }
-                  disabled={ props.tenderStatus ==="Cancel"  || (!formIsValid || isDatasending || FetchLoading)}
+                  disabled={
+                    props.tenderStatus === "Cancel" ||
+                    !formIsValid ||
+                    isDatasending ||
+                    FetchLoading
+                  }
                 >
                   {isDatasending && (
                     <span className="spinner-border spinner-border-sm mr-2"></span>
@@ -547,8 +566,10 @@ const TechnicalEvalution = (props) => {
                       ? "btn btn-outline-primary rounded-pill px-4"
                       : "btn btn-primary rounded-pill px-4"
                   }
-                  disabled={ props.tenderStatus ==="Cancel"  || 
-                    ((formIsValid || isDatasending || FetchLoading) && !isEdited)
+                  disabled={
+                    props.tenderStatus === "Cancel" ||
+                    ((formIsValid || isDatasending || FetchLoading) &&
+                      !isEdited)
                   }
                 >
                   {isDatasending && (
