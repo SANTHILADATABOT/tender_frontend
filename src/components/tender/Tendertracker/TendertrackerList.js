@@ -55,11 +55,11 @@ const TendertrackerList = (props) => {
                 { data: 'prebiddate' },
                 { data: 'submissiondate' },
             ],
-            // dom:
-            // //   "<'row'<'col-sm-12'l>>" +
-            //   "<'row'<'col-sm-12   col-md-6 pl-4'l>  <'col-sm-12 col-md-6 pr-4'f>>" +
-            //   "<'row'<'col-sm-12'tr>>" +
-            //   "<'row'<'col-sm-12 col-md-5 pl-4'i><'col-sm-12 col-md-7 pr-4'p>>",
+            dom:
+            //   "<'row'<'col-sm-12'l>>" +
+              "<'row'<'col-sm-12   col-md-6 pl-4'l>  <'col-sm-12 col-md-6 pr-4'f>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-5 pl-4'i><'col-sm-12 col-md-7 pr-4'p>>",
     
         })
     
@@ -119,7 +119,7 @@ const TendertrackerList = (props) => {
                         <thead className="text-center bg-gray-200 text-primary">
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Location Nmae</th>
+                                <th scope="col">Location Name</th>
                                 <th scope="col">State</th>
                                 <th scope="col">Quantity</th>
                                 <th scope="col">Unit</th>
