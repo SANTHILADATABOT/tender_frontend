@@ -112,7 +112,7 @@ const CommunicationFilesForm = () => {
       });
   };
   var imageurl = "";
-  console.log("iMGlIST :", ImgaeList);
+  // console.log("iMGlIST :", ImgaeList);
 
   FILELIST = ImgaeList.map((item, index) => {
     if (item.filetype == "pdf") {

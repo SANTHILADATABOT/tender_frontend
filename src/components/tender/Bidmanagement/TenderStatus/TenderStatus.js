@@ -20,7 +20,7 @@ const TenderStatus = () => {
     let tokenId = localStorage.getItem("token");
     const { id } = useParams();
     const [seed, setSeed] = useState(1);
-    const [isAwarded, setIsAwarded] = useState('false');
+    const [isAwarded, setIsAwarded] = useState(true);
     const [tenderStatus, settenderStatus] = useState(null)
     const [FetchLoading, setFetchLoading] = useState(false)
 
@@ -55,8 +55,7 @@ const TenderStatus = () => {
     const getTenderAwardedBidder = () =>
     {
       axios.get(`${baseUrl}/api/tenderstatus/awardcontract/${bidManageMainId}`).then((response)=>{
-        
-        if(response.data.status===200 && response.data.result.bidid === id)
+        if(response.data.status===200 && response?.data?.result?.bidid == id && response.data.competitorId)
         {          
             // console.log("If",response.data.result);
             setIsAwarded(true);
@@ -68,7 +67,6 @@ const TenderStatus = () => {
         }
         });  
     }
-    
     
   const updateTenderStatus = () =>{
         setLoading(true);
@@ -241,8 +239,6 @@ const reloadFunction = () => {
             {tenderStatus==='Cancel' && 'Cancelled'}
             {tenderStatus==='Retender' && 'Retender'}
             {(!tenderStatus && !FetchLoading) && 'Cancel/Retender'}
-
-
           </button> }
         </div>
 

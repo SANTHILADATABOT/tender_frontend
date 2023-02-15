@@ -113,10 +113,6 @@ const Bidders = (props) => {
     ) {
       getCompetitorList();
       //to create input state based in user input
-      // console.log(
-      //   "e.target.value > compList.length",
-      //   e.target.value + "-" + compList.length
-      // );
       if (
         e.target.value &&
         compList.length &&
@@ -125,7 +121,6 @@ const Bidders = (props) => {
         toastError(
           "Maximum No of Competitors in List is " + `${compList.length}`
         );
-        console.log("Line 130");
         setBidders("");
       } else {
         if (!edit && fetchedData.length === 0) {
@@ -146,10 +141,8 @@ const Bidders = (props) => {
 
       setFormIsValid(true);
       setHasError(false);
-      console.log("Line 151");
       setBidders(e.target.value);
     } else {
-      console.log("Line 154");
       setBidders("");
       setHasError(true);
       setFormIsValid(false);
@@ -272,10 +265,6 @@ const Bidders = (props) => {
     }
   };
 
-  // console.log("fetchedData.length > 0",fetchedData.length > 0)
-  // console.log("props.tenderStatus",props.tenderStatus)
-  // console.log("FetchLoading",FetchLoading)
-  // console.log("bidders",bidders)
 
   return (
     <Fragment>

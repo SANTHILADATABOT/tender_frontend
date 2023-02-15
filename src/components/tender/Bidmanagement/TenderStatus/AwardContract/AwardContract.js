@@ -38,9 +38,8 @@ const TechnicalEvalution = (props) => {
   const [DateValue, setDateValue] = useState("");
   const [Description, setDescription] = useState("");
   const [leastHasError, setLeastHasError] = useState("");
-  const [DateHasError, setDateHasError] = useState("");
-  
-
+  const [DateHasError, setDateHasError] = useState(true);
+  // const [hasError, setHasError] = useState("");
 
   function DateChangeHandler(e) {
     setDateValue(e.target.value);
@@ -48,7 +47,7 @@ const TechnicalEvalution = (props) => {
     //   setDateHasError(true);
     // } else {
     //   setDateHasError(false);
-      setisEdited(true);
+    setisEdited(true);
     // }
   }
   function desChangeHandler(e) {
@@ -57,7 +56,7 @@ const TechnicalEvalution = (props) => {
     //   setDateHasError(true);
     // } else {
     //   setDateHasError(false);
-      setisEdited(true);
+    setisEdited(true);
     // }
   }
 
@@ -119,9 +118,10 @@ const TechnicalEvalution = (props) => {
           .then((res) => {
             if (res.data.status === 200) {
               setUploadDocId(res.data.mainId);
-              setDateValue(res.data.date? res.data.date :"");
+              setDateValue(res.data.date ? res.data.date : "");
               let des = res.data.description ? res.data.description : "";
-              setDescription(des?des:"");
+              setDescription(des ? des : "");
+
               competid = res.data.competitorId;
               setcompetitorid(res.data.competitorId);
               setisEditbtn(true);
@@ -192,33 +192,37 @@ const TechnicalEvalution = (props) => {
 
           if (response.data.bidders.length > 0) {
             setNotHasList(false);
+
+            // console.log("In IF competid",competid);
+
+            let i = 0;
+
+            response.data.bidders.map((option, index) => {
+              if (competid) {
+                if (option.competitorId == competid) {
+                  setleastcount(option.least);
+                  setidvalue(option.competitorId);
+                }
+                if (option.least) {
+                  i++;
+                }
+              } else {
+                if (option.least === "L1") {
+                  // document.getElementById("com_id2").setAttribute("value",option.competitorId);
+                  let cid = option.competitorId;
+                  i++;
+                  setidvalue(cid);
+                } else if (option.least) {
+                  i++;
+                }
+              }
+              if (!option.least && i === 0) {
+                setNotHasList(true);
+              } else if (i > 0) {
+                setNotHasList(false);
+              }
+            });
           }
-          let i=0;
-          response.data.bidders.map((option, index) => {
-            
-            if (competid) {
-              if (option.competitorId == competid) {
-                setleastcount(option.least);
-                setidvalue(option.competitorId);
-              }
-              if(option.least)
-              {
-                i++;
-              }
-            } else {
-              if (option.least === "L1") {
-                // document.getElementById("com_id2").setAttribute("value",option.competitorId);
-                let cid = option.competitorId;
-                setidvalue(cid);
-              }
-            }
-            if (!option.least && i===0) {
-              setNotHasList(true);
-            }
-            else if(i>0){
-              setNotHasList(false);
-            }
-          });
         }
       });
     }
@@ -231,17 +235,27 @@ const TechnicalEvalution = (props) => {
 
   const OnSelect = (option, least) => {
     let id = null;
-
-    if (option && least) {
-     id = option.value;
-     setLeastHasError(false);
-    }
-    else{
-      setLeastHasError(true);
+    if (option ){
+    id = option.value;
+      if (id) {
+        setLeastHasError(false);
+      } else {
+        setLeastHasError(true);
+      }
+    } else {
+      if (option && !option.value) {
+        setLeastHasError(true);
+      }
+      else {
+        setLeastHasError(false);
+      }
     }
     setleastcount(least);
     setidvalue(id);
+    setisEdited(true);
   };
+  
+
   const leastbidder_options = leastbidder.map((option, index) => {
     return {
       label: option.compName,
@@ -251,8 +265,8 @@ const TechnicalEvalution = (props) => {
   });
   
   useEffect(() => {
-    if (isEdited) setisEdited(true);
-  }, [DateValue, file]);
+    if (isEdited) setisEdited(true); 
+  }, [DateValue, file, Description]);
 
   const resetform = () => {
     setDateValue("");
@@ -397,13 +411,13 @@ const TechnicalEvalution = (props) => {
           <div className="row align-items-baseline">
             <div className="inputgroup col-lg-7 mb-4 ">
               <div className="row  font-weight-bold">
-                <div className="col-lg-5 text-dark align-items-center">
+                <div className="col-lg-4 text-dark align-items-center">
                   <label htmlFor="contractaward" className="pt-2">
                     Contract Awarded To
                     <span className="text-danger">&nbsp;*&nbsp;</span>:
                   </label>
                 </div>
-                <div className="col-lg-7 justify-content-md-center">
+                <div className="col-lg-8 ml-0">
                   <Select
                     name="contractaward"
                     id="contractaward"
@@ -429,15 +443,16 @@ const TechnicalEvalution = (props) => {
                     </div>
                   )}
                 </div>
-                <div className="col-lg-1"></div>
               </div>
+              <div className="col-lg-1"></div>
             </div>
             <div className="inputgroup col-lg-5 mb-4 ">
               <div className="row font-weight-bold">
                 <div className="col-lg-5 text-dark align-items-center">
-                  <label htmlFor="Date"  className="pt-2">
-                    Contract Awarded Date{" "} 
-                    {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */} :
+                  <label htmlFor="Date" className="pt-2">
+                    Contract Awarded Date{" "}
+                    {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */}{" "}
+                    :
                   </label>
                 </div>
                 <div className="col-lg-7 align-items-left">
@@ -467,7 +482,8 @@ const TechnicalEvalution = (props) => {
                   <div className="col-lg-4 text-dark font-weight-bold">
                     <label htmlFor="customername">
                       Document Upload{" "}
-                      {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */} :
+                      {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */}{" "}
+                      :
                     </label>
                   </div>
                   <div className="col-lg-8">
@@ -480,14 +496,14 @@ const TechnicalEvalution = (props) => {
               </div>
             )}
             {file === null && (
-              <div className="inputgroup col-lg-6 mb-4">
+              <div className="inputgroup col-lg-7 mb-4">
                 <div className="row ">
                   <div className="col-lg-4 text-dark font-weight-bold">
                     <label htmlFor="customername">Document Upload :</label>
                   </div>
-                  <div className="col-lg-8">
+                  <div className="col-lg-8 ">
                     <div
-                      className={`border-primary d-flex flex-column align-items-center justify-content-center   bg-gray-200 ${styles.height_of_dropbox} ${styles.boderradius__dropbox} ${styles.dashed} ${styles.drop_file_input} `}
+                      className={`border-primary d-flex flex-column align-items-center justify-content-center   bg-gray-200  ${styles.height_of_dropbox} ${styles.boderradius__dropbox} ${styles.dashed} ${styles.drop_file_input} `}
                       ref={wrapperRef}
                       onDragEnter={onDragEnter}
                       onDragLeave={onDragLeave}
@@ -510,17 +526,18 @@ const TechnicalEvalution = (props) => {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-6">&nbsp;</div>
+                <div className="col-lg-5">&nbsp;</div>
               </div>
             )}
-            <div className="inputgroup col-lg-6 mb-4 "></div>
+            <div className="inputgroup col-lg-1 mb-4 "></div>
 
-            <div className="inputgroup col-lg-6 mb-4 ">
+            <div className="inputgroup col-lg-7 mb-4 ">
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
                   <label htmlFor="Date" className="pr-3">
                     AOC Description{" "}
-                    {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */} :
+                    {/* <span className="text-danger">&nbsp;*&nbsp;</span>: */}{" "}
+                    :
                   </label>
                 </div>
                 <div className="col-lg-8">
