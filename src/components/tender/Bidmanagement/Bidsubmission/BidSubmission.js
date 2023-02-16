@@ -6,7 +6,7 @@ import TenderFee from "./TenderFee/TenderFee";
 import EMD from "./EMD/EMD";
 
 const BidSubmission = () => {
-    const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId ] = useOutletContext();
+    const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId, istenderParticipated ] = useOutletContext();
     const { id } = useParams();
     useEffect(() => {
         if(id) {
@@ -16,10 +16,11 @@ const BidSubmission = () => {
 
     return(
         <Fragment>
-            <TenderFee/>
-            <EMD/>
-            <BidSubmittedStatus/>
-            
+            <LockCard locked = {!istenderParticipated}>
+                <TenderFee/>
+                <EMD/>
+                <BidSubmittedStatus/>
+            </LockCard>
         </Fragment>
     )
 }
