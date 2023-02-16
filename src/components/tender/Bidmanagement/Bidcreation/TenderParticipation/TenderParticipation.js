@@ -14,7 +14,7 @@ const TenderParticipation = () => {
     const { id } = useParams();
     const [FetchLoading, setFetchLoading] = useState(false);
     const [isdatasending, setdatasending] = useState(false);
-    const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId ] = useOutletContext();
+    const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId, istenderParticipated, setTenderParticipated ] = useOutletContext();
     const { server1: baseUrl } = useBaseUrl();
     const [formId, setFormId] = useState(0);
     
@@ -60,6 +60,12 @@ const TenderParticipation = () => {
         
         toastSuccess(resp.data.message)
         setFormId(resp.data.id)
+
+        if(data.bidcreationData.tenderParticipation.value === 'participating'){
+          setTenderParticipated(true)
+        }else{
+          setTenderParticipated(false)
+        }
         // resetall()
         // window.history.replaceState({},"Bid Creation", "/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
         // navigate("/tender/bidmanagement/list/main/bidcreationmain/"+resp.data.id);
@@ -83,6 +89,12 @@ const TenderParticipation = () => {
   
         if (resp.data.status === 200) {
           toastSuccess(resp.data.message)
+        
+          if(data.bidcreationData.tenderParticipation.value === 'participating'){
+            setTenderParticipated(true)
+          }else{
+            setTenderParticipated(false)
+          }
         }else {
           toastError("Something went wrong!")
         }

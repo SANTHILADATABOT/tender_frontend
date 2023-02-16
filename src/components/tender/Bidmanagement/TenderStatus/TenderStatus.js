@@ -196,7 +196,7 @@ const reloadFunction = () => {
 
 
          {/* Award of Contract Form */}
-      <div className="card mb-2  ">
+      <div className="card shadow mb-2  ">
         <a
           href="#awardcontract"
           className="d-block card-header py-3 bg-white "

@@ -48,7 +48,7 @@ const BidManagementList = (props) => {
                 { data: 'unit' },
                 { data: 'submissiondate' },
                 { data: 'status' },
-                { data: 'current_stage' },
+                // { data: 'current_stage' },
                 { data: 'action' },
             ],
             dom:
@@ -138,7 +138,7 @@ const BidManagementList = (props) => {
                                 <th scope="col">Unit</th>
                                 <th scope="col">Submission Date</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Current Stage</th>
+                                {/* <th scope="col">Current Stage</th> */}
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
