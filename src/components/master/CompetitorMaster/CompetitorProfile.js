@@ -5,7 +5,8 @@ import { useEffect } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
-import { useNavigate, useParams } from "react-router-dom";
+import {useOutletContext, useNavigate, useParams } from "react-router-dom";
+
 
 const registrationTypeList = [
   { value: 0, label: "Registered" },
@@ -30,6 +31,9 @@ const companyTypeList = [
 const CompetitorProfile = () => {
   const { id } = useParams();
   usePageTitle("Competitor Creation");
+  const [ competitorId, setCompetitorId] = useOutletContext();
+  
+console.log("competitorId Profile",competitorId);
 
   const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
@@ -118,7 +122,10 @@ const CompetitorProfile = () => {
   });
   
   useEffect(() => {
-    if (id) {editCompetitor();};
+    if (id) {
+      editCompetitor();
+      setCompetitorId(id);
+    };
     getCountryList();
   }, []);
 

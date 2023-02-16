@@ -7,6 +7,7 @@ const CompetitorTab = () => {
   usePageTitle("Competitor Creation");
   const { id } = useParams();
 const [competitorId,setCompetitorId]=useState(0);
+
  //assigning location variable
  const location = useLocation();
 
@@ -17,13 +18,12 @@ const [competitorId,setCompetitorId]=useState(0);
  const activeTab = pathname.split("/");
  
 useEffect(() => {
+  console.log("competitorId Outlet",id);
   {id ? setCompetitorId(id): setCompetitorId(0) }
 }, []);
 
 
-
-  return (
-      
+  return (     
     <Fragment>
       <div className="container-fluid p-0">
         <div className="row">
@@ -70,7 +70,7 @@ useEffect(() => {
                       role="tabpanel"
                       aria-labelledby="home-tab"
                     >
-                      <Outlet  competitorId/>
+                      <Outlet context={[ competitorId, setCompetitorId ]}/>
                     </div>
                     
                   </div>

@@ -15,16 +15,21 @@ const WorkOrderUploadFile = (props) => {
       // setPreview(objectUrl);
   
       const objectUrl = URL.createObjectURL(props.file);
-      setPreview(objectUrl); 
+      setPreview(objectUrl);
+      // let link = document.createElement('a');
+      // var fileExt =props.file.type.split("/")[0]
+      // link.download = 'LetterOfAcceptence'.fileExt;
+      // let blob = new Blob([props.file], {type: props.file.type});
+      // link.href = URL.createObjectURL(blob);  
+      // link.click();
+
+
+  
 
       // free memory when ever this component is unmounted
       return () => URL.revokeObjectURL(objectUrl);
     
   }, [props.file]);
-
-const onDelete = () =>{
-  props.setFile("");
-}
 
   return (
     <Fragment>
@@ -38,7 +43,7 @@ const onDelete = () =>{
                 </div>
                 <div className="row no-gutters align-items-center ">
                   <div className="col-auto">
-                    <div className="h6 mb-0 mr-4 font-weight-bold text-gray-800 ">
+                    <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
                      
                       <p className="text-truncate" title={props.file.name}>
                           {props.file.name}
@@ -48,8 +53,8 @@ const onDelete = () =>{
                   </div>
                 </div>
               </div>
+              <div className="col-md-2 d-flex align-items-center justify-content-center">
                 {preview && (
-                   <div className="col-md-2 d-flex align-items-center justify-content-center ml-n3">
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
@@ -59,13 +64,9 @@ const onDelete = () =>{
                     height="75px"
                     onClick={() => window.open(preview, "_blank")}
                     title="Click for Preview"
-                  /> 
-                  <div className="pointer fa fa-close text-danger h5 closebtn mt-3 ml-1" onClick={onDelete}
-                ></div>
-                </div>
+                  />
                 )}
                 {!preview && (
-                   <div className="col-md-2 d-flex align-items-center justify-content-center ml-n3">
                   <img
                     src={
                       ImageConfig[props.file.type.split("/")[1]] ||
@@ -77,16 +78,12 @@ const onDelete = () =>{
                     onClick={() => window.open(preview, "_blank")}
                     title="Click for Preview13"
                   />
-                  <div className="pointer fa fa-close text-danger h5 closebtn mt-3 ml-1" onClick={onDelete}
-                ></div>
-</div>
                 )}
-
-    
+                {/* <i className="fas fa-clipboard-list fa-2x " /> */}
               </div>
             </div>
           </div>
-
+        </div>
       )}
     </Fragment>
   );
