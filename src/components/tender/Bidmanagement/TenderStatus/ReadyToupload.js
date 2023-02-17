@@ -16,7 +16,10 @@ const ReadyToUpload = (props) => {
         setPreview(objectUrl)
 
         // free memory when ever this component is unmounted
-        return () => URL.revokeObjectURL(objectUrl)
+        return () => URL.revokeObjectURL(objectUrl);
+
+
+
     }, [props.file])
 
     const downloadDoc = () => {

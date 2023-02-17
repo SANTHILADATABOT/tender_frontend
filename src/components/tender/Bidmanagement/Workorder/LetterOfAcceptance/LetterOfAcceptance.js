@@ -34,6 +34,8 @@ const LetterOfAcceptance = () => {
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const [FetchLoading, setFetchLoading] = useState(false);
+  const [fileName, setFileName] = useState("");
+
 
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
@@ -49,25 +51,33 @@ const LetterOfAcceptance = () => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
+    console.log("newFile",newFile);
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "File size too Large...?!",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
-        setFile(null);
+        // setFile(null);
       });
     } else if (newFile && !doctype.includes(newFile.type)) {
+      let len=(newFile.name.split(".")).length;
+      if(newFile.type==="" && newFile.name.split(".")[len-1] === "rar"){
+        setFile(newFile);     
+      }
+      else{
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
-        setFile(null);
+        // setFile(null);
       });
-    } else {
+    }
+  }
+    else {
       setFile(newFile);
     }
   };
@@ -162,8 +172,13 @@ const LetterOfAcceptance = () => {
     let response = await axios.get(
       `${baseUrl}/api/letteracceptance/creation/${id}`
     );
+    
     if (response.status === 200) {
       setletterofacceptanceForm(response);
+      setFileName(response.data.letterofaccepttance[0].wofile);
+    }
+    else{
+      setFileName("");
     }
   };
 
@@ -184,7 +199,13 @@ const LetterOfAcceptance = () => {
         url: `${baseUrl}/api/download/letterofacceptance/workorderimage/${id}`,
         method: "GET",
         responseType: "blob", // important
+        headers: {   //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
       }).then((response) => {
+        console.log("response", response)
         if (response.status === 200) {
             setWorkOrderImage(response);
         } 
@@ -274,7 +295,7 @@ const LetterOfAcceptance = () => {
     }
   };
 
-
+// console.log("Filename", fileName);
 
   return (
     <CollapseCard id={"LetterOfAcceptance"} title={"Letter Of Acceptance"}>
@@ -368,7 +389,7 @@ const LetterOfAcceptance = () => {
                 <label> Preview</label>
               </div>
               <div className="col-lg-8">
-                <LetterAcceptanceDoc file={file} setFile={setFile}/>
+                <LetterAcceptanceDoc file={file} setFile={setFile} fileName={fileName}/>
               </div>
             </div>
           </div>
