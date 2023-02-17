@@ -18,6 +18,7 @@ import {
 import axios from "axios";
 import Swal from "sweetalert2";
 import LetterAcceptanceDoc from "./LetterAcceptanceDocsupload";
+import PreLoader from "../../../../UI/PreLoader";
 
 const LetterOfAcceptance = () => {
   const { id } = useParams();
@@ -33,7 +34,7 @@ const LetterOfAcceptance = () => {
   const [toastSuccess, toastError] = useOutletContext();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
-  const [FetchLoading, setFetchLoading] = useState(false);
+  const [FetchLoading, setFetchLoading] = useState(true);
   const [fileName, setFileName] = useState("");
 
 
@@ -205,7 +206,6 @@ const LetterOfAcceptance = () => {
           'Expires': '0',
         },
       }).then((response) => {
-        console.log("response", response)
         if (response.status === 200) {
             setWorkOrderImage(response);
         } 
@@ -215,8 +215,8 @@ const LetterOfAcceptance = () => {
         else {
           alert("Unable to Process Now!");
         }
-        setFetchLoading(false);
       });
+      setFetchLoading(false);
     }
   };
 
@@ -299,6 +299,7 @@ const LetterOfAcceptance = () => {
 
   return (
     <CollapseCard id={"LetterOfAcceptance"} title={"Letter Of Acceptance"}>
+      <PreLoader loading={FetchLoading}>
       <form onSubmit={submitHandler}>
         <div className="row align-items-center ">
           <div className="inputgroup col-lg-6 mb-4">
@@ -417,6 +418,7 @@ const LetterOfAcceptance = () => {
           </div>
         </div>
       </form>
+      </PreLoader>
     </CollapseCard>
   );
 };
