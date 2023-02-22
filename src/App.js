@@ -49,6 +49,8 @@ import BidCreationMain from "./components/tender/Bidmanagement/Bidcreation/BidCr
 import BidSubmission from "./components/tender/Bidmanagement/Bidsubmission/BidSubmission";
 import TenderStatus from "./components/tender/Bidmanagement/TenderStatus/TenderStatus";
 import Workorder from "./components/tender/Bidmanagement/Workorder/Workorder";
+import CommunicationFilesView from "./components/master/CommunicationFiles/CommunicationFilesView";
+import CommunicationFilesCreation from "./components/master/CommunicationFiles/CommunicationFilesCreation";
 
 function App() {
   const authCtx = useContext(AuthContext);
@@ -232,6 +234,11 @@ function App() {
                   path="customersubcategorycreation/:id"
                   element={<CustSubCategMaster />}
                 />
+              </Route>
+              <Route path="communicationfiles" >
+                <Route index element={<CommunicationFilesView />} />
+                <Route path="communicationfilescreation" element={<CommunicationFilesCreation />}/>
+                <Route path="communicationfilescreation/:id" element={<CommunicationFilesCreation />}/>
               </Route>
             </Route>
           </Route>
