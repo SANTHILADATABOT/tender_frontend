@@ -16,10 +16,18 @@ const CompetitorDetails = () => {
   usePageTitle("Competitor Creation");
   const { compid } = useParams();
   const { server1: baseUrl } = useBaseUrl();
-  const setCompetitorId = useOutletContext();
+  const [ competitorId, setCompetitorId] = useOutletContext();
+
+// console.log("setCompetitorId ",setCompetitorId);
+console.log("competitorId Details",competitorId);
+
+useEffect(() => {
+  if (compid) {
+    setCompetitorId(compid);
+  };
+}, []);
 
 
-  
   return (
 
     <div className="formContent">

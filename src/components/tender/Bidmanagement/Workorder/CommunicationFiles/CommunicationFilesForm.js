@@ -14,10 +14,11 @@ import Select from "react-select";
 
 //Medium Options
 const options = [
-  { value: "By Postal", label: "By Postal" },
   { value: "Courier", label: "Courier" },
-  { value: "Parcel Service", label: "Parcel Service" },
-  { value: "In hand Delivery", label: "In hand Delivery" },
+  { value: "Mail", label: "Mail" },
+  { value: "Physical Handover", label: "Physical Handover" },
+  { value: "Registered Post", label: "Registered Post"},  
+  { value: "Whatsapp", label: "Whatsapp" },
 ];
 
 const CommunicationFilesForm = () => {
@@ -112,7 +113,7 @@ const CommunicationFilesForm = () => {
       });
   };
   var imageurl = "";
-  console.log("iMGlIST :", ImgaeList);
+  // console.log("iMGlIST :", ImgaeList);
 
   FILELIST = ImgaeList.map((item, index) => {
     if (item.filetype == "pdf") {
@@ -732,7 +733,7 @@ const CommunicationFilesForm = () => {
     const s = imagePreviews.filter((img) => img !== e);
     setImagePreviews(s);
   };
-  console.log("FILELIST :", FILELIST);
+  
   return (
     <Fragment>
       <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>

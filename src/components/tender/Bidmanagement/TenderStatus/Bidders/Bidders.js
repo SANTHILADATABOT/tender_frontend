@@ -43,7 +43,6 @@ const Bidders = (props) => {
   //set Fetched Data into input While loading if Bid Id has value
   useEffect(() => {
     if (edit && fetchedData.length > 0) {
-      setFetchLoading(true);
       fetchedData.map((bidders, index) => {
         setInput((prev) => {
           return {
@@ -77,19 +76,18 @@ const Bidders = (props) => {
         .get(`${baseUrl}/api/tenderstatusbidders/${bidManageMainId}`)
         .then((response) => {
           if (response.data.status === 200) {
-            setBidders(
-              response.data.bidders.length > 0
-                ? response.data.bidders.length
-                : ""
-            );
             if (response.data.bidders.length > 0) {
+              setBidders(response.data.bidders.length);
               setFetchedData(response.data.bidders);
               setEdit(true);
+            } else {
+              setFetchLoading(false);
             }
+          } else {
+            setFetchLoading(false);
           }
         });
     }
-    setFetchLoading(false);
   };
 
   const getCompetitorList = () => {
@@ -115,10 +113,6 @@ const Bidders = (props) => {
     ) {
       getCompetitorList();
       //to create input state based in user input
-      // console.log(
-      //   "e.target.value > compList.length",
-      //   e.target.value + "-" + compList.length
-      // );
       if (
         e.target.value &&
         compList.length &&
@@ -271,10 +265,6 @@ const Bidders = (props) => {
     }
   };
 
-  // console.log("fetchedData.length > 0",fetchedData.length > 0)
-  // console.log("props.tenderStatus",props.tenderStatus)
-  // console.log("FetchLoading",FetchLoading)
-  // console.log("bidders",bidders)
 
   return (
     <Fragment>
