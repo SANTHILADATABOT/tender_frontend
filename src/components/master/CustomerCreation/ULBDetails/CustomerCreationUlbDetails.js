@@ -66,9 +66,11 @@ const CustomerCreationUlbDetails = () => {
 
   let ulbdata = useSelector((state) => state.ulbdata.inputData)
   const dispatch = useDispatch();
-
+  
   const setPresentPopulation = () => {
-    if (input.population2011) {
+  let parsedInput = parseInt(input.population2011.replace(/,/g, ''));
+  
+    if (parsedInput) {
       let date = new Date();
       var currentYear = date.getFullYear();
       //Lastest census year = 2011;
@@ -82,7 +84,7 @@ const CustomerCreationUlbDetails = () => {
       //r- growth rate
 
       let currentPopulation = Math.round(
-        input.population2011 * (1 + 1 / 100) ** (currentYear - 2011)
+        parsedInput * (1 + 1 / 100) ** (currentYear - 2011)
       );
 
       setInput((prev) => {
@@ -456,7 +458,7 @@ const CustomerCreationUlbDetails = () => {
                     id="presentpopulation"
                     name="presentpopulation"
                     // value={ulbdata?.presentpopulation ? ulbdata.presentpopulation : input.presentpopulation}
-                    value={input.presentpopulation}
+                    value={!isNaN(input.presentpopulation)?input.presentpopulation:""}
                     onChange={inputHandler}
                     disabled={true}
                   />

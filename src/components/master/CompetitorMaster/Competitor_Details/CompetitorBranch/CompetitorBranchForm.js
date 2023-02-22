@@ -1,6 +1,6 @@
 import { usePageTitle } from "../../../../hooks/usePageTitle";
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate,  useOutletContext } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Select from "react-select";
@@ -8,12 +8,15 @@ import Swal from "sweetalert2";
 // import { Loader } from "rsuite";
 import CompetitorDetailsBranchList from "./CompetitorDetailsBranchList";
 import { data } from "jquery";
+import PreLoader from "../../../../UI/PreLoader";
+
 
 let table;
 
 const CompetitorBranchForm = () => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
+  const [ competitorId, setCompetitorId] = useOutletContext();
   const initialValue = {
     branchId: null,
     compNo: null,
@@ -24,7 +27,7 @@ const CompetitorBranchForm = () => {
   };
   const [competitorBranchInput, setCompetitorBranchInput] =
     useState(initialValue);
-
+  const [FetchLoading, setFetchLoading] = useState(true);
   const [countryList, setCountryList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [districtList, setDistrictList] = useState([]);
@@ -65,6 +68,7 @@ const CompetitorBranchForm = () => {
       getCountryList();
     }
     getBranchList();
+    setFetchLoading(false);
   }, []);
 
   const getCompNo = async () => {
@@ -137,6 +141,7 @@ const CompetitorBranchForm = () => {
         }));
         setBranchList(listarr);
       });
+      
   };
 
 
@@ -281,6 +286,7 @@ useEffect(()=>{
       return { ...prev,  branchId: editableRow.branchId};
         }); 
   }
+  
 },[cityList]);
 
 //check Form is Valid or not
@@ -512,7 +518,9 @@ useEffect(() => {
   };
 
   return (
+    <PreLoader loading={FetchLoading}>
     <div className="card-body ">
+      
       <form>
         <div className="row align-items-center">
           <div className="inputgroup col-lg-5 mb-4">
@@ -652,6 +660,7 @@ useEffect(() => {
       </form>
       <CompetitorDetailsBranchList branchList={branchList} onEdit={onEdit} onDelete={onDelete}/>
     </div>
+    </PreLoader>
   );
 };
 export default CompetitorBranchForm;

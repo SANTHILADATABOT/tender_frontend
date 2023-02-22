@@ -29,7 +29,8 @@
     "react-tooltip": "^5.5.1",
     "rsuite": "^5.23.0",
     "sweetalert2": "^11.6.9",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "framer-motion": "^9.0.2"
   },
   "scripts": {
     "start": "react-scripts start",

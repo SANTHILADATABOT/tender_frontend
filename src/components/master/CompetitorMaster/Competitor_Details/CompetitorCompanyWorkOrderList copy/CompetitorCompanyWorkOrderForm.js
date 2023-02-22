@@ -11,7 +11,6 @@ import "./UploadDoc.css";
 import Select from "react-select";
 import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 import { data } from "jquery";
-import { ImageConfig } from "../../../../hooks/Config";
 
 const CompetitorCompanyWorkOrderForm = () => {
   // const compNo=useContext(CompNoContext);
@@ -113,6 +112,9 @@ const CompetitorCompanyWorkOrderForm = () => {
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const onFileDrop = (e) => {
+
+
+    
     if (e.target.name === "woUpload") {
       const newFile = e.target.files[0];
 
@@ -154,7 +156,7 @@ const CompetitorCompanyWorkOrderForm = () => {
     if (woFile && woFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "File size is too Large",
+        text: "Maximum Allowed File size is 1MB",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
@@ -162,18 +164,15 @@ const CompetitorCompanyWorkOrderForm = () => {
         setPreviewObjURL("");
       });
     } else if (woFile && !doctype.includes(woFile.type)) {
-      let len = woFile.name.split(".").length;
-      if (woFile.name.split(".")[len - 1] !== "rar") {
       Swal.fire({
         title: "File Type",
-        text: "Invalid File Type ",
+        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile("");
         setPreviewObjURL("");
       });
-    }
     }
   }, [woFile]);
 
@@ -188,15 +187,10 @@ const CompetitorCompanyWorkOrderForm = () => {
         setFile1("");
         setPreviewObjURL1("");
       });
-    } 
-  else if (completionFile && !doctype.includes(completionFile.type)) {
-    let len = completionFile.name.split(".").length;
-    if (completionFile.name.split(".")[len - 1] !== "rar") {
-    
-    // else if (completionFile && !doctype.includes(completionFile.type)) {
+    } else if (completionFile && !doctype.includes(completionFile.type)) {
       Swal.fire({
         title: "File Type",
-        text: "Invalid File Type ",
+        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
@@ -204,7 +198,6 @@ const CompetitorCompanyWorkOrderForm = () => {
         setPreviewObjURL1("");
       });
     }
-  }
   }, [completionFile]);
 
   const getCompNo = async () => {
@@ -240,85 +233,25 @@ const CompetitorCompanyWorkOrderForm = () => {
         let listarr = list.map((item, index) => ({
           ...item,
           woFile:
-            
-          item.woFile !== "" &&
-          `<img src="${woFilePath}` +
-              item.woFile +
-              `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" />
-              <img src="${
-          (item.woFile.split(".")[1] === "jpg" ||
-            item.woFile.split(".")[1] === "png" ||
-            item.woFile.split(".")[1] === "jpeg" ||
-            item.woFile.split(".")[1] === "webp")
-            ? woFilePath + item.woFile
-            : item.woFile.split(".")[1] === "rar" ||
-              item.woFile.split(".")[1] === "vnd.rar" ||
-              item.woFile.split(".")[1] === "x-rar-compressed" ||
-              item.woFile.split(".")[1] === "x-rar"
-            ? ImageConfig["x-rar"]
-            : item.woFile.split(".")[1] === "pdf"
-            ? ImageConfig["pdf"]
-            : item.woFile.split(".")[1] === "doc" ||
-              item.woFile.split(".")[1] === "docx" ||
-              item.woFile.split(".")[1] === "msword" ||
-              item.woFile.split(".")[1] ===
-                "vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ? ImageConfig["doc"]
-            : item.woFile.split(".")[1] === "zip" ||
-              item.woFile.split(".")[1] === "multipart/x-zip" ||
-              item.woFile.split(".")[1] === "x-zip" ||
-              item.woFile.split(".")[1] === "x-zip-compressed"
-            ? ImageConfig["zip"]
-            : item.woFile.split(".")[1] === "xls" ||
-              item.woFile.split(".")[1] === "xlsx" ||
-              item.woFile.split(".")[1] === "vnd.ms-excel" ||
-              item.woFile.split(".")[1] ===
-                "vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            ? ImageConfig["vnd.ms-excel"]
-            : item.woFile.split(".")[1] === "csv"
-            ? ImageConfig["csv"]
-            : ImageConfig["default"]
-            }" class="rounded-circle pointer" width="40" height="30" alt="" style="cursor:pointer"></img>`,
+            item.woFileType === "pdf"
+              ? `<img src="${woFilePath}` +
+                item.woFile +
+                `" class="rounded-circle pointer" width="0" height="0" alt="" id="woImg" style="cursor:pointer" title="File" ></img><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="woImg" style="cursor:pointer" title="PDF"></img>`
+              : `<img src="${woFilePath}` +
+                item.woFile +
+                `" class="rounded-circle pointer" width="75" height="75" alt="Image" id="woImg" style="cursor:pointer" title="File"></img>`,
 
           completionFile:
-          item.completionFile !== "" &&
-          `<img src="${woCompletionFilePath}` +
-              item.completionFile +
-              `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" />
-              <img src="${
-          (item.completionFile.split(".")[1] === "jpg" ||
-            item.completionFile.split(".")[1] === "png" ||
-            item.completionFile.split(".")[1] === "jpeg" ||
-            item.completionFile.split(".")[1] === "webp")
-            ? woCompletionFilePath + item.completionFile
-            : item.completionFile.split(".")[1] === "rar" ||
-              item.completionFile.split(".")[1] === "vnd.rar" ||
-              item.completionFile.split(".")[1] === "x-rar-compressed" ||
-              item.completionFile.split(".")[1] === "x-rar"
-            ? ImageConfig["x-rar"]
-            : item.completionFile.split(".")[1] === "pdf"
-            ? ImageConfig["pdf"]
-            : item.completionFile.split(".")[1] === "doc" ||
-              item.completionFile.split(".")[1] === "docx" ||
-              item.completionFile.split(".")[1] === "msword" ||
-              item.completionFile.split(".")[1] ===
-                "vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ? ImageConfig["doc"]
-            : item.completionFile.split(".")[1] === "zip" ||
-              item.completionFile.split(".")[1] === "multipart/x-zip" ||
-              item.completionFile.split(".")[1] === "x-zip" ||
-              item.completionFile.split(".")[1] === "x-zip-compressed"
-            ? ImageConfig["zip"]
-            : item.completionFile.split(".")[1] === "xls" ||
-              item.completionFile.split(".")[1] === "xlsx" ||
-              item.completionFile.split(".")[1] === "vnd.ms-excel" ||
-              item.completionFile.split(".")[1] ===
-                "vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            ? ImageConfig["vnd.ms-excel"]
-            : item.completionFile.split(".")[1] === "csv"
-            ? ImageConfig["csv"]
-            : ImageConfig["default"]
-            }" class="rounded-circle pointer" width="40" height="30" alt="" style="cursor:pointer"></img>`,
+          item.completionFile !=="" 
+            ?  item.completionFileType === "pdf"
+                ? `<img src="${woCompletionFilePath}` +
+                  item.completionFile +
+                  `" class="rounded-circle pointer" width="0" height="0" alt="" id="woImg1" style="cursor:pointer" title="File"><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="woImg1" style="cursor:pointer" title="PDF"></img></img>`
+                : `<img src="${woCompletionFilePath}` +
+                  item.completionFile +
+                  `" class="rounded-circle pointer" width="75" height="75" alt="No File" id="woImg1" style="cursor:pointer" title="File"></img>`
+            : `<span class="text-danger">-NA-</span>`,
+
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
@@ -327,125 +260,55 @@ const CompetitorCompanyWorkOrderForm = () => {
   };
 
   //set image preview on Edit button clicked
-  // const getImageUrl = (wo, comp) => {
-    // var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)+/;
+  const getImageUrl = (wo, comp) => {
+    var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)+/;
 
-    // if(wo!==""){
-    //   var result = wo.match(pattern);
-    //   if(result1!==null){
-    //   var type=result[0].split("."); // To Find type of document 
-    //   var img_url = woFilePath + result; //filePath is a state value, which indicates server storage location
-    //   } 
-    // }
-    // if(comp){
-    // var result1 = comp.match(pattern);
-    // if(result1!==null){
-    //   var type1=result1[0].split(".");// To Find type of document 
-    //   var img_url1 = woCompletionFilePath + result1; //filePath is a state value, which indicates server storage location
-    //   }
-    // }
-    
-    
-    
-
-    // //setting preview image for Work Order File
-    // if (!(img_url === null || img_url === undefined)) {
-    //   setPreviewForEdit(img_url);
-    //   setPreviewFileType((prev)=>{
-    //     return{...prev,woFile:type}
-    //   });
-    // } else {
-    //   setPreviewForEdit("");
-    // }
-    // //setting preview image for Work Order Completion File
-    // if (!(img_url1 === null || img_url1 === undefined)) {
-    //   setPreviewForEdit1(img_url1);
-    //   setPreviewFileType((prev)=>{
-    //     return{...prev,woCompletionFile:type1}
-    //   });
-    // } else {
-    //   setPreviewForEdit1("");
-    // }
-  // };
-
-
-  const getImageUrl = (id) => {
-     axios({
-      url: `${baseUrl}/api/download/competitorworkorder/${id}/${"woFile"}`,
-      method: "GET",
-      responseType: "blob", // important
-      headers: {
-        //to stop cacheing this response at browsers. otherwise may displayed cached files
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-        Expires: "0",
-        Accept: doctype,
-      },
-    }).then((response) => {
-      if (response.status === 200) {
-        console.log("File",response)
-        setFile(response);
-          
-          // if(response.hasOwnProperty("data") )
-          // // && response.data.type==="application/octet-stream")
-          // {
-          //   let pattern = /[A-Za-z0-9]+[\.][a-zA-Z]+/gm;
-          //   // setFileName(data.filepath.match(pattern));
-          // }
-          // setFileName(data.cerName);
-        } else if (response.status === 204) {
-          setFile("");
-          // setFileName("");
-
-        } else {
-          alert("Unable to Process Now!");
-        }
-      });
-
-      axios({
-        url: `${baseUrl}/api/download/competitorworkorder/${id}/${"woCompletionFile"}`,
-        method: "GET",
-        responseType: "blob", // important
-        headers: {
-          //to stop cacheing this response at browsers. otherwise may displayed cached files
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-          Expires: "0",
-          Accept: doctype,
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          console.log("File1",response)
-          setFile1(response);
-            // if(response.hasOwnProperty("data") )
-            // // && response.data.type==="application/octet-stream")
-            // {
-            //   let pattern = /[A-Za-z0-9]+[\.][a-zA-Z]+/gm;
-            //   // setFileName(data.filepath.match(pattern));
-            // }
-            // setFileName(data.cerName);
-          } else if (response.status === 204) {
-            setFile1("");
-            // setFileName("");
-  
-          } else {
-            alert("Unable to Process Now!");
-          }
-        });
-
-
+    if(wo!==""){
+      var result = wo.match(pattern);
+      if(result1!==null){
+      var type=result[0].split("."); // To Find type of document 
+      var img_url = woFilePath + result; //filePath is a state value, which indicates server storage location
+      } 
     }
+    if(comp){
+    var result1 = comp.match(pattern);
+    if(result1!==null){
+      var type1=result1[0].split(".");// To Find type of document 
+      var img_url1 = woCompletionFilePath + result1; //filePath is a state value, which indicates server storage location
+      }
+    }
+    
+    
+    
 
+    //setting preview image for Work Order File
+    if (!(img_url === null || img_url === undefined)) {
+      setPreviewForEdit(img_url);
+      setPreviewFileType((prev)=>{
+        return{...prev,woFile:type}
+      });
+    } else {
+      setPreviewForEdit("");
+    }
+    //setting preview image for Work Order Completion File
+    if (!(img_url1 === null || img_url1 === undefined)) {
+      setPreviewForEdit1(img_url1);
+      setPreviewFileType((prev)=>{
+        return{...prev,woCompletionFile:type1}
+      });
+    } else {
+      setPreviewForEdit1("");
+    }
+  };
 
   const onEdit = (data) => {
-    console.log("DAta",data.id);
     setFile("");
     setFile1("");
     getStateList();
     getUnitList();
     setEditDataState(data.state);
     setEditDataUnit(data.unit);
-    getImageUrl(data.id);
+    getImageUrl(data.woFile, data.completionFile);
     setFormIsValid(true);
     setCompetitorWOInput({
       woId: data.id,
@@ -631,6 +494,16 @@ const CompetitorCompanyWorkOrderForm = () => {
               timer: 2000,
             }).then(function () {
               resetFields();
+              // setLoading(false);
+              // setIsBtnClicked(false);
+              // setCompetitorWOInput({
+              //   ...competitorWOInput,
+              //   projectName: "",
+              //   custName: "",
+              // });
+              // getWOList();
+              // setFile("");
+              // setPreviewObjURL("");
             });
           } else if (resp.data.status === 404) {
             Swal.fire({
@@ -753,7 +626,7 @@ const CompetitorCompanyWorkOrderForm = () => {
       }
       //When Image is changed/reuploaded on update (either woFile or completionFile)
       else if ((previewForEdit === "" && woFile !== "") | (previewForEdit !== "" && woFile === "") | (previewForEdit1 === "" && completionFile !== "") | (previewForEdit1 !== "" && completionFile ==="")){
-        // console.log("When Image is changed/reuploaded on update");
+        console.log("When Image is changed/reuploaded on update");
         const datatosend = {
           compId: compid,
           compNo: competitorWOInput.compNo,
@@ -806,8 +679,18 @@ const CompetitorCompanyWorkOrderForm = () => {
                 text: resp.data.message,
                 timer: 2000,
               }).then(function () {
+                
                 getWOList();
                 resetFields();
+                // setCompetitorWOInput(initialValue);
+                // setIsBtnClicked(false);
+                // setLoading(false);
+                // setFile("");
+                // setFile1("");
+                // setPreviewObjURL("");
+                // setPreviewObjURL1("");
+                // setPreviewForEdit("");
+                // setPreviewForEdit1("");
               });
             } else if (resp.data.status === 404) {
               Swal.fire({
@@ -1262,8 +1145,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                   <span className="text-danger h6 font-weight-bold">
                     &nbsp;*
                   </span>
-                  {/* <p className="text-info mt-2 mb-n2">Max File size 1 MB</p>
-                  <p className="text-info ">Allowed File Type JPG/JPEG/PNG/PDF</p> */}
+                  <p className="text-info mt-2 mb-n2">Max File size 1 MB</p>
+                  <p className="text-info ">Allowed File Type JPG/JPEG/PNG/PDF</p>
                 </label>
               </div>
               <div className="col-lg-6">
@@ -1320,7 +1203,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
                            
-                          {previewObjURL && ['jpg','jpeg','png','webp'].includes(previewFileType.woFile[1])
+                          {previewObjURL && previewFileType.woFile[1]!=="pdf" 
                            ?  
                             <img
                               className="rounded-circle pointer"
@@ -1339,7 +1222,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                               className="rounded-circle pointer"
                               id="previewImg"
                               // src={previewObjURL}
-                              src={ImageConfig[previewFileType.woFile[1]]}
+                              src="assets/icons/pdf_logo.png"
                               alt="No Image"
                               width="75px"
                               height="75px"
@@ -1388,11 +1271,11 @@ const CompetitorCompanyWorkOrderForm = () => {
                             </div> */}
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                        { previewForEdit !== "" && ['jpg','jpeg','png','webp'].includes(previewFileType.woFile[1]) 
+                        { previewForEdit !== "" && previewFileType.woFile[1]!=="pdf" 
                         ?                
                             <img
                               className="rounded-circle pointer"
-                              id="previewImg" 
+                              id="previewImg"
                               src={previewForEdit}
                               alt="No Image"
                               width="75px"
@@ -1406,7 +1289,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                           <img
                               className="rounded-circle pointer"
                               id="previewImg"
-                              src={ImageConfig[previewFileType.woFile[1]]}
+                              src="assets/icons/pdf_logo.png"
                               // src={previewForEdit}
                               alt="No Image"
                               width="75px"
@@ -1454,6 +1337,8 @@ const CompetitorCompanyWorkOrderForm = () => {
                   {/* <span className="text-danger h6 font-weight-bold">
                     &nbsp;*
                   </span> */}
+                  <p className="text-info mt-2 mb-n2">Max File size 1 MB</p>
+                  <p className="text-info ">Allowed File Type JPG/JPEG/PNG/PDF</p>
                 </label>
               </div>
               <div className="col-lg-6">
@@ -1511,7 +1396,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                           </div>
                         </div>
                         <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewObjURL1 && ['jpg','jpeg','png','webp'].includes(previewFileType.woCompletionFile[1]) 
+                          {previewObjURL1 && previewFileType.woCompletionFile[1]!=="pdf" 
                            ? <img
                               className="rounded-circle pointer"
                               id="previewImg1"
@@ -1528,7 +1413,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                             <img
                               className="rounded-circle pointer"
                               id="previewImg1"
-                              src={ImageConfig[previewFileType.woCompletionFile[1]]}
+                              src="assets/icons/pdf_logo.png"
                               alt="No Image"
                               width="75px"
                               height="75px"
@@ -1595,7 +1480,7 @@ const CompetitorCompanyWorkOrderForm = () => {
                               <img
                                 className="rounded-circle pointer"
                                 id="previewImg"
-                                src={ImageConfig[previewFileType.woCompletionFile[1]]}
+                                src="assets/icons/pdf_logo.png"
                                 // src={previewForEdit1}
                                 alt="No Image"
                                 width="75px"

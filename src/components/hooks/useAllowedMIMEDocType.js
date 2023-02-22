@@ -19,12 +19,15 @@ const useAllowedMIMEDocType = () => {
       "application/x-zip-compressed",
       //for csv
       "text/csv",
+      "text/plain",
       "text/comma-separated-values",
       "application/csv",
-      "application/excel",
+    //for Excel
       "application/vnd.ms-excel",
+      "application/excel",
       "application/vnd.msexcel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    
       //for rar
       "application/x-rar",
       "application/vnd.rar",

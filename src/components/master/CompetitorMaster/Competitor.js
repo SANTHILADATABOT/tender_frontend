@@ -18,10 +18,8 @@ const [competitorId,setCompetitorId]=useState(0);
  const activeTab = pathname.split("/");
  
 useEffect(() => {
-  console.log("competitorId Outlet",id);
-  {id ? setCompetitorId(id): setCompetitorId(0) }
+  {id && setCompetitorId(id)}
 }, []);
-
 
   return (     
     <Fragment>

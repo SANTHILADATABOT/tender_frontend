@@ -15,11 +15,10 @@ const comppath="tender/master/competitorcreation/competitor/details";
 const CompetitorDetails = () => {
   usePageTitle("Competitor Creation");
   const { compid } = useParams();
-  const { server1: baseUrl } = useBaseUrl();
+    const { server1: baseUrl } = useBaseUrl();
   const [ competitorId, setCompetitorId] = useOutletContext();
 
-// console.log("setCompetitorId ",setCompetitorId);
-console.log("competitorId Details",competitorId);
+
 
 useEffect(() => {
   if (compid) {

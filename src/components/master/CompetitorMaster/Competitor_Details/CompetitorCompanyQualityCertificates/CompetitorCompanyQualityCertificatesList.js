@@ -18,7 +18,6 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 var table;
 const CompetitorCompanyQualityCertificatesList = (props) => {
-  
  var dataSet = []
 
  useEffect(() => {
