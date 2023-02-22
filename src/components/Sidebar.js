@@ -179,6 +179,14 @@ function Sidebar() {
             >
               Tender Type Master
             </NavLink>
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
+              to={`/${pathName}/master/communicationfiles`}
+              onClick={() => hideSidebarElement("MasterMenu")}
+            >
+              Communication Files
+            </NavLink>
           </div>
         </div>
       </li>

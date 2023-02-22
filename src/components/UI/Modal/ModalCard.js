@@ -11,7 +11,7 @@ const ModalCard = (props) => {
                 aria-labelledby="exampleModalLabel"
                 aria-hidden="true"
             >
-                <div className="modal-dialog" role="document">
+                <div className={`modal-dialog  ${(props.modalsize === 'large') ? 'modal-xl' : ''}`} role="document">
                     <div className="modal-content">
                         {props.children}
                     </div>
