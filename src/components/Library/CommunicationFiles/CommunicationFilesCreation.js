@@ -6,7 +6,7 @@ import { useBaseUrl } from "../../hooks/useBaseUrl";
 import axios from "axios";
 import Swal from "sweetalert2/src/sweetalert2.js";
 import styles from './UploadDoc.module.css';
-import { acceptedFileTypes } from "../FileConfig";
+import { acceptedFileTypes } from "../../master/FileConfig";
 import DocListCP from "./DocListCP";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -364,7 +364,7 @@ const CommunicationFilesCreation = () => {
                     confirmButtonColor: "#5156ed",
                   });
                 navigate(
-                        `/tender/master/communicationfiles`
+                        `/tender/library/communicationfiles`
                     );
             } else if (resp.data.status === 400) {
                 toastError(resp.data.message)
@@ -402,7 +402,7 @@ const CommunicationFilesCreation = () => {
             if (resp.data.status === 200) {
                 // console.log(resp.data)
                 navigate(
-                    `/tender/master/communicationfiles`                
+                    `/tender/library/communicationfiles`                
                 );
                 toastSuccess(resp.data.message)
             } else if (resp.data.status === 400) {

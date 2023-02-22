@@ -60,7 +60,7 @@ const DocCardCP = (props) => {
                     <div className=" row col-sm-10 bg-gray-200 rounded py-1">
                         <div className="col-sm-1 ">
                             <div>
-                            {props.item.type.split('/')[0] !== "image" && <img src={ImageConfig[props.item.type.split('/')[1]] || ImageConfig['default']} alt="" width="75px" height="75px" />}
+                            {props.item.type.split('/')[0] !== "image" && <img src={ImageConfig[props.item.type.split('/')[1]] || ImageConfig[props.item.name.split('.').pop()] ||ImageConfig['default']} alt="" width="75px" height="75px" />}
 
                             {props.item.type.split('/')[0] === "image" && <img src={URL.createObjectURL(props.item)} alt="" width="75px" height="75px" />}
 
