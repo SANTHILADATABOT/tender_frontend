@@ -151,6 +151,7 @@ const CompetitorCompanyWorkOrderForm = () => {
   };
 
   useEffect(() => {
+    console.log("File",woFile)
     if (woFile && woFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
@@ -162,8 +163,8 @@ const CompetitorCompanyWorkOrderForm = () => {
         setPreviewObjURL("");
       });
     } else if (woFile && !doctype.includes(woFile.type)) {
-      let len = woFile.name.split(".").length;
-      if (woFile.name.split(".")[len - 1] !== "rar") {
+      let len = woFile?.name?.split(".").length;
+      if (woFile?.name?.split(".")[len - 1] !== "rar") {
       Swal.fire({
         title: "File Type",
         text: "Invalid File Type ",
@@ -190,8 +191,8 @@ const CompetitorCompanyWorkOrderForm = () => {
       });
     } 
   else if (completionFile && !doctype.includes(completionFile.type)) {
-    let len = completionFile.name.split(".").length;
-    if (completionFile.name.split(".")[len - 1] !== "rar") {
+    let len = completionFile?.name?.split(".").length;
+    if (completionFile?.name?.split(".")[len - 1] !== "rar") {
     
     // else if (completionFile && !doctype.includes(completionFile.type)) {
       Swal.fire({
@@ -278,7 +279,7 @@ const CompetitorCompanyWorkOrderForm = () => {
             : item.woFile.split(".")[1] === "csv"
             ? ImageConfig["csv"]
             : ImageConfig["default"]
-            }" class="rounded-circle pointer" width="40" height="30" alt="" style="cursor:pointer"></img>`,
+            }" class="rounded-circle pointer" width="50" height="40" alt="" style="cursor:pointer"></img>`,
 
           completionFile:
           item.completionFile !== "" &&
@@ -318,7 +319,7 @@ const CompetitorCompanyWorkOrderForm = () => {
             : item.completionFile.split(".")[1] === "csv"
             ? ImageConfig["csv"]
             : ImageConfig["default"]
-            }" class="rounded-circle pointer" width="40" height="30" alt="" style="cursor:pointer"></img>`,
+            }" class="rounded-circle pointer" width="50" height="40" alt="" style="cursor:pointer"></img>`,
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));

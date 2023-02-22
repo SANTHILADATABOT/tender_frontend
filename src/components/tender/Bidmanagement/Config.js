@@ -11,6 +11,7 @@ export const ImageConfig = {
      default: fileDefault,
      pdf: filePdf,
      doc: fileDoc,
+     'rar' : fileRar,
     'msword' : fileDoc,
     'vnd.openxmlformats-officedocument.wordprocessingml.document' : fileDoc,
     'x-zip' : fileZip,
@@ -20,7 +21,9 @@ export const ImageConfig = {
     'vnd.rar' : fileRar,
     'x-rar-compressed' : fileRar,
     'octet-stream' : fileRar,
+    "plain": fileCsv,
     'csv' : fileCsv,
+    'plain' : fileCsv,
     'vnd.ms-excel' : fileXls,
     'vnd.openxmlformats-officedocument.spreadsheetml.sheet' : fileXls
 
