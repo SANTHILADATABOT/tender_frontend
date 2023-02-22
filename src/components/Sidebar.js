@@ -179,14 +179,7 @@ function Sidebar() {
             >
               Tender Type Master
             </NavLink>
-            <NavLink
-              className={`collapse-item ${({ isActive }) =>
-                isActive ? "active" : undefined}`}
-              to={`/${pathName}/master/communicationfiles`}
-              onClick={() => hideSidebarElement("MasterMenu")}
-            >
-              Communication Files
-            </NavLink>
+            
           </div>
         </div>
       </li>
@@ -248,6 +241,43 @@ function Sidebar() {
               Legacy Statement
             </NavLink>
             
+          </div>
+        </div>
+      </li>
+
+
+       {/* Divider */}
+       <hr className="sidebar-divider my-0" />
+      {/* Nav Item - Pages Collapse Menu */}
+      <li className="nav-item">
+        <Link
+          className="nav-link collapsed"
+          to="#"
+          data-toggle="collapse"
+          data-target="#collapseLibraryMenu"
+          aria-expanded="true"
+          aria-controls="collapseLibraryMenu"
+          id="libraryMenu"
+        >
+          {/*<i className="fas fa-fw fa-cog" />*/}
+          <i className="fa fa-book"></i>
+          <span className="font-weight-bold ml-1">Library</span>
+        </Link>
+        <div
+          id="collapseLibraryMenu"
+          className="collapse"
+          aria-labelledby="headingTwo"
+          data-parent="#accordionSidebar"
+        >
+          <div className="bg-white py-2 collapse-inner rounded">
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
+              to={`/${pathName}/library/communicationfiles`}
+              onClick={() => hideSidebarElement("libraryMenu")}
+            >
+              Communication Files
+            </NavLink>           
           </div>
         </div>
       </li>

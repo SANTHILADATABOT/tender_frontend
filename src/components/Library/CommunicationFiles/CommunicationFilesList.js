@@ -66,7 +66,7 @@ const CommunicationFilesList = (props) => {
           let rowdata =table.row($(this).closest('tr')).data();
         
           navigate(
-            `/tender/master/communicationfiles/communicationfilescreation/` +
+            `/tender/library/communicationfiles/communicationfilescreation/` +
             rowdata.id
           );
           // if(rowdata.bidid !== null){
