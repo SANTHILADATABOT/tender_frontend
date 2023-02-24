@@ -13,6 +13,7 @@ const DocListPreBid = forwardRef((props, ref) => {
     const [docList, setDocList] = useState([]);
     const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId ] = useOutletContext();
     const [loading, setPreLoader] = useState(false)
+   
 
     useImperativeHandle(ref , () => ({
         getDocList
@@ -23,9 +24,15 @@ const DocListPreBid = forwardRef((props, ref) => {
         let data ={
             mainid : props.BidCreationId,
         }
-      
+        
+        let total_size = 0;
         axios.post(`${baseUrl}/api/bidcreation/prebidqueries/docupload/list`, data).then((resp) => {
             if(resp.status === 200){
+                for(const document of resp.data.docs){
+                    // console.log(document.file_size)
+                    total_size += (+document.file_size)
+                }
+                props.setTotalSize(total_size)
                 setDocList(resp.data.docs)     
             }else{
     
@@ -33,6 +40,7 @@ const DocListPreBid = forwardRef((props, ref) => {
             setPreLoader(false)
         })
     }
+
 
     const deleteHandler = (id, docname) => {
         Swal.fire({
