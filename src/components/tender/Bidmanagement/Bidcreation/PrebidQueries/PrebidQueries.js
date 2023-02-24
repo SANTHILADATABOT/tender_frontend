@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import useInputValidation from "../../../../hooks/useInputValidation";
@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import DocListPreBid from "./DocListPreBid";
 import LockCard from "../../../../UI/LockCard";
 import PreLoader from "../../../../UI/PreLoader";
+import { acceptedFileTypes } from "../../../../master/FileConfig";
 
 const PrebidQueries = () => {
 
@@ -22,6 +23,7 @@ const PrebidQueries = () => {
     const [dragover, setdragover] = useState(false);
     const [progress, setProgressCompleted] = useState(0)
     const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] = useOutletContext();
+    const [totalSize, setTotal_size] = useState(0)
 
     const wrapperRef = useRef(null);
     const ref = useRef()
@@ -37,6 +39,10 @@ const PrebidQueries = () => {
         setInputValue: setDateValue,
         reset: resetDate,
     } = useInputValidation(isNotEmpty);
+
+    useEffect(() => {
+
+    }, [])
 
     const onDragEnter = () => {
         wrapperRef.current.classList.add(styles['dragover'])
@@ -55,10 +61,33 @@ const PrebidQueries = () => {
 
         let filetypes = newFile.type
 
-        if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetypes.split('/')[0] === "image") {
+        let uploadSize =0;
+        if(!isEditbtn){
+            uploadSize = (totalSize + (newFile.size/1000))/1000; 
+        }
+
+        if(file && isEditbtn){
+            // console.log('yes')
+            uploadSize = (totalSize + (newFile.size/1000) - (file.size/1000))/1000; 
+        }
+
+        // console.log('total size' , totalSize/1000)
+        // console.log('newfile', newFile.size/(1000*1000))
+        // console.log('fiel', file?.size/(1000*1000))
+        // console.log('uploaded size',  uploadSize)
+        
+
+        let MaxSize = 50;
+        if(uploadSize > MaxSize){
+            alert('Maximun upload size (50 MB) limit reached');
+            return;
+        }
+
+
+        if (acceptedFileTypes.includes(filetypes) || filetypes.split('/')[0] === "image" || newFile.name.split('.').pop() === 'rar' ){
             setFile(newFile);
         } else {
-            alert("File format not suppoted. Upload pdf, doc, docx and images only")
+            alert("File format not suppoted. Upload pdf, doc, docx, csv, xlsx, zip, rar and images only")
         }
 
     }
@@ -200,6 +229,7 @@ const PrebidQueries = () => {
             setFetchLoading(false)
         });
     }
+    
     return (
         <CollapseCard id={"PrebidQueries"} title={"Prebid Queries"}>
             <LockCard locked={!id}>
@@ -260,7 +290,7 @@ const PrebidQueries = () => {
                                         <p className="display-4 mb-0"><i className='fas fa-cloud-upload-alt text-primary '></i></p>
                                         {!dragover && <p className="mt-0">Drag & Drop an document or Click</p>}
                                         {dragover && <p className="mt-0">Drop the document</p>}
-                                        <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/* " onChange={onFileDrop} />
+                                        <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept={`${acceptedFileTypes.join()}`} onChange={onFileDrop} />
                                     </div>
                                 </div>
                             </div>
@@ -296,7 +326,7 @@ const PrebidQueries = () => {
                     </div>
                 </form>
                 </PreLoader>
-                <DocListPreBid ref={ref} BidCreationId={id} onEdit={editHandler} />
+                <DocListPreBid ref={ref} BidCreationId={id} onEdit={editHandler} setTotalSize={setTotal_size}/>
             </LockCard>
           
         </CollapseCard>
