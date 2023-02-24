@@ -43,7 +43,7 @@ const DocCardPrebid = (props) => {
         }
 
       }
-      console.log(props.item)
+    //   console.log(props.item)
     return (
 
         <Fragment>
