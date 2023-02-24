@@ -3,22 +3,51 @@ import { ImageConfig } from "../../Config";
 
 const WorkOrderUploadFile = (props) => {
   const [preview, setPreview] = useState();
+  const [notAnImage, setNotAnImage] = useState(false);
+  //$$$
+  // console.log("8 :", props.file && !notAnImage)
+  console.log("8 :", props.file && !notAnImage)
+  console.log("9 :", props.file)
+  console.log("10 :", props.file?.type)
+  
+
+
 
   useEffect(() => {
-    if (
-      !props.file ||
-      (props.file.type.split("/")[0] !== "image" &&
-        props.file.type.split("/")[0] !== "application")
-    ) {
-      // setPreview(undefined);
-      setPreview(props.file);
+    if (!props.file) {
+      setPreview(undefined);
       return;
+    }
+
+    if (!props.file || props.file.type.split("/")[0] !== "image") {
+      setNotAnImage(true);
     }
 
     const objectUrl = URL.createObjectURL(props.file);
     setPreview(objectUrl);
+
     // free memory when ever this component is unmounted
     return () => URL.revokeObjectURL(objectUrl);
+
+
+    // if (
+    //   !props.file ||
+    //   (props.file.type.split("/")[0] !== "image" &&
+    //     props.file.type.split("/")[0] !== "application")
+    // ) {
+    //   // setPreview(undefined);
+    //   setPreview(props.file);
+    //   return;
+    // }
+
+    // if (!props.file || props.file?.type.split("/")[0] !== "image") {
+    //   setNotAnImage(true);
+    // }
+
+    // const objectUrl = URL.createObjectURL(props.file);
+    // setPreview(objectUrl);
+    // // free memory when ever this component is unmounted
+    // return () => URL.revokeObjectURL(objectUrl);
   }, [props.file]);
 
   let downloadFileName =
@@ -77,18 +106,19 @@ const WorkOrderUploadFile = (props) => {
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    // src={(props.file==="" || props.file.type.split("/")[0] !== "application") ? preview : ImageConfig["pdf"]}
-                    src={
-                      props.file !== "" &&
-                      props.file.type.split("/")[0] === "image"
+                    src={//$$$
+                      props.file &&
+                      !notAnImage
                         ? preview
-                        : props.file.type.split("/")[0] === "application"
-                        ? ImageConfig[props.file.type.split("/")[1]]
-                        : props.file.type.split("/")[0] === "text"
-                        ? ImageConfig[props.file.type.split("/")[1]]
-                        : (props.file.type=== "" && downloadFileName.split(".")[downloadFileName.split(".").length-1] ==='rar')
-                        ? ImageConfig["x-rar-compressed"]
-                        : ImageConfig["default"]
+                        : downloadFileName.split(".")[1] === "csv" &&
+                        (props.file?.type?.split("/")[1] === "octet-stream" || props.file?.type?.split("/")[1] === "csv")
+                      ? ImageConfig["csv"]
+                      : downloadFileName.split(".")[1] === "rar" &&
+                        (props.file.type.split("/")[1] === "octet-stream" || props.file.type === "")
+                      ? ImageConfig["rar"]
+                      : props.file.type.split("/")[1]
+                      ? ImageConfig[props.file.type.split("/")[1]]
+                      : ImageConfig["default"]
                     }
                     alt="No Image"
                     width="75px"

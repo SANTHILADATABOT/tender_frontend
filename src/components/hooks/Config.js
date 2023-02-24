@@ -10,8 +10,6 @@ import fileRar from './imglogo/archive.png';
 export const ImageConfig = {
     default: fileDefault,
     pdf: filePdf,
-    // png: filePng,
-    // css: fileCSS,
     doc: fileDoc,
     'docx': fileDoc,
     'csv' : fileCsv, // text/csv

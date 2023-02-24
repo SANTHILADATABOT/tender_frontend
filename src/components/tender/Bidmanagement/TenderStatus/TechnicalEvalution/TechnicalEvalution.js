@@ -11,6 +11,8 @@ import LockCard from "../../../../UI/LockCard";
 import PreLoader from "../../../../UI/PreLoader";
 import AcceptedBidders from "./AcceptedBidders";
 import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
+import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
+import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 
 const TechnicalEvalution = (props) => {
   const [file, setFile] = useState(null);
@@ -29,9 +31,11 @@ const TechnicalEvalution = (props) => {
   const { id } = useParams();
   const { server1: baseUrl } = useBaseUrl();
   const [input, setInput] = useState({});
-
+  const { img: maxImageSize } = useAllowedUploadFileSize();
+  const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const [DateValue, setDateValue] = useState("");
   const [DateHasError, setDateHasError] = useState("");
+  
   function DateChangeHandler(e) {
     setDateValue(e.target.value);
     if (!e.target.value) {
@@ -57,19 +61,49 @@ const TechnicalEvalution = (props) => {
   const onFileDrop = (e) => {
     setisEdited(true);
     const newFile = e.target.files[0];
-
-    let filetypes = newFile.type;
-
-    if (
-      filetypes === "application/pdf" ||
-      filetypes === "application/msword" ||
-      filetypes ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      filetypes.split("/")[0] === "image"
+    
+    let len = newFile?.name?.split(".").length;
+    if(newFile && newFile.size > maxImageSize)
+    {
+      Swal.fire({
+        title: "File Size",
+        text: "File size is too Large",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile(null);
+        // setPreviewObjURL("");
+      });
+    } else if (newFile && !doctype.includes(newFile.type)) {
+      if (newFile?.name?.split(".")[len - 1] !== "rar") {
+        Swal.fire({
+          title: "File Type",
+          text: "Invalid File Type",
+          icon: "error",
+          confirmButtonColor: "#2fba5f",
+        }).then(() => {
+          setFile(null);
+          // setPreviewObjURL("");
+        });
+      }
+      else{
+        setFile(newFile);
+      }
+    } else if (
+      newFile?.name?.split(".")[len - 1] === "txt"
     ) {
+      Swal.fire({
+        title: "File Type",
+        text: "Invalid File Type",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile(null);
+        // setPreviewObjURL("");
+      });
+    }
+    else{
       setFile(newFile);
-    } else {
-      alert("File format not suppoted. Upload pdf, doc, docx and images only");
     }
   };
 
@@ -295,6 +329,9 @@ const TechnicalEvalution = (props) => {
     }
   };
 
+   
+
+
   //  {(!formIsValid || isDatasending || FetchLoading) && !isEdited}
   return (
     <LockCard locked={!id || notHasValue}>
@@ -372,7 +409,7 @@ const TechnicalEvalution = (props) => {
                         type="file"
                         value=""
                         className="h-100 w-100 position-absolute top-50 start-50 pointer"
-                        accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/* "
+                        accept={{doctype}+'.rar'}
                         onChange={onFileDrop}
                       />
                     </div>

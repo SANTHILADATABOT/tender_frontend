@@ -29,9 +29,10 @@ const useAllowedMIMEDocType = () => {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     
       //for rar
+      "application/x-rar-compressed",
+      "application/rar",
       "application/x-rar",
       "application/vnd.rar",
-      "application/x-rar-compressed",
     ],
   };
 };

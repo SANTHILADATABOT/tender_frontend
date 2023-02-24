@@ -118,7 +118,6 @@ const CompetitorCompanyWorkOrderForm = () => {
   };
 
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
-  console.log("FileSize",fileSize);
   const onFileDrop = (e) => {
     if (e.target.name === "woUpload") {
       const newFile = e.target.files[0];

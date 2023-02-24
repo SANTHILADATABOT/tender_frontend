@@ -176,7 +176,7 @@ const LetterOfAcceptance = () => {
     
     if (response.status === 200) {
       setletterofacceptanceForm(response);
-      setFileName(response.data.letterofaccepttance[0].wofile);
+      setFileName(response.data.letterofaccepttance[0].wofile?response.data.letterofaccepttance[0].wofile:"");
     }
     else{
       setFileName("");
@@ -227,6 +227,7 @@ const LetterOfAcceptance = () => {
   }, [lettacpId]);
 
   const putData = (data, lettacpId) => {
+    console.log("Put Data");
     axios
       .post(
         `${baseUrl}/api/letteracceptance/creation/update/${lettacpId}`,
@@ -268,10 +269,6 @@ const LetterOfAcceptance = () => {
     let data = {
       Date: Datevalue ? Datevalue : "",
       refrenceNo: refrenceNovalue ? refrenceNovalue : "",
-      // from: fromvalue ? fromvalue : "",
-      // medium: mediumvalue ? mediumvalue : "",
-      // medRefrenceNo: medRefrenceNovalue ? medRefrenceNovalue : "",
-      // mediumSelect: mediumSelectvalue ? mediumSelectvalue.value : "",
       tokenid: localStorage.getItem("token"),
       bidid: id,
     };
