@@ -72,7 +72,7 @@ const DocCardCP = (props) => {
                             {/* <img src={ImageConfig[props.item.file_type.split('/')[1]] || ImageConfig['default']} alt="" width="75px" height="75px" /> */}
                             
                             
-                            {props.item.file_type.split('/')[0] !== "image" && <img src={ImageConfig[props.item.file_type.split('/')[1]] || ImageConfig[props.item.name.split('.').pop()] ||ImageConfig['default']} alt="" width="75px" height="75px" />}
+                            {props.item.file_type.split('/')[0] !== "image" && <img src={ImageConfig[props.item?.file_original_name?.split('.').pop()] || ImageConfig[props.item.file_type.split('/')[1]] || ImageConfig['default']} alt="" width="75px" height="75px" />}
 
                             {props.item.file_type.split('/')[0] === "image" && <img src={biddocs_filePath+props.item.file_new_name} alt="" width="75px" height="75px" />}
                             

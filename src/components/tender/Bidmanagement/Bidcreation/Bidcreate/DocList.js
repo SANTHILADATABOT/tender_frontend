@@ -24,8 +24,14 @@ const DocList = forwardRef((props, ref) => {
             mainid : props.BidCreationId,
         }
       
+        let total_size = 0;
         axios.post(`${baseUrl}/api/bidcreation/creation/docupload/list`, data).then((resp) => {
             if(resp.status === 200){
+                for(const document of resp.data.docs){
+                    // console.log(document.file_size)
+                    total_size += (+document.file_size)
+                }
+                props.setTotalSize(total_size)
                 setDocList(resp.data.docs)     
             }else{
     
