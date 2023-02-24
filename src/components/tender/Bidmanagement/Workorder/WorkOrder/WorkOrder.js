@@ -38,6 +38,13 @@ const WorkOrder = () => {
   const [FetchLoading, setFetchLoading] = useState(false);
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  const [FileSize, setFilesize] = useState({
+    file: 0,
+    file1: 0,
+    file2: 0,
+    total: 0
+  });
+
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -49,9 +56,10 @@ const WorkOrder = () => {
   };
 
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
-
+console.log("FileSize",FileSize)
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
+    setFilesize((prev) => {return{...prev, file: parseInt(newFile.size), total: FileSize.total+newFile.size}});
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
@@ -241,7 +249,9 @@ const WorkOrder = () => {
     OrderDatevalue ||
     AgreeDatevalue ||
     SiteHandOverDatevalue ||
-    file || file1 || file 
+    file ||
+    file1 ||
+    file
   ) {
     formIsValid = true;
   }
@@ -281,12 +291,12 @@ const WorkOrder = () => {
     let data = response.data.WorkOrder[0];
     if (data !== undefined) {
       setworkid(data.id);
-      setorderQuantityValue(data.orderquantity?data.orderquantity:"");
-      setPricePerUnitValue(data.priceperunit?data.priceperunit:"");
-      setLoaDateValue(data.loadate?data.loadate:"");
-      setOrderDateValue(data.orderdate?data.orderdate:"");
-      setAgreeDateValue(data.agreedate?data.agreedate:"");
-      SiteHandOverDateValue(data.sitehandoverdate?data.sitehandoverdate:"");
+      setorderQuantityValue(data.orderquantity ? data.orderquantity : "");
+      setPricePerUnitValue(data.priceperunit ? data.priceperunit : "");
+      setLoaDateValue(data.loadate ? data.loadate : "");
+      setOrderDateValue(data.orderdate ? data.orderdate : "");
+      setAgreeDateValue(data.agreedate ? data.agreedate : "");
+      SiteHandOverDateValue(data.sitehandoverdate ? data.sitehandoverdate : "");
     }
   };
 
@@ -295,7 +305,7 @@ const WorkOrder = () => {
     let response = await axios.get(
       `${baseUrl}/api/workorder/creation/Workorder/${id}`
     );
-    if (response.status === 200 ) {
+    if (response.status === 200) {
       setWorkOrderForm(response);
     }
   };
@@ -306,27 +316,27 @@ const WorkOrder = () => {
     }
   }, []);
 
-
   const setWorkOrderImage = (response) => {
     //response.data.name = wofilename;
     setFile(response.data);
   };
 
   var getWorkOrderImage = async () => {
-    if(workid) {
+    if (workid) {
       await axios({
         url: `${baseUrl}/api/download/workorderimage/${id}`,
         method: "GET",
         responseType: "blob", //important
       }).then((response) => {
         if (response.status === 200) {
-          if(response.data.size >0 )
-            {setWorkOrderImage(response);}
+          if (response.data.size > 0) {
+            setWorkOrderImage(response);
+          }
         } else {
           alert("Unable to Process Now!");
         }
         setFetchLoading(false);
-      }); 
+      });
     }
   };
 
@@ -336,19 +346,19 @@ const WorkOrder = () => {
   //   }
   // }, [workid]);
 
-
   //agreement image data
 
   const getWorkOrderImageData = async () => {
-    if(workid) {
+    if (workid) {
       await axios({
         url: `${baseUrl}/api/download/agreementimage/${id}`,
         method: "GET",
         responseType: "blob", // important
       }).then((response) => {
         if (response.status === 200) {
-          if(response.data.size >0 )
-          {setAgreementImage(response);}
+          if (response.data.size > 0) {
+            setAgreementImage(response);
+          }
         } else {
           alert("Unable to Process Now!");
         }
@@ -376,15 +386,16 @@ const WorkOrder = () => {
   };
 
   const getsitehandoverImageData = async () => {
-    if(workid) {
+    if (workid) {
       await axios({
         url: `${baseUrl}/api/download/sitehandoverimage/${id}`,
         method: "GET",
         responseType: "blob", // important
       }).then((response) => {
         if (response.status === 200) {
-          if(response.data.size >0 )
-          {setSitehandoverImage(response);}
+          if (response.data.size > 0) {
+            setSitehandoverImage(response);
+          }
         } else {
           alert("Unable to Process Now!");
         }
@@ -427,7 +438,6 @@ const WorkOrder = () => {
         setDataSending(false);
       });
   };
-
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -475,7 +485,6 @@ const WorkOrder = () => {
       putData(formdata, workid);
     }
   };
-
 
   return (
     <CollapseCard id={"WorkOrder"} title={"Work Order"}>
@@ -671,7 +680,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <WorkOrderUploadFile file={file} id={id} workid={workid}/>
+                <WorkOrderUploadFile file={file} id={id} workid={workid} />
               </div>
             </div>
           </div>
@@ -709,7 +718,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <AgreemaneUploadFile file={file1} id={id} workid={workid}/>
+                <AgreemaneUploadFile file={file1} id={id} workid={workid} />
               </div>
             </div>
           </div>
@@ -747,7 +756,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <SiteHandOverUploadFile file={file2} id={id} workid={workid}/>
+                <SiteHandOverUploadFile file={file2} id={id} workid={workid} />
               </div>
             </div>
           </div>

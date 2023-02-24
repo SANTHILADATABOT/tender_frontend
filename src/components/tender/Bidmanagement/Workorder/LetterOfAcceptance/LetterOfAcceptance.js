@@ -52,7 +52,6 @@ const LetterOfAcceptance = () => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-    console.log("newFile",newFile);
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
@@ -152,19 +151,11 @@ const LetterOfAcceptance = () => {
 
   var setletterofacceptanceForm = (response) => {
     let data = response.data.letterofaccepttance[0];
-    // console.log(data)
+    
     if (data !== undefined) {
       setlettacpId(data.id);
       setDateValue(data.date ? data.date : "");
       setrefrenceNoValue(data.refrence_no ? data.refrence_no : "");
-      // setfromValue(data.from ? data.from : "");
-      // setmediumValue(data.medium ? data.medium : "");
-      // setmedRefrenceNoValue(data.med_refrence_no ? data.med_refrence_no : "");
-    //   mediumSelectValue(
-    //     data.medium_select
-    //       ? options.find((x) => x.value === data.medium_select)
-    //       : ""
-    //   );
     }
   };
 
@@ -176,7 +167,7 @@ const LetterOfAcceptance = () => {
     
     if (response.status === 200) {
       setletterofacceptanceForm(response);
-      setFileName(response.data.letterofaccepttance[0].wofile?response.data.letterofaccepttance[0].wofile:"");
+      setFileName(response.data.letterofaccepttance[0]?.wofile?response.data.letterofaccepttance[0].wofile:"");
     }
     else{
       setFileName("");
@@ -218,6 +209,7 @@ const LetterOfAcceptance = () => {
       });
       setFetchLoading(false);
     }
+    setFetchLoading(false);
   };
 
   useEffect(() => {
@@ -227,7 +219,6 @@ const LetterOfAcceptance = () => {
   }, [lettacpId]);
 
   const putData = (data, lettacpId) => {
-    console.log("Put Data");
     axios
       .post(
         `${baseUrl}/api/letteracceptance/creation/update/${lettacpId}`,

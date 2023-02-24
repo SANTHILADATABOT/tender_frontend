@@ -4,15 +4,7 @@ import { ImageConfig } from "../../Config";
 const WorkOrderUploadFile = (props) => {
   const [preview, setPreview] = useState();
   const [notAnImage, setNotAnImage] = useState(false);
-  //$$$
-  // console.log("8 :", props.file && !notAnImage)
-  console.log("8 :", props.file && !notAnImage)
-  console.log("9 :", props.file)
-  console.log("10 :", props.file?.type)
   
-
-
-
   useEffect(() => {
     if (!props.file) {
       setPreview(undefined);
@@ -21,6 +13,9 @@ const WorkOrderUploadFile = (props) => {
 
     if (!props.file || props.file.type.split("/")[0] !== "image") {
       setNotAnImage(true);
+    }
+    else{
+      setNotAnImage(false);
     }
 
     const objectUrl = URL.createObjectURL(props.file);
@@ -106,7 +101,7 @@ const WorkOrderUploadFile = (props) => {
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={//$$$
+                    src={
                       props.file &&
                       !notAnImage
                         ? preview
