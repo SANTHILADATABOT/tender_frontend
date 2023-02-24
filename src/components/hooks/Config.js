@@ -19,7 +19,7 @@ export const ImageConfig = {
     "vnd.ms-excel": fileXls,
     "xlsx": fileXls,
     "xls": fileXls,
-    "vnd.openxmlformats-officedocument.spreadsheetml.sheet": fileXls,
+    "vnd.openxmlformats-officedocument.spreadsheetml.sheet": fileXls, 
     'vnd.openxmlformats-officedocument.wordprocessingml.document' : fileDoc,
     'x-zip-compressed' : fileZip,
     'x-rar-compressed': fileRar,

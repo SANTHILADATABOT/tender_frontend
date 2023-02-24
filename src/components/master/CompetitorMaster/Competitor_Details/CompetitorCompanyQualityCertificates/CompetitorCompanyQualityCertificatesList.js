@@ -64,7 +64,7 @@ const CompetitorCompanyQualityCertificatesList = (props) => {
         </div>
       <div className="table-responsive">
         <table
-          className="table   text-center"
+          className="table text-center"
           id="qualityCertificateTable"
           width="100%"
           cellSpacing={0}
@@ -74,7 +74,7 @@ const CompetitorCompanyQualityCertificatesList = (props) => {
               <th scope="col">#</th>
               <th scope="col">Certificate</th>
               <th scope="col">Remarks</th>
-              <th scope="col">Image</th>
+              <th scope="col">File</th>
               <th scope="col">Action</th>
             </tr>
           </thead>

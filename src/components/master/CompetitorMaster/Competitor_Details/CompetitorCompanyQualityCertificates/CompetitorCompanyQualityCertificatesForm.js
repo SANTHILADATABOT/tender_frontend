@@ -11,6 +11,7 @@ import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 import "./UploadDoc.css";
 import Docsupload from "./Docsupload";
 import { ImageConfig } from "../../../../hooks/Config";
+import PreLoader from "../../../../UI/PreLoader";
 
 const CompetitorCompanyQualityCertificatesForm = () => {
   const { compid } = useParams();
@@ -23,14 +24,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     fileName: "",
   };
 
-  useEffect(() => {
-    if(compid)
-    {
-    getCompNo();
-    getQCList();
-    }
-  }, []);
-
+  
   const [competitorQCInput, setCompetitorQCInput] = useState(initialValue);
   const [formIsValid, setFormIsValid] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,6 +44,15 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const [fileName, setFileName] = useState("");
   const [FetchLoading, setFetchLoading] = useState(true);
 
+  useEffect(() => {
+    if (compid) {
+      getCompNo();
+      getQCList();
+    }
+  }, []);
+
+
+
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -65,6 +68,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const onFileDrop = (e) => {
     e.preventDefault();
     const newFile = e.target.files[0];
+
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
@@ -85,12 +89,21 @@ const CompetitorCompanyQualityCertificatesForm = () => {
           text: "Invalid File type",
           icon: "error",
           confirmButtonColor: "#2fba5f",
-        }).then(() => {
-          // setFile(null);
-        });
+        })
       }
     } else {
+      if(e.target.files[0].type==="text/plain")
+      {
+        Swal.fire({
+          title: "File Type",
+          text: "Invalid File type",
+          icon: "error",
+          confirmButtonColor: "#2fba5f",
+        })
+      }
+      else{
       setFile(newFile);
+      }
     }
   };
 
@@ -132,105 +145,101 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     axios
       .get(`${baseUrl}/api/competitordetails/qclist/${compid}`)
       .then((resp) => {
-  
         let list = [...resp.data.qc];
         let listarr = list.map((item, index) => ({
           ...item,
-          filepath:  
+          filepath:
             item.filepath !== "" &&
-            `<img src="${filePath}` +
-                item.filepath +
-                `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" />
-                <img src="${
             (item.filepath.split(".")[1] === "jpg" ||
               item.filepath.split(".")[1] === "png" ||
               item.filepath.split(".")[1] === "jpeg" ||
               item.filepath.split(".")[1] === "webp")
-              ? filePath + item.filepath
-              : item.filepath.split(".")[1] === "rar" ||
-                item.filepath.split(".")[1] === "vnd.rar" ||
-                item.filepath.split(".")[1] === "x-rar-compressed" ||
-                item.filepath.split(".")[1] === "x-rar"
-              ? ImageConfig["x-rar"]
-              : item.filepath.split(".")[1] === "pdf"
-              ? ImageConfig["pdf"]
-              : item.filepath.split(".")[1] === "doc" ||
-                item.filepath.split(".")[1] === "docx" ||
-                item.filepath.split(".")[1] === "msword" ||
-                item.filepath.split(".")[1] ===
-                  "vnd.openxmlformats-officedocument.wordprocessingml.document"
-              ? ImageConfig["doc"]
-              : item.filepath.split(".")[1] === "zip" ||
-                item.filepath.split(".")[1] === "multipart/x-zip" ||
-                item.filepath.split(".")[1] === "x-zip" ||
-                item.filepath.split(".")[1] === "x-zip-compressed"
-              ? ImageConfig["zip"]
-              : item.filepath.split(".")[1] === "xls" ||
-                item.filepath.split(".")[1] === "xlsx" ||
-                item.filepath.split(".")[1] === "vnd.ms-excel" ||
-                item.filepath.split(".")[1] ===
-                  "vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              ? ImageConfig["vnd.ms-excel"]
-              : item.filepath.split(".")[1] === "csv"
-              ? ImageConfig["csv"]
-              : ImageConfig["default"]
-              }" class="rounded-circle pointer" width="40" height="30" alt="" style="cursor:pointer"></img>`,
+              ? `<img src="${filePath}` +
+                item.filepath +
+                `" class="rounded-circle pointer" width="40" height="40" style="cursor:pointer" />`
+              : `<img src="${
+                  item.filepath.split(".")[1] === "rar" ||
+                  item.filepath.split(".")[1] === "vnd.rar" ||
+                  item.filepath.split(".")[1] === "x-rar-compressed" ||
+                  item.filepath.split(".")[1] === "x-rar"
+                    ? ImageConfig["x-rar"]
+                    : item.filepath.split(".")[1] === "pdf"
+                    ? ImageConfig["pdf"]
+                    : item.filepath.split(".")[1] === "doc" ||
+                      item.filepath.split(".")[1] === "docx" ||
+                      item.filepath.split(".")[1] === "msword" ||
+                      item.filepath.split(".")[1] ===
+                        "vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    ? ImageConfig["doc"]
+                    : item.filepath.split(".")[1] === "zip" ||
+                      item.filepath.split(".")[1] === "multipart/x-zip" ||
+                      item.filepath.split(".")[1] === "x-zip" ||
+                      item.filepath.split(".")[1] === "x-zip-compressed"
+                    ? ImageConfig["zip"]
+                    : item.filepath.split(".")[1] === "xls" ||
+                      item.filepath.split(".")[1] === "xlsx" ||
+                      item.filepath.split(".")[1] === "vnd.ms-excel" ||
+                      item.filepath.split(".")[1] ===
+                        "vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    ? ImageConfig["vnd.ms-excel"]
+                    : item.filepath.split(".")[1] === "csv"
+                    ? ImageConfig["csv"]
+                    : ImageConfig["default"]
+                }" class="rounded-circle pointer" width="40" height="40" alt="" style="cursor:pointer"></img>`,
 
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
         setQCList(listarr);
+      }).then(()=>{
+        setFetchLoading(false);
       });
-    setFetchLoading(false);
   };
 
-    const onEdit = (data) => {
-    // setFile("");
+  const onEdit = (data) => {
     setFormIsValid(true);
     setCompetitorQCInput({
       qcId: data.id,
       compNo: data.compNo,
-      cerName: data.cerName?data.cerName:"",
-      remark: data.remark?data.remark:"",
+      cerName: data.cerName ? data.cerName : "",
+      remark: data.remark ? data.remark : "",
     });
 
     if (data.filepath) {
-      axios({
-        url: `${baseUrl}/api/download/competitorqcertificate/${data.id}`,
-        method: "GET",
-        responseType: "blob", // important
-        headers: {
-          //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          setFile(response);
-          
-          if(response.hasOwnProperty("data") )
-          // && response.data.type==="application/octet-stream")
-          {
-            let pattern = /[A-Za-z0-9]+[\.][a-zA-Z]+/gm;
-            setFileName(data.filepath.match(pattern));
+      axios
+        .get(`${baseUrl}/api/competitorqcertificate/${data.id}`)
+        .then((resp) => {
+          if (resp.status === 200) {
+            if (resp.data.qc[0].filepath) {
+              setFileName(resp.data.qc[0].filepath);
+              axios({
+                url: `${baseUrl}/api/download/competitorqcertificate/${data.id}`,
+                method: "GET",
+                responseType: "blob", // important
+                headers: {
+                  //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+                  "Cache-Control": "no-cache",
+                  Pragma: "no-cache",
+                  Expires: "0",
+                  Accept: doctype,
+                },
+              }).then((response) => {
+                if (response.status === 200) {
+                  setFile(response);
+                } else if (response.status === 204) {
+                  setFile("");
+                  setFileName("");
+                } else {
+                  alert("Unable to Process Now!");
+                }
+              });
+            }
           }
-          // setFileName(data.cerName);
-        } else if (response.status === 204) {
-          setFile("");
-          setFileName("");
-
-        } else {
-          alert("Unable to Process Now!");
-        }
-      });
+        });
     }
-    setFetchLoading(false);
   };
-
   const onPreview = (data) => {
-    // console.log("file.data.type.split(/)[0] ",file.data.type.split("/")[0] );
-     if (file !== "" && file.data.type.split("/")[0] === "image") {
+    if (file !== "" && file.data.type.split("/")[0] === "image") {
       return window.open(data.filepath), "_blank";
     }
   };
@@ -526,25 +535,10 @@ const CompetitorCompanyQualityCertificatesForm = () => {
       });
     }
   };
-  const removeImgHandler = (e) => {
-    setFile("");
-    setPreviewObjURL("");
-    setPreviewForEdit("");
-  };
-
-  // const downloadDoc = () => {
-  //   const url = window.URL.createObjectURL(file);
-  //   const link = document.createElement("a");
-  //   link.href = url;
-  //   link.setAttribute(
-  //     "download",
-  //     file.name ? file.name : competitorQCInput.cerName
-  //   );
-  //   document.body.appendChild(link);
-  //   link.click();
-  // };
+ 
 
   return (
+    <PreLoader loading={FetchLoading}>
     <div className="card-body ">
       <form>
         <div className="row align-items-center">
@@ -679,8 +673,10 @@ const CompetitorCompanyQualityCertificatesForm = () => {
         onEdit={onEdit}
         onDelete={onDelete}
         onPreview={onPreview}
+
       />
     </div>
+    </PreLoader>
   );
 };
 export default CompetitorCompanyQualityCertificatesForm;
