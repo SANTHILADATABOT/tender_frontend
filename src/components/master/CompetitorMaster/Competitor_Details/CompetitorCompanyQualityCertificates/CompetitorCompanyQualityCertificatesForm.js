@@ -51,8 +51,6 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     }
   }, []);
 
-
-
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -72,7 +70,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "File size too Large...?!",
+        text: "File size too Large...!",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {

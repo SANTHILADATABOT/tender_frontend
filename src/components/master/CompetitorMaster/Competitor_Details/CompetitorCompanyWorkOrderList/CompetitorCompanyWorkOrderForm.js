@@ -70,7 +70,7 @@ const CompetitorCompanyWorkOrderForm = () => {
   const [editDataUnit, setEditDataUnit] = useState("");
   const [FetchLoading, setFetchLoading] = useState(false);
   const [ListLoading, setListLoading] = useState(false);
-  
+  const [fileSize, setFileSize] = useState(0);
 
   const [hasError, setHasError] = useState({
     custName: false,
@@ -89,7 +89,7 @@ const CompetitorCompanyWorkOrderForm = () => {
   });
 
   useEffect(() => {
-    setListLoading(true)
+    setListLoading(true);
     getCompNo();
     getStateList();
     getUnitList();
@@ -118,12 +118,14 @@ const CompetitorCompanyWorkOrderForm = () => {
   };
 
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
-
+  console.log("FileSize",fileSize);
   const onFileDrop = (e) => {
     if (e.target.name === "woUpload") {
       const newFile = e.target.files[0];
       if (newFile) {
         setFile(newFile);
+        setFileSize((prev)=> prev+newFile.size);
+        
         setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
         // var uploaded_wo_file_name=e.target.files[0].name;
         var type = e.target.files[0].name.split(".")[1]; // To Find type of File
@@ -143,6 +145,7 @@ const CompetitorCompanyWorkOrderForm = () => {
       });
       if (newFile) {
         setFile1(newFile);
+        setFileSize((prev)=> prev+newFile.size);
         setPreviewObjURL1(URL.createObjectURL(e.target.files[0]));
         if (previewForEdit1) {
           setPreviewForEdit1("");
@@ -161,7 +164,10 @@ const CompetitorCompanyWorkOrderForm = () => {
   };
 
   useEffect(() => {
-    if (woFile && woFile.size > maxImageSize) {
+    let len = woFile?.name?.split(".").length;
+    if(woFile && fileSize > maxImageSize)
+    {
+      setFileSize(prev=>prev-woFile.size);
       Swal.fire({
         title: "File Size",
         text: "File size is too Large",
@@ -171,12 +177,21 @@ const CompetitorCompanyWorkOrderForm = () => {
         setFile("");
         setPreviewObjURL("");
       });
+    // if (woFile && woFile.size > maxImageSize) {
+    //   Swal.fire({
+    //     title: "File Size",
+    //     text: "File size is too Large",
+    //     icon: "error",
+    //     confirmButtonColor: "#2fba5f",
+    //   }).then(() => {
+    //     setFile("");
+    //     setPreviewObjURL("");
+    //   });
     } else if (woFile && !doctype.includes(woFile.type)) {
-      let len = woFile?.name?.split(".").length;
       if (woFile?.name?.split(".")[len - 1] !== "rar") {
         Swal.fire({
           title: "File Type",
-          text: "Invalid File Type ",
+          text: "Invalid File Type",
           icon: "error",
           confirmButtonColor: "#2fba5f",
         }).then(() => {
@@ -184,22 +199,46 @@ const CompetitorCompanyWorkOrderForm = () => {
           setPreviewObjURL("");
         });
       }
+    } else if (
+      FileName.woFile === "text/plain" ||
+      woFile?.name?.split(".")[len - 1] === "txt"
+    ) {
+      Swal.fire({
+        title: "File Type",
+        text: "Invalid File Type",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile("");
+        setPreviewObjURL("");
+      });
     }
   }, [woFile]);
 
   useEffect(() => {
-    if (completionFile && completionFile.size > maxImageSize) {
+    let len = completionFile?.name?.split(".").length;
+    if (completionFile && fileSize > maxImageSize) {
+      setFileSize(prev=>prev-completionFile.size);
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "File Size is too large",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile1("");
         setPreviewObjURL1("");
       });
+    // if (completionFile && completionFile.size > maxImageSize) {
+    //   Swal.fire({
+    //     title: "File Size",
+    //     text: "File Size is too large",
+    //     icon: "error",
+    //     confirmButtonColor: "#2fba5f",
+    //   }).then(() => {
+    //     setFile1("");
+    //     setPreviewObjURL1("");
+    //   });
     } else if (completionFile && !doctype.includes(completionFile.type)) {
-      let len = completionFile?.name?.split(".").length;
       if (completionFile?.name?.split(".")[len - 1] !== "rar") {
         // else if (completionFile && !doctype.includes(completionFile.type)) {
         Swal.fire({
@@ -212,6 +251,19 @@ const CompetitorCompanyWorkOrderForm = () => {
           setPreviewObjURL1("");
         });
       }
+    } else if (
+      FileName.completionFile === "text/plain" ||
+      completionFile?.name?.split(".")[len - 1] === "txt"
+    ) {
+      Swal.fire({
+        title: "File Type",
+        text: "Invalid File Type",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile1("");
+        setPreviewObjURL1("");
+      });
     }
   }, [completionFile]);
 
@@ -330,11 +382,9 @@ const CompetitorCompanyWorkOrderForm = () => {
         }));
         setWOList(listarr);
       })
-      .then(()=>{
-        setListLoading(false)
-      })
-      ;
-      
+      .then(() => {
+        setListLoading(false);
+      });
   };
 
   const getImageUrl = (id) => {
@@ -358,6 +408,7 @@ const CompetitorCompanyWorkOrderForm = () => {
             },
           }).then((response) => {
             if (response.status === 200) {
+              setFileSize(prev=>prev+response.data.size);
               setFile(response.data);
               setPreviewObjURL(URL.createObjectURL(response.data));
               setPreviewFileType((prev) => {
@@ -392,6 +443,7 @@ const CompetitorCompanyWorkOrderForm = () => {
             },
           }).then((response) => {
             if (response.status === 200) {
+              setFileSize(prev=>prev+response.data.size);
               setFile1(response.data);
               setPreviewObjURL1(URL.createObjectURL(response.data));
               setPreviewFileType((prev) => {
@@ -739,12 +791,15 @@ const CompetitorCompanyWorkOrderForm = () => {
   };
 
   const removeImgHandler = (e) => {
+    console.log("remove handler", e.target, " ----");
     //e.target.name receives only undefiend so used 'e.target.id'
     if (e.target.id === "woUpload") {
+      setFileSize(prev=>prev-woFile.size);
       setFile("");
       setPreviewObjURL("");
       setPreviewForEdit("");
     } else if (e.target.id === "completionCertificate") {
+      setFileSize(prev=>prev-completionFile.size);
       setFile1("");
       setPreviewObjURL1("");
       setPreviewForEdit1("");
@@ -1252,16 +1307,18 @@ const CompetitorCompanyWorkOrderForm = () => {
                                 title="Click for Preview"
                               />
                             )}
-                            &nbsp;&nbsp;&nbsp;
+
                             {previewObjURL !== null && (
-                              <span
-                                className="fa fa-close text-danger h4 closebtn pointer"
+                              <button
+                                type="button"
+                                className="close"
+                                aria-label="Close"
                                 onClick={removeImgHandler}
-                                name="woUpload"
-                                id="woUpload"
                               >
-                                &nbsp;
-                              </span>
+                                <span aria-hidden="true" id="woUpload">
+                                  &times;
+                                </span>
+                              </button>
                             )}
                           </div>
                         </div>
@@ -1377,16 +1434,21 @@ const CompetitorCompanyWorkOrderForm = () => {
                                 title="Click for Preview"
                               />
                             )}
-                            &nbsp;&nbsp;&nbsp;
+                            
                             {previewObjURL1 && (
-                              <span
-                                className="fa fa-close text-danger h4 closebtn"
+                              <button
+                                type="button"
+                                className="close"
+                                aria-label="Close"
                                 onClick={removeImgHandler}
-                                name="completionCertificate"
-                                id="completionCertificate"
                               >
-                                &nbsp;
-                              </span>
+                                <span
+                                  aria-hidden="true"
+                                  id="completionCertificate"
+                                >
+                                  &times;
+                                </span>
+                              </button>
                             )}
                           </div>
                         </div>
@@ -1439,13 +1501,13 @@ const CompetitorCompanyWorkOrderForm = () => {
         </form>
       </PreLoader>
       <PreLoader loading={ListLoading}>
-      <CompetitorCompanyWorkOrderList
-        wOList={wOList}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        onPreview={onPreview}
-        onPreview1={onPreview1}
-      />
+        <CompetitorCompanyWorkOrderList
+          wOList={wOList}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onPreview={onPreview}
+          onPreview1={onPreview1}
+        />
       </PreLoader>
     </div>
   );
