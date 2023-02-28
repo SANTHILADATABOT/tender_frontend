@@ -59,24 +59,26 @@ const WorkOrder = () => {
 console.log("FileSize",FileSize)
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-    setFilesize((prev) => {return{...prev, file: parseInt(newFile.size), total: FileSize.total+newFile.size}});
-    if (newFile && newFile.size > maxImageSize) {
+    setFilesize((prev) => {return{...prev, file: parseInt(newFile.size), total: FileSize.file1+FileSize.file2+newFile.size}});
+    if (newFile && FileSize.total > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "File Size is too Large",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile(null);
+        setFilesize((prev) => {return{...prev, file: 0, total: (FileSize.file1+FileSize.file2)-newFile.size}});
       });
     } else if (newFile && !doctype.includes(newFile.type)) {
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File Type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile(null);
+        setFilesize((prev) => {return{...prev, file: 0, total: (FileSize.file1+FileSize.file2)-newFile.size}});
       });
     } else {
       setFile(newFile);
@@ -97,23 +99,26 @@ console.log("FileSize",FileSize)
 
   const onFileDrop1 = (e) => {
     const newFile1 = e.target.files[0];
-    if (newFile1 && newFile1.size > maxImageSize) {
+    setFilesize((prev) => {return{...prev, file1: parseInt(newFile1.size), total: FileSize.file1+FileSize.file2+newFile1.size}});
+    if (newFile1 && FileSize.total > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "Exceeding maximum allowed File size..!",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile1(null);
+        setFilesize((prev) => {return{...prev, file1: 0, total: (FileSize.file1+FileSize.file2)-newFile1.size}});
       });
     } else if (newFile1 && !doctype.includes(newFile1.type)) {
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File Type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile1(null);
+        setFilesize((prev) => {return{...prev, file1: 0, total: (FileSize.file1+FileSize.file2)-newFile1.size}});
       });
     } else {
       setFile1(newFile1);
@@ -129,27 +134,36 @@ console.log("FileSize",FileSize)
     wrapperRef.current.classList.remove("dragover");
     setdragover2(false);
   };
+// console.log("maxImageSize", maxImageSize)
+// console.log("File 1 Size", file1?.size)
+// console.log("maxImageSize<File1", maxImageSize<file1?.size)
 
   const onDrop2 = () => wrapperRef.current.classList.remove("dragover");
   const onFileDrop2 = (e) => {
     const newFile2 = e.target.files[0];
-    if (newFile2 && newFile2.size > maxImageSize) {
+    console.log("FileSize.total befo", FileSize.total)
+    setFilesize((prev) => {return{...prev, file2: parseInt(newFile2.size), total: FileSize.file1+FileSize.file2+newFile2.size}});
+    console.log("FileSize.total after", FileSize.total)
+    console.log("maxImageSize<FileSize.total", maxImageSize<FileSize.total)
+    if (newFile2 && FileSize.total > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "Exceeding maximum allowed File size..!",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile2(null);
+        setFilesize((prev) => {return{...prev, file2: 0, total: (FileSize.file1+FileSize.file2)-newFile2.size}});
       });
     } else if (newFile2 && !doctype.includes(newFile2.type)) {
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File Type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile2(null);
+        setFilesize((prev) => {return{...prev, file2: 0, total: (FileSize.file1+FileSize.file2)-newFile2.size}});
       });
     } else {
       setFile2(newFile2);
