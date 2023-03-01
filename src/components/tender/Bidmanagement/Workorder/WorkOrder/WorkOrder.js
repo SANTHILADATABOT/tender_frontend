@@ -5,11 +5,7 @@ import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import useInputValidation from "../../../../hooks/useInputValidation";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
-//import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
-// import {
-//   isNotEmpty,
-//   isNotNull,
-// } from "../../../CommonFunctions/CommonFunctions";
+
 import {
   isNotEmpty,
   isNotNull,
@@ -42,7 +38,13 @@ const WorkOrder = () => {
     file: 0,
     file1: 0,
     file2: 0,
-    total: 0
+    total: 0,
+  });
+
+  const [fileName, setFileName] = useState({
+    file: "",
+    file1: "",
+    file2: "",
   });
 
   const onDragEnter = () => {
@@ -56,11 +58,10 @@ const WorkOrder = () => {
   };
 
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
-console.log("FileSize",FileSize)
+
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-    setFilesize((prev) => {return{...prev, file: parseInt(newFile.size), total: FileSize.file1+FileSize.file2+newFile.size}});
-    if (newFile && FileSize.total > maxImageSize) {
+    if (newFile && FileSize.total + newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
         text: "File Size is too Large",
@@ -68,7 +69,23 @@ console.log("FileSize",FileSize)
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile(null);
-        setFilesize((prev) => {return{...prev, file: 0, total: (FileSize.file1+FileSize.file2)-newFile.size}});
+        setFilesize((prev) => {
+          return { ...prev, file: 0, total: FileSize.file1 + FileSize.file2 };
+        });
+      });
+    } else if (
+      e.target.files[0].type === "" &&
+      e.target.files[0].name.split(".")[
+        e.target.files[0].name.split(".").length - 1
+      ] === "rar"
+    ) {
+      setFile(newFile);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file: parseInt(newFile.size),
+          total: FileSize.file1 + FileSize.file2 + newFile.size,
+        };
       });
     } else if (newFile && !doctype.includes(newFile.type)) {
       Swal.fire({
@@ -78,11 +95,21 @@ console.log("FileSize",FileSize)
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile(null);
-        setFilesize((prev) => {return{...prev, file: 0, total: (FileSize.file1+FileSize.file2)-newFile.size}});
+        setFilesize((prev) => {
+          return { ...prev, file: 0, total: FileSize.file2 + FileSize.file1 };
+        });
       });
     } else {
       setFile(newFile);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file: parseInt(newFile.size),
+          total: FileSize.file1 + FileSize.file2 + newFile.size,
+        };
+      });
     }
+    setFileName(prev=>{return{...prev, file: ""}})
   };
 
   const onDragEnter1 = () => {
@@ -99,8 +126,8 @@ console.log("FileSize",FileSize)
 
   const onFileDrop1 = (e) => {
     const newFile1 = e.target.files[0];
-    setFilesize((prev) => {return{...prev, file1: parseInt(newFile1.size), total: FileSize.file1+FileSize.file2+newFile1.size}});
-    if (newFile1 && FileSize.total > maxImageSize) {
+
+    if (newFile1 && FileSize.total + newFile1.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
         text: "Exceeding maximum allowed File size..!",
@@ -108,7 +135,23 @@ console.log("FileSize",FileSize)
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile1(null);
-        setFilesize((prev) => {return{...prev, file1: 0, total: (FileSize.file1+FileSize.file2)-newFile1.size}});
+        setFilesize((prev) => {
+          return { ...prev, file1: 0, total: FileSize.file + FileSize.file2 };
+        });
+      });
+    } else if (
+      e.target.files[0].type === "" &&
+      e.target.files[0].name.split(".")[
+        e.target.files[0].name.split(".").length - 1
+      ] === "rar"
+    ) {
+      setFile1(newFile1);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file1: parseInt(newFile1.size),
+          total: FileSize.file + FileSize.file2 + newFile1.size,
+        };
       });
     } else if (newFile1 && !doctype.includes(newFile1.type)) {
       Swal.fire({
@@ -118,11 +161,21 @@ console.log("FileSize",FileSize)
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile1(null);
-        setFilesize((prev) => {return{...prev, file1: 0, total: (FileSize.file1+FileSize.file2)-newFile1.size}});
+        setFilesize((prev) => {
+          return { ...prev, file1: 0, total: FileSize.file + FileSize.file2 };
+        });
       });
     } else {
       setFile1(newFile1);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file1: parseInt(newFile1.size),
+          total: FileSize.file + FileSize.file2 + newFile1.size,
+        };
+      });
     }
+    setFileName(prev=>{return{...prev, file1: ""}})
   };
 
   const onDragEnter2 = () => {
@@ -134,26 +187,35 @@ console.log("FileSize",FileSize)
     wrapperRef.current.classList.remove("dragover");
     setdragover2(false);
   };
-// console.log("maxImageSize", maxImageSize)
-// console.log("File 1 Size", file1?.size)
-// console.log("maxImageSize<File1", maxImageSize<file1?.size)
 
   const onDrop2 = () => wrapperRef.current.classList.remove("dragover");
   const onFileDrop2 = (e) => {
     const newFile2 = e.target.files[0];
-    console.log("FileSize.total befo", FileSize.total)
-    setFilesize((prev) => {return{...prev, file2: parseInt(newFile2.size), total: FileSize.file1+FileSize.file2+newFile2.size}});
-    console.log("FileSize.total after", FileSize.total)
-    console.log("maxImageSize<FileSize.total", maxImageSize<FileSize.total)
-    if (newFile2 && FileSize.total > maxImageSize) {
+    if (newFile2 && FileSize.total + newFile2.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
         text: "Exceeding maximum allowed File size..!",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
+        setFilesize((prev) => {
+          return { ...prev, file2: 0, total: FileSize.file + FileSize.file1 };
+        });
         setFile2(null);
-        setFilesize((prev) => {return{...prev, file2: 0, total: (FileSize.file1+FileSize.file2)-newFile2.size}});
+      });
+    } else if (
+      e.target.files[0].type === "" &&
+      e.target.files[0].name.split(".")[
+        e.target.files[0].name.split(".").length - 1
+      ] === "rar"
+    ) {
+      setFile2(newFile2);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file2: parseInt(newFile2.size),
+          total: FileSize.file + FileSize.file1 + newFile2.size,
+        };
       });
     } else if (newFile2 && !doctype.includes(newFile2.type)) {
       Swal.fire({
@@ -163,11 +225,21 @@ console.log("FileSize",FileSize)
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile2(null);
-        setFilesize((prev) => {return{...prev, file2: 0, total: (FileSize.file1+FileSize.file2)-newFile2.size}});
+        setFilesize((prev) => {
+          return { ...prev, file2: 0, total: FileSize.file + FileSize.file1 };
+        });
       });
     } else {
       setFile2(newFile2);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file2: parseInt(newFile2.size),
+          total: FileSize.file + FileSize.file1 + newFile2.size,
+        };
+      });
     }
+    setFileName(prev=>{return{...prev, file2: ""}})
   };
 
   const {
@@ -311,6 +383,7 @@ console.log("FileSize",FileSize)
       setOrderDateValue(data.orderdate ? data.orderdate : "");
       setAgreeDateValue(data.agreedate ? data.agreedate : "");
       SiteHandOverDateValue(data.sitehandoverdate ? data.sitehandoverdate : "");
+      setFileName({file: data.wofile?data.wofile:"", file1: data.agfile?data.agfile:"", file2:  data.shofile?data.shofile:""})
     }
   };
 
@@ -334,6 +407,8 @@ console.log("FileSize",FileSize)
     //response.data.name = wofilename;
     setFile(response.data);
   };
+
+  // useEffect(() => {}, [file, file1, file2]);
 
   var getWorkOrderImage = async () => {
     if (workid) {
@@ -694,7 +769,7 @@ console.log("FileSize",FileSize)
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <WorkOrderUploadFile file={file} id={id} workid={workid} />
+                <WorkOrderUploadFile file={file} id={id} workid={workid} fileName={fileName.file}/>
               </div>
             </div>
           </div>
@@ -732,7 +807,7 @@ console.log("FileSize",FileSize)
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <AgreemaneUploadFile file={file1} id={id} workid={workid} />
+                <AgreemaneUploadFile file={file1} id={id} workid={workid} fileName={fileName.file1} />
               </div>
             </div>
           </div>
@@ -770,7 +845,7 @@ console.log("FileSize",FileSize)
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <SiteHandOverUploadFile file={file2} id={id} workid={workid} />
+                <SiteHandOverUploadFile file={file2} id={id} workid={workid} fileName={fileName.file2} />
               </div>
             </div>
           </div>

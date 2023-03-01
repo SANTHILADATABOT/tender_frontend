@@ -306,7 +306,7 @@ useEffect(() => {
 
 
   const onDelete = (data) => {
-    console.log(data);
+    // console.log(data);
     
     Swal.fire({
       text: `Are You sure, to delete ?`,

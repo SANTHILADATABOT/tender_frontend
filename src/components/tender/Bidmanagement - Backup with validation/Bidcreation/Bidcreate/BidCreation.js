@@ -273,7 +273,7 @@ const BidCreation = () => {
   const setBidNo = (statecode, lastId, year, month) => {
     let newSqNo = "";
     let prevYear=parseInt(lastId.substring(5, 7));
-    console.log("statecode, lastId, year, month",statecode, lastId, year, month);
+    // console.log("statecode, lastId, year, month",statecode, lastId, year, month);
     if(lastId==="000" || year>prevYear){
      //Yearly reset or First Entry for Bid no Sequence No done here  
       newSqNo="001";
@@ -330,7 +330,7 @@ const BidCreation = () => {
         // lastId !== "" &&
         // lastId !== undefined
       ) {
-        console.log("Test23");
+        // console.log("Test23");
         var now = new Date();
         var currentYear = now.getFullYear() % 1000;
         var currentMonth =
@@ -342,7 +342,7 @@ const BidCreation = () => {
           .then((resp) => {
             statecode = resp.data.state_code;
             getLastCustomerId(statecode);
-            console.log("lastId && statecode",lastId && statecode);
+            // console.log("lastId && statecode",lastId && statecode);
             if (lastId && statecode) {
               setBidNo(statecode, lastId, currentYear, currentMonth);
             } else {

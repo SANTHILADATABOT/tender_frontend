@@ -790,7 +790,7 @@ const CompetitorCompanyWorkOrderForm = () => {
   };
 
   const removeImgHandler = (e) => {
-    console.log("remove handler", e.target, " ----");
+    // console.log("remove handler", e.target, " ----");
     //e.target.name receives only undefiend so used 'e.target.id'
     if (e.target.id === "woUpload") {
       setFileSize(prev=>prev-woFile.size);

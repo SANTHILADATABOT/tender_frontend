@@ -46,7 +46,7 @@ const UploadDoc = () => {
   const onDrop = () => wrapperRef.current.classList.remove(styles['dragover']);
 
   const onFileDrop = (e) => {
-    console.log("File :",e.target.files);
+    // console.log("File :",e.target.files);
     const newFile = e.target.files[0];
 
     let filetypes = newFile.type

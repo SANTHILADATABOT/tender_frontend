@@ -79,11 +79,14 @@ const AcceptedBidders = (props) => {
 
   return (
     <Fragment>
-      {acceptedBidders.map((item) => {
+      {acceptedBidders.map((item, index) => {
         return (
           <div className="row mb-2" key={item.competitorId}>
-            <div className="col-sm-1"> </div>
-            <div className="col-lg-4 text-dark text-left mr-4">
+            {/* <div className="col-sm-1"> </div> */}
+            <div className="col-lg-2 text-dark font-weight-bold text-left ">
+          <label>Name of Bidder {index + 1}</label>
+        </div>
+            <div className="col-lg-3 text-dark text-left mr-4">
               <label>{item.compName}</label>
             </div>
 

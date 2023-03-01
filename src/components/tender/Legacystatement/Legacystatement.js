@@ -119,8 +119,8 @@ function Legacystatement() {
 		  quality: (item.quality) ? item.quality.toLocaleString('en-IN') : '',
 		  projectvalue: (item.estprojectvalue) ? item.estprojectvalue.toLocaleString('en-IN') : '',
 		  status:`<span class="font-weight-bold" style="color:orange;">${item.tenderStatus}</span>`,
-		  action:`
-		  <i class="fa fa-print text-info mr-2 h6" style="cursor:pointer; font-size: 1.25rem" title="Print"></i>`,
+		//   action:`
+		//   <i class="fa fa-print text-info mr-2 h6" style="cursor:pointer; font-size: 1.25rem" title="Print"></i>`,
 		//   <i class="fas fa-edit text-success mx-2 h6" style="cursor:pointer" title="Edit"></i> 
 		//   <i class="fa fa-trash-o  text-danger h6  mx-2" style="cursor:pointer; font-size: 1.25rem"  title="Delete"></i>
 		

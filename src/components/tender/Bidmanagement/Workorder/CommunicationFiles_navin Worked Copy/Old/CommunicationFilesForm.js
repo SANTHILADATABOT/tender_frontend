@@ -73,7 +73,7 @@ const CommunicationFilesForm = () => {
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const onFileDrop = (e) => {
-    console.log("File :",e.target.file);
+    // console.log("File :",e.target.file);
     const newFile = e.target.files[0];
     if(e.target.files[0]){
     var splited = newFile.name.split(".");
@@ -221,7 +221,7 @@ const CommunicationFilesForm = () => {
   };
 
   const onDelete = (data) => {
-    console.log("Data", data);
+    // console.log("Data", data);
     Swal.fire({
       text: `Are You sure, to delete ?`,
       icon: "warning",
@@ -474,7 +474,7 @@ const CommunicationFilesForm = () => {
         for (var key in datatosend) {
           formdata.append(key, datatosend[key]);
         }
-        console.log("Input", input);
+        // console.log("Input", input);
         axios
           .post(
             `${baseUrl}/api/workorder/creation/communicationfiles/${input.commId}`,

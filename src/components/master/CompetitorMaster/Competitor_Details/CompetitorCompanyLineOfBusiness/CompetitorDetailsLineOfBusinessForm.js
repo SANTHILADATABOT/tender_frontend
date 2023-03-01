@@ -156,7 +156,7 @@ useEffect(() => {
       bizLineValue: competitorBizLineInput.bizLineValue,
       tokenId: tokenId,
     };
-    console.log("datatosend",datatosend);
+    // console.log("datatosend",datatosend);
     if (
       datatosend.compId !== null &&
       datatosend.compNo !== null &&

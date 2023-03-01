@@ -177,7 +177,7 @@ const CustomerCreationBankDetails = () => {
         setdatasending(true)
 
         if (!formIsValid) {
-          console.log("Inavlid Form!");
+          // console.log("Inavlid Form!");
           setdatasending(false)
           return;
         }
@@ -206,7 +206,7 @@ const CustomerCreationBankDetails = () => {
 
     const postData = (data) => {
       axios.post(`${baseUrl}/api/customercreationbankdetails`, data).then((resp) => {
-        console.log(resp);
+        // console.log(resp);
         if (resp.data.status === 200) {
           getsublist()
           toastSuccess(resp.data.message)
@@ -221,7 +221,7 @@ const CustomerCreationBankDetails = () => {
 
     const putData = (data) => {
       axios.put(`${baseUrl}/api/customercreationbankdetails/${bankid}`, data).then((resp) =>{
-        console.log(resp);
+        // console.log(resp);
         if (resp.data.status === 200) {
           getsublist()
           resetform()

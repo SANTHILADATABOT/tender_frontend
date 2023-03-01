@@ -243,7 +243,7 @@ const StatusModal = (props) => {
       return;
     }
 
-    console.log("Submitted!");
+    // console.log("Submitted!");
 
     const formdata = new FormData();
 

@@ -205,7 +205,7 @@ const CommunicationFilesCreation = () => {
 
         for (let chosenFile of chosenFiles) {
             let filetypes = chosenFile.type;
-            console.log(filetypes)
+            // console.log(filetypes)
             if (
                 uploadedFiles.findIndex((f) => f.name === chosenFile.name) === -1 &&
                 (acceptedFileTypes.includes(filetypes) || filetypes.split('/')[0] === "image" || chosenFile.name.split('.').pop() === 'rar')

@@ -219,7 +219,7 @@ const CommunicationFilesForm = () => {
   };
 
   const onDelete = (data) => {
-    console.log("Data", data);
+    // console.log("Data", data);
     Swal.fire({
       text: `Are You sure, to delete ?`,
       icon: "warning",
@@ -472,7 +472,7 @@ const CommunicationFilesForm = () => {
         for (var key in datatosend) {
           formdata.append(key, datatosend[key]);
         }
-        console.log("Input", input);
+        // console.log("Input", input);
         axios
           .post(
             `${baseUrl}/api/workorder/creation/communicationfiles/${input.commId}`,

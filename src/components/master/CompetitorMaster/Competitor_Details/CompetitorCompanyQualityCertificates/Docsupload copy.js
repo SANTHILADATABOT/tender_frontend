@@ -6,7 +6,7 @@ const Docsupload = (props) => {
   const [preview, setPreview] = useState("");
   const [doc, setDoc] = useState("");
   let filesize = 0;
-console.log("props",props);
+// console.log("props",props);
   if (props.file.hasOwnProperty("data")) {
     setDoc(props.file.data);
     filesize=props.file.data.size;
@@ -16,7 +16,7 @@ console.log("props",props);
   }
 
     useEffect(() => {
-      console.log("UseEffect");
+      // console.log("UseEffect");
     if (
       !props.file ||
       (props.file.type.split("/")[0] !== "image" &&

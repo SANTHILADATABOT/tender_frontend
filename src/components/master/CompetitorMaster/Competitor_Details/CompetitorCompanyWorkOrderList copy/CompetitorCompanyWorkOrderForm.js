@@ -626,7 +626,7 @@ const CompetitorCompanyWorkOrderForm = () => {
       }
       //When Image is changed/reuploaded on update (either woFile or completionFile)
       else if ((previewForEdit === "" && woFile !== "") | (previewForEdit !== "" && woFile === "") | (previewForEdit1 === "" && completionFile !== "") | (previewForEdit1 !== "" && completionFile ==="")){
-        console.log("When Image is changed/reuploaded on update");
+        // console.log("When Image is changed/reuploaded on update");
         const datatosend = {
           compId: compid,
           compNo: competitorWOInput.compNo,

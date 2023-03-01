@@ -120,7 +120,7 @@ const TenderParticipation = () => {
       return;
     }
 
-    console.log("Submitted!");
+    // console.log("Submitted!");
 
     let bidcreationData = {
         tenderParticipation: tenderParticipationValue,

@@ -69,12 +69,12 @@ function Bidmanagement(props) {
       status:`<span class="font-weight-bold text-primary">${item.tenderStatus}</span>`,
       current_stage:`<span class="font-weight-bold text-warning">Stage</span>`,
       action:`
-      <i class="fa fa-print text-info mr-2 h6" style="cursor:pointer; font-size: 1.25rem" title="Print"></i> 
+      
       <i class="fas fa-edit text-success mx-2 h6" style="cursor:pointer" title="Edit"></i> 
       <i class="fa fa-trash-o  text-danger h6  mx-2" style="cursor:pointer; font-size: 1.25rem"  title="Delete"></i>`,
       sl_no : index+1
     }))
-
+// <i class="fa fa-print text-info mr-2 h6" style="cursor:pointer; font-size: 1.25rem" title="Print"></i>  -- To add @ line 72 
     return listarr;
   }
 
