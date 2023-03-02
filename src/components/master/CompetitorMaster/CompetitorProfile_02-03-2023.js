@@ -116,7 +116,7 @@ const CompetitorProfile = () => {
     district: false,
     city: false,
   });
-  const [fetchLoading, setFetchingLoading] = useState(true);
+  const [fetchLoading, setFetchingLoading]=useState(true);
 
   useEffect(() => {
     if (id) {
@@ -131,58 +131,6 @@ const CompetitorProfile = () => {
       setCountryList(resp.data.countryList);
     });
   };
-
-  //Generate set Customer No for new Entry
-  useEffect(() => {
-    if (competitorFormInput.state) {
-      generateNewCompNo();
-    }
-  }, [competitorFormInput.state]);
-
-  const generateNewCompNo = () => {
-    let stateCode,
-      newCompNo = "";
-
-    axios
-      .get(
-        `${baseUrl}/api/customercreation/getstatecode/${competitorFormInput.state.value}`
-      )
-      .then((resp) => {
-        if (resp.status === 200) {
-          stateCode = resp.data.state_code;
-        }
-      })
-      .then(() => {
-        axios
-          .get(
-            `${baseUrl}/api/competitorprofile/getlastcompno/${competitorFormInput.state.value}`
-          )
-          .then((resp1) => {
-            if (resp1.status === 200) {
-              if (resp1.data.lastcompno) {
-                let lastCompNo = resp1.data.lastcompno.match(/[0-9]{4,5}/)[0];
-                newCompNo = lastCompNo
-                  ? lastCompNo < 9
-                    ? "000" + (Number(lastCompNo) + 1).toString()
-                    : lastCompNo < 99
-                    ? "00" + (Number(lastCompNo) + 1).toString()
-                    : lastCompNo < 999
-                    ? "0" + (Number(lastCompNo) + 1).toString()
-                    : (Number(lastCompNo) + 1).toString()
-                  : "0001";
-              } else {
-                newCompNo = "0001";
-              }
-            }
-          })
-          .then(() => {
-            let NewCompNO = stateCode + "CMP" + newCompNo;
-            setCompetitorFormInput((prev) => {
-              return { ...prev, compNo: NewCompNO };
-            });
-          });
-      });
-    }
 
   //set Country on Edit
   useEffect(() => {
@@ -311,6 +259,7 @@ const CompetitorProfile = () => {
       });
       setFetchingLoading(false);
     }
+   
   }, [cityList]);
 
   const getStateList = async () => {
@@ -395,7 +344,8 @@ const CompetitorProfile = () => {
           manpower: fetchingData.manpower,
         };
       });
-    } else {
+    }
+    else{
       setFetchingLoading(false);
     }
   }, [fetchingData]);
@@ -443,6 +393,7 @@ const CompetitorProfile = () => {
       });
       setFormIsValid(true);
     });
+    
   };
 
   useEffect(() => {
@@ -879,7 +830,7 @@ const CompetitorProfile = () => {
                     value={competitorFormInput.compNo}
                     onChange={textInputHandler}
                     // ////onBlur={onBlurSelectHandler}
-                    disabled={true}
+                    disabled={false}
                   />
                 </div>
               </div>

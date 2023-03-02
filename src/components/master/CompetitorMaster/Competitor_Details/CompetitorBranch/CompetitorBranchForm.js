@@ -13,10 +13,10 @@ import PreLoader from "../../../../UI/PreLoader";
 
 let table;
 
-const CompetitorBranchForm = () => {
+const CompetitorBranchForm = (props) => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
-  const [ competitorId, setCompetitorId] = useOutletContext();
+  
   const initialValue = {
     branchId: null,
     compNo: null,
@@ -62,7 +62,7 @@ const CompetitorBranchForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getCompNo();
+    // getCompNo();
     if(editableRow.branchId===null)
     {
       getCountryList();
@@ -71,18 +71,27 @@ const CompetitorBranchForm = () => {
     setFetchLoading(false);
   }, []);
 
-  const getCompNo = async () => {
-    await axios
-      .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          setCompetitorBranchInput({
-            ...competitorBranchInput,
-            compNo: resp.data.compNo,
-          });
-        }
+
+  useEffect(() => {
+    if (props.compNo) {
+      setCompetitorBranchInput({
+        ...competitorBranchInput,
+        compNo: props.compNo,
       });
-  };
+    }
+  }, [props.compNo]);
+  // const getCompNo = async () => {
+  //   await axios
+  //     .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
+  //     .then((resp) => {
+  //       if (resp.data.status === 200) {
+  //         setCompetitorBranchInput({
+  //           ...competitorBranchInput,
+  //           compNo: resp.data.compNo,
+  //         });
+  //       }
+  //     });
+  // };
   const getCountryList = async () => {
     await axios.get(`${baseUrl}/api/country/list`).then((resp) => {
       setCountryList(resp.data.countryList);

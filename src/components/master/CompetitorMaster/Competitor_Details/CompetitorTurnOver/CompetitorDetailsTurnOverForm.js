@@ -10,7 +10,7 @@ import CompetitorDetailsTurnOverList from "./CompetitorDetailsTurnOverList";
 
 
 
-const CompetitorDetailsTurnOverForm = () => {
+const CompetitorDetailsTurnOverForm = (props) => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
   const initialValue = {
@@ -36,14 +36,23 @@ const CompetitorDetailsTurnOverForm = () => {
   var dataSet = [];
   let btn_clicked= false;
   const { server1: baseUrl } = useBaseUrl();
-  // const navigate = useNavigate();
+  
 
   useEffect(() => {
-    getCompNo();
     getAccountYearList();
     getTurnOverList();
   }, []);
   
+  useEffect(() => {
+    
+    if (props.compNo) {
+      setCompetitorTurnOverInput({
+        ...competitorTurnOverInput,
+        compNo: props.compNo,
+      });
+    }
+  }, [props.compNo]);
+
   const getAccountYearList = async() =>{
     const today =new Date();
     let curr_year = today.getFullYear();
@@ -57,18 +66,18 @@ const CompetitorDetailsTurnOverForm = () => {
     setAccountYearList(list);
   };
 
-  const getCompNo = async () => {
-    await axios
-      .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          setCompetitorTurnOverInput({
-            ...competitorTurnOverInput,
-            compNo: resp.data.compNo,
-          });
-        }
-      });
-  };
+  // const getCompNo = async () => {
+  //   await axios
+  //     .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
+  //     .then((resp) => {
+  //       if (resp.data.status === 200) {
+  //         setCompetitorTurnOverInput({
+  //           ...competitorTurnOverInput,
+  //           compNo: resp.data.compNo,
+  //         });
+  //       }
+  //     });
+  // };
   
   //check Form is Valid or not
 useEffect(() => {

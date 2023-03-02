@@ -89,7 +89,7 @@ const CommunicationFilesList = (props) => {
         
         $('#dataTable tbody').on('click', 'tr .fa-cloud-download ', function () {
           let rowdata = table.row($(this).closest('tr')).data();
-              console.log(rowdata)
+              // console.log(rowdata)
               setMainId(rowdata.id)
           // deleteList(rowdata)
           // props.onDelete(rowdata)

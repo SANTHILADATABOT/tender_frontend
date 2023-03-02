@@ -28,8 +28,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 let table;
 
 const TendertrackerList = (props) => {
-
-    usePageTitle('List of Tender Tracker');
+    usePageTitle('Tender Tracker');
 
     const [TendertrackerList, setTendertrackerList] = useState([])
     const { server1: baseUrl } = useBaseUrl();

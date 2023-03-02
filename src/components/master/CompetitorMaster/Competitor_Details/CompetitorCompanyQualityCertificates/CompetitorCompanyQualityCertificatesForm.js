@@ -1,8 +1,8 @@
 import { usePageTitle } from "../../../../hooks/usePageTitle";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef} from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
@@ -13,8 +13,9 @@ import Docsupload from "./Docsupload";
 import { ImageConfig } from "../../../../hooks/Config";
 import PreLoader from "../../../../UI/PreLoader";
 
-const CompetitorCompanyQualityCertificatesForm = () => {
+const CompetitorCompanyQualityCertificatesForm = (props) => {
   const { compid } = useParams();
+
   usePageTitle("Competitor Creation");
   const initialValue = {
     qcId: null,
@@ -43,14 +44,23 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const { qcFile: filePath } = useImageStoragePath();
   const [fileName, setFileName] = useState("");
   const [FetchLoading, setFetchLoading] = useState(true);
-
+  
   useEffect(() => {
     if (compid) {
-      getCompNo();
+      // getCompNo();
       getQCList();
     }
   }, []);
 
+  useEffect(() => {
+    if (props.compNo) {
+      setCompetitorQCInput({
+        ...competitorQCInput,
+        compNo: props.compNo,
+      });
+    }
+  }, [props.compNo]);
+  
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -114,18 +124,18 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     },
   };
 
-  const getCompNo = async () => {
-    await axios
-      .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          setCompetitorQCInput({
-            ...competitorQCInput,
-            compNo: resp.data.compNo,
-          });
-        }
-      });
-  };
+  // const getCompNo = async () => {
+  //   await axios
+  //     .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
+  //     .then((resp) => {
+  //       if (resp.data.status === 200) {
+  //         setCompetitorQCInput({
+  //           ...competitorQCInput,
+  //           compNo: resp.data.compNo,
+  //         });
+  //       }
+  //     });
+  // };
 
   //check Form is Valid or not
   useEffect(() => {
@@ -655,10 +665,10 @@ const CompetitorCompanyQualityCertificatesForm = () => {
               >
                 {!competitorQCInput.qcId
                   ? loading === true
-                    ? "Adding...."
+                    ?  <span className="spinner-border spinner-border-sm mr-2"></span>+ progress + '% Uploaded'
                     : "Add"
                   : loading === true
-                  ? "Updating...."
+                  ? progress + '% Updating'
                   : "Update"}
               </button>
             </div>

@@ -279,10 +279,10 @@ const CommunicationFilesCreation = () => {
 
     var config = {
         onUploadProgress: function (progressEvent) {
+            console.log("progressEvent",progressEvent)
             var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             setProgressCompleted(percentCompleted)
         }
-
     }
 
 

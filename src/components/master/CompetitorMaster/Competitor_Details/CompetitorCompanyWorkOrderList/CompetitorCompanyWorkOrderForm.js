@@ -14,7 +14,7 @@ import { data } from "jquery";
 import { ImageConfig } from "../../../../hooks/Config";
 import PreLoader from "../../../../UI/PreLoader";
 
-const CompetitorCompanyWorkOrderForm = () => {
+const CompetitorCompanyWorkOrderForm = (props) => {
   // const compNo=useContext(CompNoContext);
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
@@ -90,11 +90,20 @@ const CompetitorCompanyWorkOrderForm = () => {
 
   useEffect(() => {
     setListLoading(true);
-    getCompNo();
+    // getCompNo();
     getStateList();
     getUnitList();
     getWOList();
   }, []);
+
+  useEffect(() => {
+    if (props.compNo) {
+      setCompetitorWOInput({
+        ...competitorWOInput,
+        compNo: props.compNo,
+      });
+    }
+  }, [props.compNo]);
 
   const getStateList = async () => {
     await axios.get(`${baseUrl}/api/state/list/105`).then((resp) => {
@@ -266,18 +275,18 @@ const CompetitorCompanyWorkOrderForm = () => {
     }
   }, [completionFile]);
 
-  const getCompNo = async () => {
-    await axios
-      .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          setCompetitorWOInput({
-            ...competitorWOInput,
-            compNo: resp.data.compNo,
-          });
-        }
-      });
-  };
+  // const getCompNo = async () => {
+  //   await axios
+  //     .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
+  //     .then((resp) => {
+  //       if (resp.data.status === 200) {
+  //         setCompetitorWOInput({
+  //           ...competitorWOInput,
+  //           compNo: resp.data.compNo,
+  //         });
+  //       }
+  //     });
+  // };
 
   //check Form is Valid or not
   useEffect(() => {

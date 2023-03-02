@@ -4,6 +4,7 @@ import AuthContext from "../storeAuth/auth-context";
 import { useBaseUrl } from "./hooks/useBaseUrl";
 import axios from "axios";
 import './logoicon.css';
+import { usePageTitle } from "./hooks/usePageTitle";
 
 
 function Dashboard() {
@@ -15,7 +16,7 @@ function Dashboard() {
   const[fresh_tenders_count, setfresh_tenders_count] = useState(0)
   const[awarded_tenders_count, setawarded_tenders_count] = useState(0)
   // url: 'bidcreation/creation/live_tenders'
-
+  usePageTitle("Dashboard");
   axios.get(`${baseUrl}/api/bidcreation/creation/live_tenders`).then((resp) => {
     if(resp.data.live_tender_count){
       setLive_tenders_count(resp.data.live_tender_count)
@@ -37,7 +38,7 @@ function Dashboard() {
             {/* Page Heading */}
             
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
-              <h1 className="h3 mb-0 text-gray-800">Dashboard</h1>
+              {/* <h1 className="h3 mb-0 text-gray-800">Dashboard</h1> */}
               
             </div>
             
