@@ -3,45 +3,32 @@ import { ImageConfig } from "../../Config";
 
 const WorkOrderUploadFile = (props) => {
   const [preview, setPreview] = useState(undefined);
-  
+  let fileName = "";
 
   useEffect(() => {
-    if (!props.file || (props.file.type.split("/")[0] !== "image" && props.file.type.split("/")[0] !== "application")) {
+
+    if (!props.file) {
       setPreview(undefined);
       return;
     }
-      const objectUrl = URL.createObjectURL(props.file);
-      setPreview(objectUrl);
-      // free memory when ever this component is unmounted
-      return () => URL.revokeObjectURL(objectUrl);
+    fileName = props.file.name ? props.file.name : props.fileName;
+
+    const objectUrl = URL.createObjectURL(props.file);
+    setPreview(objectUrl);
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
   }, [props.file]);
 
 
-  
-  // const setWorkOrderwoimage = (response) => {
-  //   let data = response.data.doc[0];
-  //   setwofilename(data.wofile);
-  // };
-   
-  //work order image data
-  // const getWorkOrderwoimagename = async () => {
-  //   let response = await axios.get(
-  //     `${baseUrl}/api/workorder/creation/Workorder/getimagename/${props.id}`
-  //   );
-  //   if (response.status === 200) {
-  //     setWorkOrderwoimage(response);
-  //   }
-  // };
+  const downloadDoc = () => {
+    const url = window.URL.createObjectURL(props.file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${props?.fileName ? props?.fileName : props?.file?.name}`);
+    document.body.appendChild(link);
+    link.click();
+  };
 
-  // useEffect(() => {
-  //   if (props.id) {
-  //     getWorkOrderwoimagename();
-  //   }
-  // }, [props.workid]);
-
-  // console.log(baseUrl+'/uploads/BidManagement/WorkOrder/WorkOrder/workorderDocument/'+wofileame)
-
-  //console.log(wofileame+woFileName)
 
   return (
     <Fragment>
@@ -57,9 +44,15 @@ const WorkOrderUploadFile = (props) => {
                   <div className="col-auto">
                     <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800">
                       <p className="text-truncate" title={props.file.name}>
-                          {props.file.name}
-                        </p>
-                      <p>({props.file.size / 1000} KB)</p>
+                        {props.fileName ? props.fileName : props.file.name}
+                      </p>
+                      <p>({props.file.size / 1000} KB)
+                      <span
+                          className="btn btn-outline-warning btn-small ml-3 py-0 px-1"
+                          onClick={downloadDoc}
+                        >
+                          <i className="fa fa-download"></i>
+                        </span></p>
                     </div>
                   </div>
                 </div>
@@ -69,27 +62,31 @@ const WorkOrderUploadFile = (props) => {
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={(props.file==="" || props.file.type.split("/")[0] !== "application") ? preview : ImageConfig["pdf"]}
+                    src={
+                      (preview && props.file?.type?.split("/")[0]==='image')
+                        ? preview
+                        : props.file?.name?.split(".")[
+                            props.file?.name?.split(".").length - 1
+                          ] === "csv" &&
+                          props.file?.type?.split("/")[1] === "octet-stream"
+                        ? ImageConfig["csv"]
+                        : props.file?.name?.split(".")[
+                            props.file?.name?.split(".").length - 1
+                          ] === "rar" &&
+                          (props.file?.type?.split("/")[1] === "octet-stream" ||
+                            props.file?.type === "")
+                        ? ImageConfig["rar"]
+                        : props.file?.type?.split("/")[1]
+                        ? ImageConfig[props.file?.type?.split("/")[1]]
+                        : ImageConfig["default"]
+                    }
                     alt="No Image"
                     width="75px"
                     height="75px"
-                    onClick={() => window.open(preview, "_blank")}
+                    onClick={() => (preview && props.file.type.split("/")[0]==='image') && window.open(preview, "_blank")}
                     title="Click for Preview"
                   />
                 )}
-                {/* {!preview && (
-                  <img
-                    src={
-                      ImageConfig[props.file.type.split("/")[1]] ||
-                      ImageConfig["default"]
-                    }
-                    alt=""
-                    width="75px"
-                    height="75px"
-                    onClick={() => window.open(wofileame+woFileName, "_blank")}
-                  />
-                )} */}
-                {/* <i className="fas fa-clipboard-list fa-2x " /> */}
               </div>
             </div>
           </div>

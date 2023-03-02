@@ -5,11 +5,7 @@ import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import useInputValidation from "../../../../hooks/useInputValidation";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
-//import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
-// import {
-//   isNotEmpty,
-//   isNotNull,
-// } from "../../../CommonFunctions/CommonFunctions";
+
 import {
   isNotEmpty,
   isNotNull,
@@ -38,6 +34,19 @@ const WorkOrder = () => {
   const [FetchLoading, setFetchLoading] = useState(false);
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  const [FileSize, setFilesize] = useState({
+    file: 0,
+    file1: 0,
+    file2: 0,
+    total: 0,
+  });
+
+  const [fileName, setFileName] = useState({
+    file: "",
+    file1: "",
+    file2: "",
+  });
+
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -52,27 +61,55 @@ const WorkOrder = () => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-    if (newFile && newFile.size > maxImageSize) {
+    if (newFile && FileSize.total + newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "File Size is too Large",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile(null);
+        setFilesize((prev) => {
+          return { ...prev, file: 0, total: FileSize.file1 + FileSize.file2 };
+        });
+      });
+    } else if (
+      e.target.files[0].type === "" &&
+      e.target.files[0].name.split(".")[
+        e.target.files[0].name.split(".").length - 1
+      ] === "rar"
+    ) {
+      setFile(newFile);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file: parseInt(newFile.size),
+          total: FileSize.file1 + FileSize.file2 + newFile.size,
+        };
       });
     } else if (newFile && !doctype.includes(newFile.type)) {
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File Type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile(null);
+        setFilesize((prev) => {
+          return { ...prev, file: 0, total: FileSize.file2 + FileSize.file1 };
+        });
       });
     } else {
       setFile(newFile);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file: parseInt(newFile.size),
+          total: FileSize.file1 + FileSize.file2 + newFile.size,
+        };
+      });
     }
+    setFileName(prev=>{return{...prev, file: ""}})
   };
 
   const onDragEnter1 = () => {
@@ -89,27 +126,56 @@ const WorkOrder = () => {
 
   const onFileDrop1 = (e) => {
     const newFile1 = e.target.files[0];
-    if (newFile1 && newFile1.size > maxImageSize) {
+
+    if (newFile1 && FileSize.total + newFile1.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "Exceeding maximum allowed File size..!",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile1(null);
+        setFilesize((prev) => {
+          return { ...prev, file1: 0, total: FileSize.file + FileSize.file2 };
+        });
+      });
+    } else if (
+      e.target.files[0].type === "" &&
+      e.target.files[0].name.split(".")[
+        e.target.files[0].name.split(".").length - 1
+      ] === "rar"
+    ) {
+      setFile1(newFile1);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file1: parseInt(newFile1.size),
+          total: FileSize.file + FileSize.file2 + newFile1.size,
+        };
       });
     } else if (newFile1 && !doctype.includes(newFile1.type)) {
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File Type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile1(null);
+        setFilesize((prev) => {
+          return { ...prev, file1: 0, total: FileSize.file + FileSize.file2 };
+        });
       });
     } else {
       setFile1(newFile1);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file1: parseInt(newFile1.size),
+          total: FileSize.file + FileSize.file2 + newFile1.size,
+        };
+      });
     }
+    setFileName(prev=>{return{...prev, file1: ""}})
   };
 
   const onDragEnter2 = () => {
@@ -125,27 +191,55 @@ const WorkOrder = () => {
   const onDrop2 = () => wrapperRef.current.classList.remove("dragover");
   const onFileDrop2 = (e) => {
     const newFile2 = e.target.files[0];
-    if (newFile2 && newFile2.size > maxImageSize) {
+    if (newFile2 && FileSize.total + newFile2.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "Exceeding maximum allowed File size..!",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
+        setFilesize((prev) => {
+          return { ...prev, file2: 0, total: FileSize.file + FileSize.file1 };
+        });
         setFile2(null);
+      });
+    } else if (
+      e.target.files[0].type === "" &&
+      e.target.files[0].name.split(".")[
+        e.target.files[0].name.split(".").length - 1
+      ] === "rar"
+    ) {
+      setFile2(newFile2);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file2: parseInt(newFile2.size),
+          total: FileSize.file + FileSize.file1 + newFile2.size,
+        };
       });
     } else if (newFile2 && !doctype.includes(newFile2.type)) {
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File Type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
         setFile2(null);
+        setFilesize((prev) => {
+          return { ...prev, file2: 0, total: FileSize.file + FileSize.file1 };
+        });
       });
     } else {
       setFile2(newFile2);
+      setFilesize((prev) => {
+        return {
+          ...prev,
+          file2: parseInt(newFile2.size),
+          total: FileSize.file + FileSize.file1 + newFile2.size,
+        };
+      });
     }
+    setFileName(prev=>{return{...prev, file2: ""}})
   };
 
   const {
@@ -241,7 +335,9 @@ const WorkOrder = () => {
     OrderDatevalue ||
     AgreeDatevalue ||
     SiteHandOverDatevalue ||
-    file || file1 || file 
+    file ||
+    file1 ||
+    file
   ) {
     formIsValid = true;
   }
@@ -281,12 +377,13 @@ const WorkOrder = () => {
     let data = response.data.WorkOrder[0];
     if (data !== undefined) {
       setworkid(data.id);
-      setorderQuantityValue(data.orderquantity?data.orderquantity:"");
-      setPricePerUnitValue(data.priceperunit?data.priceperunit:"");
-      setLoaDateValue(data.loadate?data.loadate:"");
-      setOrderDateValue(data.orderdate?data.orderdate:"");
-      setAgreeDateValue(data.agreedate?data.agreedate:"");
-      SiteHandOverDateValue(data.sitehandoverdate?data.sitehandoverdate:"");
+      setorderQuantityValue(data.orderquantity ? data.orderquantity : "");
+      setPricePerUnitValue(data.priceperunit ? data.priceperunit : "");
+      setLoaDateValue(data.loadate ? data.loadate : "");
+      setOrderDateValue(data.orderdate ? data.orderdate : "");
+      setAgreeDateValue(data.agreedate ? data.agreedate : "");
+      SiteHandOverDateValue(data.sitehandoverdate ? data.sitehandoverdate : "");
+      setFileName({file: data.wofile?data.wofile:"", file1: data.agfile?data.agfile:"", file2:  data.shofile?data.shofile:""})
     }
   };
 
@@ -295,7 +392,7 @@ const WorkOrder = () => {
     let response = await axios.get(
       `${baseUrl}/api/workorder/creation/Workorder/${id}`
     );
-    if (response.status === 200 ) {
+    if (response.status === 200) {
       setWorkOrderForm(response);
     }
   };
@@ -306,27 +403,29 @@ const WorkOrder = () => {
     }
   }, []);
 
-
   const setWorkOrderImage = (response) => {
     //response.data.name = wofilename;
     setFile(response.data);
   };
 
+  // useEffect(() => {}, [file, file1, file2]);
+
   var getWorkOrderImage = async () => {
-    if(workid) {
+    if (workid) {
       await axios({
         url: `${baseUrl}/api/download/workorderimage/${id}`,
         method: "GET",
         responseType: "blob", //important
       }).then((response) => {
         if (response.status === 200) {
-          if(response.data.size >0 )
-            {setWorkOrderImage(response);}
+          if (response.data.size > 0) {
+            setWorkOrderImage(response);
+          }
         } else {
           alert("Unable to Process Now!");
         }
         setFetchLoading(false);
-      }); 
+      });
     }
   };
 
@@ -336,19 +435,19 @@ const WorkOrder = () => {
   //   }
   // }, [workid]);
 
-
   //agreement image data
 
   const getWorkOrderImageData = async () => {
-    if(workid) {
+    if (workid) {
       await axios({
         url: `${baseUrl}/api/download/agreementimage/${id}`,
         method: "GET",
         responseType: "blob", // important
       }).then((response) => {
         if (response.status === 200) {
-          if(response.data.size >0 )
-          {setAgreementImage(response);}
+          if (response.data.size > 0) {
+            setAgreementImage(response);
+          }
         } else {
           alert("Unable to Process Now!");
         }
@@ -376,15 +475,16 @@ const WorkOrder = () => {
   };
 
   const getsitehandoverImageData = async () => {
-    if(workid) {
+    if (workid) {
       await axios({
         url: `${baseUrl}/api/download/sitehandoverimage/${id}`,
         method: "GET",
         responseType: "blob", // important
       }).then((response) => {
         if (response.status === 200) {
-          if(response.data.size >0 )
-          {setSitehandoverImage(response);}
+          if (response.data.size > 0) {
+            setSitehandoverImage(response);
+          }
         } else {
           alert("Unable to Process Now!");
         }
@@ -427,7 +527,6 @@ const WorkOrder = () => {
         setDataSending(false);
       });
   };
-
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -475,7 +574,6 @@ const WorkOrder = () => {
       putData(formdata, workid);
     }
   };
-
 
   return (
     <CollapseCard id={"WorkOrder"} title={"Work Order"}>
@@ -671,7 +769,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <WorkOrderUploadFile file={file} id={id} workid={workid}/>
+                <WorkOrderUploadFile file={file} id={id} workid={workid} fileName={fileName.file}/>
               </div>
             </div>
           </div>
@@ -709,7 +807,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <AgreemaneUploadFile file={file1} id={id} workid={workid}/>
+                <AgreemaneUploadFile file={file1} id={id} workid={workid} fileName={fileName.file1} />
               </div>
             </div>
           </div>
@@ -747,7 +845,7 @@ const WorkOrder = () => {
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">Upload File</div>
               <div className="col-lg-8">
-                <SiteHandOverUploadFile file={file2} id={id} workid={workid}/>
+                <SiteHandOverUploadFile file={file2} id={id} workid={workid} fileName={fileName.file2} />
               </div>
             </div>
           </div>

@@ -18,6 +18,7 @@ import {
 import axios from "axios";
 import Swal from "sweetalert2";
 import LetterAcceptanceDoc from "./LetterAcceptanceDocsupload";
+import PreLoader from "../../../../UI/PreLoader";
 
 const LetterOfAcceptance = () => {
   const { id } = useParams();
@@ -33,14 +34,9 @@ const LetterOfAcceptance = () => {
   const [toastSuccess, toastError] = useOutletContext();
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
-  const [FetchLoading, setFetchLoading] = useState(false);
+  const [FetchLoading, setFetchLoading] = useState(true);
+  const [fileName, setFileName] = useState("");
 
-  const options = [
-    { value: "Postal", label: "Postal" },
-    { value: "Courier", label: "Courier" },
-    { value: "Parcel Service", label: "Parcel Service" },
-    { value: "In hand Delivery", label: "In hand Delivery" },
-  ];
 
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
@@ -59,22 +55,29 @@ const LetterOfAcceptance = () => {
     if (newFile && newFile.size > maxImageSize) {
       Swal.fire({
         title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
+        text: "File size too Large...?!",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
-        setFile(null);
+        // setFile(null);
       });
     } else if (newFile && !doctype.includes(newFile.type)) {
+      let len=(newFile.name.split(".")).length;
+      if(newFile.type==="" && newFile.name.split(".")[len-1] === "rar"){
+        setFile(newFile);     
+      }
+      else{
       Swal.fire({
         title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
+        text: "Invalid File type",
         icon: "error",
         confirmButtonColor: "#2fba5f",
       }).then(() => {
-        setFile(null);
+        // setFile(null);
       });
-    } else {
+    }
+  }
+    else {
       setFile(newFile);
     }
   };
@@ -99,66 +102,18 @@ const LetterOfAcceptance = () => {
     reset: resetrefrenceNo,
   } = useInputValidation(isNotEmpty);
 
-  const {
-    value: fromvalue,
-    isValid: fromIsValid,
-    hasError: fromHasError,
-    valueChangeHandler: fromChangeHandler,
-    inputBlurHandler: fromBlurHandler,
-    setInputValue: setfromValue,
-    reset: resetfrom,
-  } = useInputValidation(isNotEmpty);
-
-  const {
-    value: mediumvalue,
-    isValid: mediumIsValid,
-    hasError: mediumHasError,
-    valueChangeHandler: mediumChangeHandler,
-    inputBlurHandler: mediumBlurHandler,
-    setInputValue: setmediumValue,
-    reset: resetmedium,
-  } = useInputValidation(isNotEmpty);
-
-  const {
-    value: medRefrenceNovalue,
-    isValid: medRefrenceNoIsValid,
-    hasError: medRefrenceNoHasError,
-    valueChangeHandler: medRefrenceNoChangeHandler,
-    inputBlurHandler: medRefrenceNoBlurHandler,
-    setInputValue: setmedRefrenceNoValue,
-    reset: resetmedRefrenceNo,
-  } = useInputValidation(isNotEmpty);
-
-  const {
-    value: mediumSelectvalue,
-    isValid: mediumSelectIsValid,
-    hasError: mediumSelectHasError,
-    valueChangeHandlerForReactSelect: mediumSelectChangeHandler,
-    inputBlurHandler: mediumSelectBlurHandler,
-    setInputValue: mediumSelectValue,
-    reset: resetmediumSelect,
-  } = useInputValidation(isNotNull);
-
   let formIsValid = false;
 
   // if (
   //   DateIsValid &&
   //   refrenceNoIsValid &&
-  //   fromIsValid &&
-  //   mediumIsValid &&
-  //   medRefrenceNoIsValid &&
-  //   mediumSelectIsValid
   // ) {
   //   formIsValid = true;
   // }
 
   if (
     Datevalue ||
-    refrenceNovalue ||
-    fromvalue ||
-    mediumvalue ||
-    medRefrenceNovalue ||
-    mediumSelectvalue
+    refrenceNovalue 
   ) {
     formIsValid = true;
   }
@@ -196,19 +151,11 @@ const LetterOfAcceptance = () => {
 
   var setletterofacceptanceForm = (response) => {
     let data = response.data.letterofaccepttance[0];
-    // console.log(data)
+    
     if (data !== undefined) {
       setlettacpId(data.id);
       setDateValue(data.date ? data.date : "");
       setrefrenceNoValue(data.refrence_no ? data.refrence_no : "");
-      setfromValue(data.from ? data.from : "");
-      setmediumValue(data.medium ? data.medium : "");
-      setmedRefrenceNoValue(data.med_refrence_no ? data.med_refrence_no : "");
-      mediumSelectValue(
-        data.medium_select
-          ? options.find((x) => x.value === data.medium_select)
-          : ""
-      );
     }
   };
 
@@ -217,8 +164,13 @@ const LetterOfAcceptance = () => {
     let response = await axios.get(
       `${baseUrl}/api/letteracceptance/creation/${id}`
     );
+    
     if (response.status === 200) {
       setletterofacceptanceForm(response);
+      setFileName(response.data.letterofaccepttance[0]?.wofile?response.data.letterofaccepttance[0].wofile:"");
+    }
+    else{
+      setFileName("");
     }
   };
 
@@ -239,19 +191,25 @@ const LetterOfAcceptance = () => {
         url: `${baseUrl}/api/download/letterofacceptance/workorderimage/${id}`,
         method: "GET",
         responseType: "blob", // important
+        headers: {   //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
       }).then((response) => {
         if (response.status === 200) {
-          // if (response.data.type === "application/json") {
-          //   setFile("");
-          // } else {
             setWorkOrderImage(response);
-          // }
-        } else {
+        } 
+        else if (response.status === 204) {
+          setWorkOrderImage("");
+        }
+        else {
           alert("Unable to Process Now!");
         }
-        setFetchLoading(false);
       });
+      setFetchLoading(false);
     }
+    setFetchLoading(false);
   };
 
   useEffect(() => {
@@ -261,7 +219,6 @@ const LetterOfAcceptance = () => {
   }, [lettacpId]);
 
   const putData = (data, lettacpId) => {
-    console.log('data',data);
     axios
       .post(
         `${baseUrl}/api/letteracceptance/creation/update/${lettacpId}`,
@@ -303,10 +260,6 @@ const LetterOfAcceptance = () => {
     let data = {
       Date: Datevalue ? Datevalue : "",
       refrenceNo: refrenceNovalue ? refrenceNovalue : "",
-      from: fromvalue ? fromvalue : "",
-      medium: mediumvalue ? mediumvalue : "",
-      medRefrenceNo: medRefrenceNovalue ? medRefrenceNovalue : "",
-      mediumSelect: mediumSelectvalue ? mediumSelectvalue.value : "",
       tokenid: localStorage.getItem("token"),
       bidid: id,
     };
@@ -330,8 +283,11 @@ const LetterOfAcceptance = () => {
     }
   };
 
+// console.log("Filename", fileName);
+
   return (
     <CollapseCard id={"LetterOfAcceptance"} title={"Letter Of Acceptance"}>
+      <PreLoader loading={FetchLoading}>
       <form onSubmit={submitHandler}>
         <div className="row align-items-center ">
           <div className="inputgroup col-lg-6 mb-4">
@@ -384,112 +340,8 @@ const LetterOfAcceptance = () => {
               </div>
             </div>
           </div>
-          <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="from">From</label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  name="from"
-                  id="from"
-                  className="form-control"
-                  value={fromvalue}
-                  onChange={fromChangeHandler}
-                  onBlur={fromBlurHandler}
-                />
-                {fromHasError && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-normal">
-                      from is invalid
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="to">Medium</label>
-              </div>
-              <div className="col-lg-8 ">
-                <div className="d-flex justify-content-between">
-                  <div className="col-lg-6">
-                    <input
-                      type="text"
-                      name="medium"
-                      id="medium"
-                      className="form-control"
-                      value={mediumvalue}
-                      onChange={mediumChangeHandler}
-                      onBlur={mediumBlurHandler}
-                    />
-                  </div>
-                  <div className="col-lg-6 ml-2">
-                    <Select
-                      name="mediumSelect"
-                      id="mediumSelect"
-                      options={options}
-                      isSearchable="true"
-                      isClearable="true"
-                      value={mediumSelectvalue}
-                      onChange={(selectedOptions) => {
-                        mediumSelectChangeHandler(selectedOptions);
-                        // getcustno(selectedOptions);
-                      }}
-                      onBlur={mediumSelectBlurHandler}
-                    ></Select>
-                  </div>
-                </div>
-                <div className="d-flex justify-content-between">
-                  {mediumHasError && (
-                    <div className="pt-1">
-                      <span className="text-danger font-weight-normal">
-                        medium is invalid
-                      </span>
-                    </div>
-                  )}
-                  {mediumSelectHasError && (
-                    <div className="pt-1">
-                      <span className="text-danger font-weight-normal">
-                        mediumSelect is invalid
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label>Med.Refrence No</label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  name="medRefrenceNo"
-                  id="medRefrenceNo"
-                  className="form-control"
-                  value={medRefrenceNovalue}
-                  onChange={medRefrenceNoChangeHandler}
-                  onBlur={medRefrenceNoBlurHandler}
-                />
-                {medRefrenceNoHasError && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-normal">
-                      medRefrenceNo is invalid
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
-            <div className="row align-items-center font-weight-bold"></div>
-          </div>
+          
+          
           <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
               <div className="col-lg-4 text-dark">
@@ -526,7 +378,7 @@ const LetterOfAcceptance = () => {
                 <label> Preview</label>
               </div>
               <div className="col-lg-8">
-                <LetterAcceptanceDoc file={file} />
+                <LetterAcceptanceDoc file={file} setFile={setFile} fileName={fileName}/>
               </div>
             </div>
           </div>
@@ -554,6 +406,7 @@ const LetterOfAcceptance = () => {
           </div>
         </div>
       </form>
+      </PreLoader>
     </CollapseCard>
   );
 };

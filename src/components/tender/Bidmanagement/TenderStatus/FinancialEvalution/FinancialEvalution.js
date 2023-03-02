@@ -369,7 +369,13 @@ const FinancialEvalution = (props) => {
     
   return (
     <LockCard locked={!id || qualifiedList.length===0}>
-      <PreLoader loading={FetchLoading}>
+      <PreLoader loading={FetchLoading} >
+        <div className="row text-info">
+        <div className="col-lg-3 font-weight-bold text-center">Name of The Bidder</div>
+        <div className="col-lg-3 font-weight-bold text-center">Unit</div>
+        <div className="col-lg-3 font-weight-bold text-center">Price/Unit</div>
+        <div className="col-lg-3 font-weight-bold text-center">Least Sequence</div>
+        </div>
         {qualifiedList.map((item) => {
           return (
             <div
@@ -442,7 +448,7 @@ const FinancialEvalution = (props) => {
                   : "btn btn-primary rounded-pill px-4"
               }
               onClick={submitHandler}
-              disabled={!formIsValid || isDatasending || FetchLoading}
+              disabled={props.tenderStatus ==="Cancel"  || (!formIsValid || isDatasending || FetchLoading)}
             >
               {isDatasending && (
                 <span className="spinner-border spinner-border-sm mr-2"></span>
@@ -459,7 +465,7 @@ const FinancialEvalution = (props) => {
                   : "btn btn-primary rounded-pill px-4"
               }
               onClick={submitHandler}
-              disabled={!formIsValid || isDatasending || FetchLoading}
+              disabled={props.tenderStatus ==="Cancel"  || (!formIsValid || isDatasending || FetchLoading)}
             >
               {isDatasending && (
                 <span className="spinner-border spinner-border-sm mr-2"></span>

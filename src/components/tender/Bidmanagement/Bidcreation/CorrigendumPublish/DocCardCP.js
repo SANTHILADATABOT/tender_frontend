@@ -55,7 +55,7 @@ const DocCardCP = (props) => {
                     <div className=" row col-sm-8 bg-gray-200 rounded py-1">
                         <div className="col-sm-1 ">
                             <div>
-                            {props.item.file_type === "application/pdf" && <img src={ImageConfig['pdf']} alt="" width="75px" height="75px" />}
+                            {/* {props.item.file_type === "application/pdf" && <img src={ImageConfig['pdf']} alt="" width="75px" height="75px" />}
 
                             {props.item.file_type === "application/msword"  && <img src={ImageConfig['doc']} alt="" width="75px" height="75px" />}
 
@@ -67,9 +67,15 @@ const DocCardCP = (props) => {
                               props.item.file_type !== "application/msword" && 
                               props.item.file_type !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
                               props.item.file_type.split('/')[0] !== "image"
-                              ) && <img src={ImageConfig['default']} alt="" width="75px" height="75px" />}
+                              ) && <img src={ImageConfig['default']} alt="" width="75px" height="75px" />} */}
 
                             {/* <img src={ImageConfig[props.item.file_type.split('/')[1]] || ImageConfig['default']} alt="" width="75px" height="75px" /> */}
+                            
+                            
+                            {props.item.file_type.split('/')[0] !== "image" && <img src={ImageConfig[props.item?.file_original_name?.split('.').pop()] || ImageConfig[props.item.file_type.split('/')[1]] || ImageConfig['default']} alt="" width="75px" height="75px" />}
+
+                            {props.item.file_type.split('/')[0] === "image" && <img src={biddocs_filePath+props.item.file_new_name} alt="" width="75px" height="75px" />}
+                            
                             </div>
                         </div>
                         <div className="col-sm-11 pl-5">

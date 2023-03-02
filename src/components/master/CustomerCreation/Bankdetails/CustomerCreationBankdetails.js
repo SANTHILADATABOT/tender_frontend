@@ -179,38 +179,37 @@ const CustomerCreationBankDetails = () => {
 
     setdatasending(true);
 
-    if (!formIsValid) {
-      console.log("Inavlid Form!");
-      setdatasending(false);
-      return;
-    }
+        if (!formIsValid) {
+          // console.log("Inavlid Form!");
+          setdatasending(false)
+          return;
+        }
+    
+        let bankdetails = {
+          ifsccode : ifsccodeValue,
+          bankname : banknameValue,
+          bankaddress : bankaddressValue,
+          beneficiaryaccountname : beneficiaryaccountnameValue,
+          accountnumber : accountnumberValue
+       }
+   
+        let datatosend ={
+          bankdetails,
+          tokenid : localStorage.getItem("token"),
+          cust_creation_mainid : id
+        }
+    
+        if(bankid === null){
+          postData(datatosend)
+        }else{
+          putData(datatosend)
+        }
+   
+      }
 
-    let bankdetails = {
-      ifsccode: ifsccodeValue,
-      bankname: banknameValue,
-      bankaddress: bankaddressValue,
-      beneficiaryaccountname: beneficiaryaccountnameValue,
-      accountnumber: accountnumberValue,
-    };
-
-    let datatosend = {
-      bankdetails,
-      tokenid: localStorage.getItem("token"),
-      cust_creation_mainid: id,
-    };
-
-    if (bankid === null) {
-      postData(datatosend);
-    } else {
-      putData(datatosend);
-    }
-  };
-
-  const postData = (data) => {
-    axios
-      .post(`${baseUrl}/api/customercreationbankdetails`, data)
-      .then((resp) => {
-        console.log(resp);
+    const postData = (data) => {
+      axios.post(`${baseUrl}/api/customercreationbankdetails`, data).then((resp) => {
+        // console.log(resp);
         if (resp.data.status === 200) {
           getsublist();
           toastSuccess(resp.data.message);
@@ -223,11 +222,9 @@ const CustomerCreationBankDetails = () => {
       });
   };
 
-  const putData = (data) => {
-    axios
-      .put(`${baseUrl}/api/customercreationbankdetails/${bankid}`, data)
-      .then((resp) => {
-        console.log(resp);
+    const putData = (data) => {
+      axios.put(`${baseUrl}/api/customercreationbankdetails/${bankid}`, data).then((resp) =>{
+        // console.log(resp);
         if (resp.data.status === 200) {
           getsublist();
           resetform();

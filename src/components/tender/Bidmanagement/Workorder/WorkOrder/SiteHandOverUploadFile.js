@@ -1,19 +1,54 @@
 import { Fragment, useEffect, useState } from "react";
 import { ImageConfig } from "../../Config";
-// import axios from "axios";
-// import { useBaseUrl } from "../../../../hooks/useBaseUrl";
-// import {useImageStoragePath} from "../../../../hooks/useImageStoragePath";
 
 const SiteHandOverUploadFile = (props) => {
   const [preview, setPreview] = useState(undefined);
-  // const { server1: baseUrl } = useBaseUrl();
-  // const [shoFilName, setshofilename] = useState();
-  // const { shofile: shofilename } = useImageStoragePath();
+  const [isNotAnImage, setIsNotAnImage] = useState(false);
+  let fileName = "";
 
   useEffect(() => {
-    if (!props.file || (props.file.type.split("/")[0] !== "image" && props.file.type.split("/")[0] !== "application")) {
+    if (!props.file) {
       setPreview(undefined);
       return;
+    }
+    fileName = props.file.name ? props.file.name : props.fileName;
+    // // console.log("props?.file?.type", props?.file?.type);
+    // // console.log("props", props);
+    // if (props.file?.type) {
+
+    //   if (
+    //     props?.file?.name?.split(".")[
+    //       props?.file?.name?.split(".").length - 1
+    //     ] === "csv" &&
+    //     props.file.type.split("/")[1] === "octet-stream"
+    //   ) {
+    //     console.log("If");
+    //     setPreviewImg("csv");
+    //   } else if (
+    //     props?.file?.name?.split(".")[
+    //       props?.file?.name?.split(".").length - 1
+    //     ] === "rar" &&
+    //     (props?.file?.type?.split("/")[1] === "octet-stream" ||
+    //       props?.file?.type === "")
+    //   ) {
+    //     console.log("else If");
+    //     setPreviewImg("rar");
+    //   } else if (props?.file?.type?.split("/")[1]) {
+    //     console.log("else If");
+    //     setPreviewImg(props?.file?.type.split("/")[1]);
+    //     console.log("props?.file?.type.split(/)[1]",props?.file?.type.split("/")[1]);
+    //   } else if (fileName) {
+    //     console.log("else If");
+    //     setPreviewImg(
+    //       props.fileName.split(".")[props.file.name.split(".").length - 1]
+    //     );
+      // }
+    // }
+
+    
+
+    if (!props.file || props.file.type.split("/")[0] !== "image") {
+      setIsNotAnImage(true);
     }
 
     const objectUrl = URL.createObjectURL(props.file);
@@ -23,27 +58,20 @@ const SiteHandOverUploadFile = (props) => {
     return () => URL.revokeObjectURL(objectUrl);
   }, [props.file]);
 
-  // const setWorkOrdershoimage = (response) => {
-  //   let data = response.data.doc[0];
-  //   setshofilename(data.shofile);
-  // };
+  const downloadDoc = () => {
+    const url = window.URL.createObjectURL(props.file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `${props?.fileName ? props?.fileName : props?.file?.name}`
+    );
+    document.body.appendChild(link);
+    link.click();
+  };
 
-  // //work order image data
-  // const getWorkOrdershoimagename = async () => {
-  //   let response = await axios.get(
-  //     `${baseUrl}/api/workorder/creation/Workorder/getimagename/${props.id}`
-  //   );
-  //   if (response.status === 200) {
-  //     setWorkOrdershoimage(response);
-  //   }
-  // };
 
-  // useEffect(() => {
-  //   if (props.id) {
-  //     getWorkOrdershoimagename();
-  //   }
-  // }, [props.workid]);
-
+  
   return (
     <Fragment>
       {props.file && (
@@ -54,20 +82,22 @@ const SiteHandOverUploadFile = (props) => {
                 <div className="font-weight-bold text-info text-uppercase mb-1">
                   {props.docName}
                 </div>
-                {/* {props.file.name ? (
-                  <p className="text-truncate" title={props.file.name}>
-                    {props.file.name}
-                  </p>
-                ) : (
-                  <p>{shofileame}</p>
-                )} */}
+
                 <div className="row no-gutters align-items-center ">
                   <div className="col-auto">
                     <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
                       <p className="text-truncate" title={props.file.name}>
-                        {props.file.name}
+                        {props.fileName ? props.fileName : props.file.name}
                       </p>
-                      <p>({props.file.size / 1000} KB)</p>
+                      <p>
+                        ({props.file.size / 1000} KB)
+                        <span
+                          className="btn btn-outline-warning btn-small ml-3 py-0 px-1"
+                          onClick={downloadDoc}
+                        >
+                          <i className="fa fa-download"></i>
+                        </span>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -77,28 +107,42 @@ const SiteHandOverUploadFile = (props) => {
                   <img
                     className="rounded-circle pointer"
                     id="previewImg"
-                    src={(props.file==="" || props.file.type.split("/")[0] !== "application") ? preview : ImageConfig["pdf"]}
+                    src={
+                      preview && (props?.file?.type?.split("/")[0] === "image" ||
+                        ["jpg", "png", "jpeg", "webp"].includes(
+                          fileName?.split(".")[fileName?.split(".").length - 1]
+                        ))
+                        ? preview
+                        : (props.file?.name?.split(".")[
+                            props.file?.name?.split(".").length - 1
+                          ] === "csv" &&
+                          props.file?.type?.split("/")[1] === "octet-stream") ||  props.fileName?.split(".")[
+                            props.fileName?.split(".").length - 1
+                          ] === "csv"
+                        ? ImageConfig["csv"]
+                        : props.file?.name?.split(".")[
+                            props.file?.name?.split(".").length - 1
+                          ] === "rar" &&
+                          (props.file?.type?.split("/")[1] === "octet-stream" ||
+                            props.file?.type === "" ||  props.fileName?.split(".")[
+                              props.fileName?.split(".").length - 1
+                            ] === "rar")
+                        ? ImageConfig["rar"]
+                        : props.file?.type?.split("/")[1]
+                        ? ImageConfig[props.file?.type?.split("/")[1]]
+                        : ImageConfig["default"]
+                    }
                     alt="No Image"
                     width="75px"
                     height="75px"
-                    onClick={() => window.open(preview, "_blank")}
+                    onClick={() =>
+                      preview &&
+                      props.file.type.split("/")[0] === "image" &&
+                      window.open(preview, "_blank")
+                    }
                     title="Click for Preview"
                   />
                 )}
-
-                {/* {!preview && (
-                  <img
-                    src={
-                      ImageConfig[props.file.type.split("/")[1]] ||
-                      ImageConfig["default"]
-                    }
-                    alt=""
-                    width="75px"
-                    height="75px"
-                    onClick={() => window.open(shofilename+shoFilName, "_blank")}
-                  />
-                )} */}
-                {/* <i className="fas fa-clipboard-list fa-2x " /> */}
               </div>
             </div>
           </div>

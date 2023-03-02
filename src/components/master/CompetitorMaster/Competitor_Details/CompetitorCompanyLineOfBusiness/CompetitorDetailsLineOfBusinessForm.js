@@ -9,7 +9,7 @@ import CompetitorDetailsLineOfBusinessList from "./CompetitorDetailsLineOfBusine
 
 
 
-const CompetitorDetailsLineOfBusinessForm = () => {
+const CompetitorDetailsLineOfBusinessForm = (props) => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
   const initialValue = {
@@ -32,23 +32,30 @@ const CompetitorDetailsLineOfBusinessForm = () => {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    getCompNo();
+    // getCompNo();
     getBizLineList();
   }, []);
-  
 
-  const getCompNo = async () => {
-    await axios
-      .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          setCompetitorBizLineInput({
-            ...competitorBizLineInput,
-            compNo: resp.data.compNo,
-          });
-        }
+  useEffect(() => {
+    if (props.compNo) {
+      setCompetitorBizLineInput({
+        ...competitorBizLineInput,
+        compNo: props.compNo,
       });
-  };
+    }
+  }, [props.compNo]);
+  // const getCompNo = async () => {
+  //   await axios
+  //     .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
+  //     .then((resp) => {
+  //       if (resp.data.status === 200) {
+  //         setCompetitorBizLineInput({
+  //           ...competitorBizLineInput,
+  //           compNo: resp.data.compNo,
+  //         });
+  //       }
+  //     });
+  // };
   
   //check Form is Valid or not
 useEffect(() => {
@@ -156,7 +163,7 @@ useEffect(() => {
       bizLineValue: competitorBizLineInput.bizLineValue,
       tokenId: tokenId,
     };
-    console.log("datatosend",datatosend);
+    // console.log("datatosend",datatosend);
     if (
       datatosend.compId !== null &&
       datatosend.compNo !== null &&

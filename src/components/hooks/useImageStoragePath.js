@@ -16,6 +16,7 @@ const useImageStoragePath = () => {
         commnunicationfile : baseUrl+'/uploads/BidManagement/WorkOrder/CommunicationFiles/',//Bit Management Work Order form
         letterofacceptence : baseUrl+'/uploads/BidManagement/WorkOrder/LetterOfAcceptence/Document/',//Bit Management Work Order form
         techEval: baseUrl+'/uploads/BidManagement/techevaluation/',//Bit Management Tender Status Tech Evaluation form
+        commnunicationfilesmaster: baseUrl+'/uploads/Communicationfiles/',
 
 
         //----- Uncomment when build App ----
@@ -31,6 +32,8 @@ const useImageStoragePath = () => {
         // commnunicationfile : baseUrl+'/public/uploads/BidManagement/WorkOrder/CommunicationFiles/',//Bit Management Work Order form
         // letterofacceptence : baseUrl+'/public/uploads/BidManagement/WorkOrder/LetterOfAcceptence/Document/',//Bit Management Work Order form
         // techEval: baseUrl+'/public/uploads/BidManagement/techevaluation/',
+        // commnunicationfilesmaster: baseUrl+'/public/uploads/Communicationfiles/',
+
 }
 }
 export {useImageStoragePath};

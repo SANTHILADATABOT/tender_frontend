@@ -37,7 +37,7 @@ const LegacystatementList = (props) => {
                 { data: 'unit' },
                 { data: 'projectvalue' },
                 { data: 'status' },
-                { data: 'action' },
+                // { data: 'action' },
             ],
             dom:
             //   "<'row'<'col-sm-12'l>>" +
@@ -97,7 +97,7 @@ return (
                                 <th scope="col">Unit</th>
                                 <th scope="col">Project Cost</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Action</th>
+                                {/* <th scope="col">Action</th> */}
                             </tr>
                         </thead>
                         <tbody>

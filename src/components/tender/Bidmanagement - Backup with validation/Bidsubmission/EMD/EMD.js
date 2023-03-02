@@ -160,7 +160,7 @@ const EMD = () => {
             setFetchLoading(true)
             axios.get(`${baseUrl}/api/bidcreation/bidsubmission/emdfee/${id}`).then((resp) => {
               if (resp.data.status === 200) {
-                console.log("resp.data",resp.data);
+                // console.log("resp.data",resp.data);
                   setFormId(resp.data.BidCreationEMD.id)
                   let emdfee = resp.data.BidCreationEMD
                   setbanknameValue(emdfee.bankname)
@@ -326,7 +326,7 @@ const EMD = () => {
         return;
         }
 
-        console.log("Submitted!");
+        // console.log("Submitted!");
 
         const formdata = new FormData();
 

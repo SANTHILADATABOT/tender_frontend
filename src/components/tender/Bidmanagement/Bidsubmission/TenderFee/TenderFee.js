@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import PreLoader from "../../../../UI/PreLoader";
+import { acceptedFileTypes } from "../../../../master/FileConfig";
 
 
 
@@ -220,12 +221,17 @@ const TenderFee = () => {
     const onFileDrop = (e) => {
         const newFile = e.target.files[0];
 
-        let filetypes = newFile.type
+        let filetypes = newFile.type;
 
-        if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetypes.split('/')[0] === "image") {
+        if((newFile.size/(1000*1000)) > 50){
+            alert("Maximum upload size limit (50 MB) reached")
+            return;
+        }
+
+        if (acceptedFileTypes.includes(filetypes) || filetypes.split('/')[0] === "image" || newFile.name.split('.').pop() === 'rar') {
             setFile(newFile);
         } else {
-            alert("File format not supported. Upload pdf, doc, docx and images only")
+            alert("File format not suppoted. Upload pdf, doc, docx, csv, xlsx, zip, rar and images only")
         }
 
     }
@@ -340,7 +346,7 @@ const TenderFee = () => {
         return;
         }
 
-        console.log("Submitted!");
+        // console.log("Submitted!");
 
         const formdata = new FormData();
 
@@ -776,7 +782,7 @@ const TenderFee = () => {
                                         <p className="display-4 mb-0"><i className='fas fa-cloud-upload-alt text-primary '></i></p>
                                         {!dragover && <p className="mt-0">Drag & Drop an document or Click</p>}
                                         {dragover && <p className="mt-0">Drop the document</p>}
-                                        <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/* " onChange={onFileDrop} />
+                                        <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept={`${acceptedFileTypes.join()}`}  onChange={onFileDrop} />
                                     </div>
                                 </div>
                             </div>

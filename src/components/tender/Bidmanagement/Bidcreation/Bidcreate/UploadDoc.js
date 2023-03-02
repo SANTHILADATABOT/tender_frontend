@@ -10,6 +10,7 @@ import axios from "axios";
 import DocList from "./DocList";
 import styles from './UploadDoc.module.css';
 import LockCard from "../../../../UI/LockCard";
+import { acceptedFileTypes } from "../../../../master/FileConfig";
 
 const UploadDoc = () => {
 
@@ -26,6 +27,7 @@ const UploadDoc = () => {
   const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] = useOutletContext();
   const [progress, setProgressCompleted] = useState(0)
   const [locked, setLocked] = useState(true)
+  const [totalSize, setTotal_size] = useState(0)
 
   useEffect(() => {
     if(id){
@@ -48,9 +50,31 @@ const UploadDoc = () => {
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
 
-    let filetypes = newFile.type
+    let filetypes = newFile.type;
 
-    if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetypes.split('/')[0] === "image"){
+    let uploadSize =0;
+    if(!isEditbtn){
+        uploadSize = (totalSize + (newFile.size/1000))/1000; 
+    }
+
+    if(file && isEditbtn){
+        // console.log('yes')
+        uploadSize = (totalSize + (newFile.size/1000) - (file.size/1000))/1000; 
+    }
+
+    // console.log('total size' , totalSize/1000)
+    // console.log('newfile', newFile.size/(1000*1000))
+    // console.log('fiel', file?.size/(1000*1000))
+    // console.log('uploaded size',  uploadSize)
+    
+
+    let MaxSize = 50;
+    if(uploadSize > MaxSize){
+        alert('Maximun upload size (50 MB) limit reached');
+        return;
+    }
+
+    if (acceptedFileTypes.includes(filetypes) || filetypes.split('/')[0] === "image" || newFile.name.split('.').pop() === 'rar'){
       setFile(newFile);
     } else {
       alert("File format not suppoted. Upload pdf, doc, docx and images only")
@@ -271,7 +295,7 @@ const UploadDoc = () => {
                   <p className="display-4 mb-0"><i className='fas fa-cloud-upload-alt text-primary '></i></p>
                   {!dragover && <p className="mt-0">Drag & Drop an document or Click</p>}
                   {dragover && <p className="mt-0">Drop the document</p>}
-                  <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/* " onChange={onFileDrop} />
+                  <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer"  accept={`${acceptedFileTypes.join()}`}  onChange={onFileDrop} />
                 </div>
               </div>
             </div>
@@ -306,7 +330,7 @@ const UploadDoc = () => {
           </div>
         </div>
       </form>
-      <DocList ref={ref} BidCreationId={id} onEdit={editHandler}  />
+      <DocList ref={ref} BidCreationId={id} onEdit={editHandler} setTotalSize={setTotal_size}  />
       </LockCard>
     </Fragment>
   )

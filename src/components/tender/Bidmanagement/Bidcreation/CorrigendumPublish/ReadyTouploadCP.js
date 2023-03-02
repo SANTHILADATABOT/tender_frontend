@@ -62,7 +62,7 @@ const ReadyToUploadCP = (props) => {
                         <div className="col-md-2 d-flex align-items-center justify-content-center">
                             {preview &&  <img className="rounded-circle pointer" id="previewImg" src={preview} alt="No Image" width="75px" height="75px"   onClick={()=> window.open(preview, "_blank")} title="Click for Preview"/>}
 
-                            {!preview && <img src={ImageConfig[props.file.type.split('/')[1]] || ImageConfig['default']} alt="" width="75px" height="75px"/>}
+                            {!preview && <img src={ImageConfig[props.file.name.split('.').pop()] ||ImageConfig[props.file.type.split('/')[1]] ||   ImageConfig['default']} alt="" width="75px" height="75px"/>}
                             {/* <i className="fas fa-clipboard-list fa-2x " /> */}
                         </div>
                     </div>

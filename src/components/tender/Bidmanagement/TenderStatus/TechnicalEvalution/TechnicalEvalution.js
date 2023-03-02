@@ -11,6 +11,8 @@ import LockCard from "../../../../UI/LockCard";
 import PreLoader from "../../../../UI/PreLoader";
 import AcceptedBidders from "./AcceptedBidders";
 import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
+import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
+import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 
 const TechnicalEvalution = (props) => {
   const [file, setFile] = useState(null);
@@ -29,22 +31,19 @@ const TechnicalEvalution = (props) => {
   const { id } = useParams();
   const { server1: baseUrl } = useBaseUrl();
   const [input, setInput] = useState({});
-
+  const { img: maxImageSize } = useAllowedUploadFileSize();
+  const { MIMEtype: doctype } = useAllowedMIMEDocType();
+  const [DateValue, setDateValue] = useState("");
+  const [DateHasError, setDateHasError] = useState("");
   
-
-  const [DateValue, setDateValue]=useState("");
-  const [DateHasError, setDateHasError]=useState("");
-  function DateChangeHandler(e)
-  {
+  function DateChangeHandler(e) {
     setDateValue(e.target.value);
-    if(!e.target.value ){
+    if (!e.target.value) {
       setDateHasError(true);
-    }
-    else{
+    } else {
       setDateHasError(false);
       setisEdited(true);
     }
-    
   }
 
   const onDragEnter = () => {
@@ -62,19 +61,49 @@ const TechnicalEvalution = (props) => {
   const onFileDrop = (e) => {
     setisEdited(true);
     const newFile = e.target.files[0];
-
-    let filetypes = newFile.type;
-
-    if (
-      filetypes === "application/pdf" ||
-      filetypes === "application/msword" ||
-      filetypes ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      filetypes.split("/")[0] === "image"
+    
+    let len = newFile?.name?.split(".").length;
+    if(newFile && newFile.size > maxImageSize)
+    {
+      Swal.fire({
+        title: "File Size",
+        text: "File size is too Large",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile(null);
+        // setPreviewObjURL("");
+      });
+    } else if (newFile && !doctype.includes(newFile.type)) {
+      if (newFile?.name?.split(".")[len - 1] !== "rar") {
+        Swal.fire({
+          title: "File Type",
+          text: "Invalid File Type",
+          icon: "error",
+          confirmButtonColor: "#2fba5f",
+        }).then(() => {
+          setFile(null);
+          // setPreviewObjURL("");
+        });
+      }
+      else{
+        setFile(newFile);
+      }
+    } else if (
+      newFile?.name?.split(".")[len - 1] === "txt"
     ) {
+      Swal.fire({
+        title: "File Type",
+        text: "Invalid File Type",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile(null);
+        // setPreviewObjURL("");
+      });
+    }
+    else{
       setFile(newFile);
-    } else {
-      alert("File format not suppoted. Upload pdf, doc, docx and images only");
     }
   };
 
@@ -89,80 +118,81 @@ const TechnicalEvalution = (props) => {
 
   function getTechEvalutionList() {
     if (bidManageMainId) {
-      try{
-      axios({url : `${baseUrl}/api/tenderstatus/techevaluation/${bidManageMainId}`, method: 'GET', headers: {   //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },})
-        .then((res) => {
-          if (res.data.status === 200) {
-            
-            
-            setUploadDocId(res.data.mainId);
-            setDateValue(res.data.date);
-            res.data.result.map((bidders) => {
-              setInput((prev) => {
-                return {
-                  ...prev,
-                  [bidders.competitorId]: {
-                    [bidders.competitorId + "status"]: bidders.qualifiedStatus,
-                    [bidders.competitorId + "reason"]: bidders.reason
-                      ? bidders.reason
-                      : "",
-                  },
-                };
-              });
-            });
-            if(Object.keys(res.data.result).length>0)
-            {
-              setNotHasValue(false);
-            }
-            
-            axios({url: `${baseUrl}/api/tenderstatus/techevaluation/download/${bidManageMainId}`,
-            method: 'GET',
-            responseType: 'blob', // important
-            headers: {   //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Expires': '0',
-            },
-          }).then((response)=>{
-
-            if(response.status===200)
-            {
-            response.data.name = res.data.filename;
-            setisEditbtn(true);
-            setFile(response.data );
-            
-            }
-            else{
-              setisEditbtn(false);
-              setFile(null);
-            }
-          });
-        }
-        else if (res.data.status === 404) {
-          {
-            setisEditbtn(false);
-            setFile(null);
-          }          
-          }
+      try {
+        axios({
+          url: `${baseUrl}/api/tenderstatus/techevaluation/${bidManageMainId}`,
+          method: "GET",
+          headers: {
+            //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
         })
-        .then(()=>{
+          .then((res) => {
+            if (res.data.status === 200) {
+              setUploadDocId(res.data.mainId);
+              setDateValue(res.data.date ? res.data.date : "");
+              setisEditbtn(true);
+              res.data.result.map((bidders) => {
+                setInput((prev) => {
+                  return {
+                    ...prev,
+                    [bidders.competitorId]: {
+                      [bidders.competitorId + "status"]:
+                        bidders.qualifiedStatus ? bidders.qualifiedStatus: "",
+                      [bidders.competitorId + "reason"]: bidders.reason
+                        ? bidders.reason
+                        : "",
+                    },
+                  };
+                });
+              });
+              if (Object.keys(res.data.result).length > 0) {
+                setNotHasValue(false);
+              }
+
+              axios({
+                url: `${baseUrl}/api/tenderstatus/techevaluation/download/${bidManageMainId}`,
+                method: "GET",
+                responseType: "blob", // important
+                headers: {
+                  //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+                  "Cache-Control": "no-cache",
+                  Pragma: "no-cache",
+                  Expires: "0",
+                },
+              }).then((response) => {
+                if (response.status === 200) {
+                  response.data.name = res.data.filename;
+                  setisEditbtn(true);
+                  setFile(response.data);
+                } else if (UploadDocId || response.status === 204) {
+                  setisEditbtn(true);
+                  setFile(null);
+                } else {
+                  setisEditbtn(false);
+                  setFile(null);
+                }
+              });
+            } else if (res.data.status === 404) {
+              {
+                setisEditbtn(false);
+                setFile(null);
+              }
+            }
+          })
+          .then(() => {
             setFetchLoading(false);
-        });
-      }
-      catch(exception)
-      {
+          });
+      } catch (exception) {
         setFetchLoading(false);
         setNotHasValue(true);
         console.log(exception);
       }
     }
-    formIsValid=false;
-  };
-  
+    formIsValid = false;
+  }
 
   //Get List of Competitors who are involved for Technical evaluation
   useEffect(() => {
@@ -171,30 +201,29 @@ const TechnicalEvalution = (props) => {
   }, [bidManageMainId]);
 
   useEffect(() => {
-    if(isEdited)
-    setisEdited(true)  
+    if (isEdited) setisEdited(true);
   }, [DateValue, file]);
-  
 
   const resetform = () => {
     setDateValue("");
     setFile(null);
     //have to reset input with loop
-    Object.keys(input).forEach(key => {
+    Object.keys(input).forEach((key) => {
       setInput((prev) => {
-            return {
-              ...prev, [key]: {[`${key}status`]:"", [`${key}reason`]:""}
-          };
-        });
+        return {
+          ...prev,
+          [key]: { [`${key}status`]: "", [`${key}reason`]: "" },
+        };
       });
-    
-    setisEditbtn(false);
-    setUploadDocId(null);
+    });
+
+    // setisEditbtn(false);
+    // setUploadDocId(null);
   };
-  
+
   let formIsValid = false;
 
-  if (DateValue && file !== null) {
+  if (DateValue || file !== null) {
     formIsValid = true;
   }
 
@@ -240,7 +269,6 @@ const TechnicalEvalution = (props) => {
           toastError("Unable to update");
         }
         setdatasending(false);
-
       })
       .catch((err) => {
         Swal.fire({
@@ -270,9 +298,9 @@ const TechnicalEvalution = (props) => {
       tokenid: localStorage.getItem("token"),
       bid_creation_mainid: id,
     };
-    if(UploadDocId)
-    { data._method = "PUT";
-  }
+    if (UploadDocId) {
+      data._method = "PUT";
+    }
 
     if (file instanceof Blob) {
       data.file = new File([file], file.name);
@@ -301,9 +329,12 @@ const TechnicalEvalution = (props) => {
     }
   };
 
-//  {(!formIsValid || isDatasending || FetchLoading) && !isEdited}
+   
+
+
+  //  {(!formIsValid || isDatasending || FetchLoading) && !isEdited}
   return (
-    <LockCard locked={!id || notHasValue }>
+    <LockCard locked={!id || notHasValue}>
       <PreLoader loading={FetchLoading}>
         <form onSubmit={submitHandler} encType="multipart/form-data">
           <div className="row align-items-baseline">
@@ -311,7 +342,7 @@ const TechnicalEvalution = (props) => {
               <div className="row align-items-center font-weight-bold">
                 <div className="col-lg-4 text-dark">
                   <label htmlFor="Date" className="pr-3">
-                    Evaluation Date <span className="text-danger">&nbsp;*&nbsp;</span>: 
+                    Evaluation Date <span className="text-danger">&nbsp;*&nbsp;</span>:
                   </label>
                 </div>
                 <div className="col-lg-8">
@@ -340,7 +371,9 @@ const TechnicalEvalution = (props) => {
               <div className="inputgroup col-lg-6 mb-4">
                 <div className="row ">
                   <div className="col-lg-4 text-dark font-weight-bold">
-                    <label htmlFor="customername">Document Upload <span className="text-danger">&nbsp;*&nbsp;</span>:</label>
+                    <label htmlFor="customername">
+                      Document Upload :
+                    </label>
                   </div>
                   <div className="col-lg-8">
                     <ReadyToUpload
@@ -376,7 +409,7 @@ const TechnicalEvalution = (props) => {
                         type="file"
                         value=""
                         className="h-100 w-100 position-absolute top-50 start-50 pointer"
-                        accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/* "
+                        accept={{doctype}+'.rar'}
                         onChange={onFileDrop}
                       />
                     </div>
@@ -426,7 +459,9 @@ const TechnicalEvalution = (props) => {
                       ? "btn btn-outline-primary rounded-pill px-4"
                       : "btn btn-primary rounded-pill px-4"
                   }
-                  disabled={(formIsValid || isDatasending || FetchLoading) && !isEdited}
+                  disabled={props.tenderStatus==='Cancel' ||
+                    (!formIsValid || isDatasending || FetchLoading) && !isEdited
+                  }
                 >
                   {isDatasending && (
                     <span className="spinner-border spinner-border-sm mr-2"></span>

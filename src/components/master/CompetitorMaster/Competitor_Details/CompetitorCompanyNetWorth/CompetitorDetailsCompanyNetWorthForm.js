@@ -1,5 +1,5 @@
 import { usePageTitle } from "../../../../hooks/usePageTitle";
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
@@ -8,9 +8,7 @@ import Swal from "sweetalert2";
 import CompetitorDetailsCompanyNetWorthList from "./CompetitorDetailsCompanyNetWorthList";
 // import { data, map } from "jquery";
 
-
-
-const CompetitorDetailsCompanyNetWorthForm = () => {
+const CompetitorDetailsCompanyNetWorthForm = (props) => {
   const { compid } = useParams();
   usePageTitle("Competitor Creation");
   const initialValue = {
@@ -26,62 +24,66 @@ const CompetitorDetailsCompanyNetWorthForm = () => {
   const [formIsValid, setFormIsValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [netWorthList, setNetWorthList] = useState([]);
-  const [editYearData,setEditYearData]=useState();
-  const [isBtnClicked,setIsBtnClicked]=useState(false);
+  const [editYearData, setEditYearData] = useState();
+  const [isBtnClicked, setIsBtnClicked] = useState(false);
   const [hasError, setHasError] = useState({
     accountYear: null,
     accValue: null,
   });
   let tokenId = localStorage.getItem("token");
   var dataSet = [];
-  let btn_clicked= false;
+  let btn_clicked = false;
   const { server1: baseUrl } = useBaseUrl();
   // const navigate = useNavigate();
 
   useEffect(() => {
-    getCompNo();
+    // getCompNo();
     getAccountYearList();
     getNetWorthList();
   }, []);
-  
-  const getAccountYearList = async() =>{
-    const today =new Date();
+
+  const getAccountYearList = async () => {
+    const today = new Date();
     let curr_year = today.getFullYear();
-    let startYear=1970;
-    let list=[];
-    for(var i=curr_year;i>=startYear ;i--)
-    {
-      let y=i+"-"+(i+1);
-      list.push({value: y,label: y});
+    let startYear = 1970;
+    let list = [];
+    for (var i = curr_year; i >= startYear; i--) {
+      let y = i + "-" + (i + 1);
+      list.push({ value: y, label: y });
     }
     setAccountYearList(list);
   };
-
-  const getCompNo = async () => {
-    await axios
-      .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          setCompetitorNetWorthInput({
-            ...competitorNetWorthInput,
-            compNo: resp.data.compNo,
-          });
-        }
-      });
-  };
   
+  useEffect(() => {
+    if (props.compNo) {
+      setCompetitorNetWorthInput({
+        ...competitorNetWorthInput,
+        compNo: props.compNo,
+      });
+    }
+  }, [props.compNo]);
+
+  // const getCompNo = async () => {
+  //   await axios
+  //     .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
+  //     .then((resp) => {
+  //       if (resp.data.status === 200) {
+  //         setCompetitorNetWorthInput({
+  //           ...competitorNetWorthInput,
+  //           compNo: resp.data.compNo,
+  //         });
+  //       }
+  //     });
+  // };
+
   //check Form is Valid or not
-useEffect(() => {
-  if (
-    hasError.accValue !== true &&
-    hasError.accountYear !== true 
-  ) {
-    setFormIsValid(true);
-  }
-  else{
-    setFormIsValid(false);
-  }
-}, [hasError]);
+  useEffect(() => {
+    if (hasError.accValue !== true && hasError.accountYear !== true) {
+      setFormIsValid(true);
+    } else {
+      setFormIsValid(false);
+    }
+  }, [hasError]);
 
   const getNetWorthList = () => {
     axios
@@ -90,38 +92,44 @@ useEffect(() => {
         let list = [...resp.data.networth];
         let listarr = list.map((item, index) => ({
           ...item,
-          buttons:`<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
+          buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
         setNetWorthList(listarr);
       });
   };
 
-useEffect(()=>{
-  getAccountYearList();
-},[competitorNetWorthInput.accYearId]);
+  useEffect(() => {
+    getAccountYearList();
+  }, [competitorNetWorthInput.accYearId]);
 
-useEffect(()=>{
-  if(competitorNetWorthInput.accYearId!==null && editYearData!==null && accountYearList.length>0)
-  {
-  setCompetitorNetWorthInput((prev)=>{return {...prev,accountYear: accountYearList.find(x => x.value === editYearData)
-  }});
-}
-},[accountYearList]);
+  useEffect(() => {
+    if (
+      competitorNetWorthInput.accYearId !== null &&
+      editYearData !== null &&
+      accountYearList.length > 0
+    ) {
+      setCompetitorNetWorthInput((prev) => {
+        return {
+          ...prev,
+          accountYear: accountYearList.find((x) => x.value === editYearData),
+        };
+      });
+    }
+  }, [accountYearList]);
 
-
-  const onEdit = (data) => {    
-      setFormIsValid(true);
-      getAccountYearList();      
-        setEditYearData(data.accountYear);
-        setCompetitorNetWorthInput({
-          accYearId: data.id,
-          compNo: data.compNo,
-          accValue: data.accValue,
-        });
+  const onEdit = (data) => {
+    setFormIsValid(true);
+    getAccountYearList();
+    setEditYearData(data.accountYear);
+    setCompetitorNetWorthInput({
+      accYearId: data.id,
+      compNo: data.compNo,
+      accValue: data.accValue,
+    });
   };
-  
-  const onDelete = (data) => {    
+
+  const onDelete = (data) => {
     Swal.fire({
       text: `Are You sure, to delete ?`,
       icon: "warning",
@@ -139,7 +147,7 @@ useEffect(()=>{
               Swal.fire({
                 //success msg
                 icon: "success",
-                title: "Accounting year "+data.accountYear,
+                title: "Accounting year " + data.accountYear,
                 text: `removed!`,
                 timer: 2000,
                 showConfirmButton: false,
@@ -169,9 +177,9 @@ useEffect(()=>{
       }
     });
   };
- 
+
   const selectInputHandler = (value, action) => {
-       setCompetitorNetWorthInput({
+    setCompetitorNetWorthInput({
       ...competitorNetWorthInput,
       [action.name]: value,
     });
@@ -182,17 +190,22 @@ useEffect(()=>{
     }
   };
 
-  const textInputHandler = (e) =>{
-    setCompetitorNetWorthInput({...competitorNetWorthInput, accValue: e.target.value});
-    
-    if (!e.target.value === "" || !e.target.value === null || !(/^[1-9]{1}[0-9]{0,10}[\.][0-9]{2}$/).test(e.target.value))  {
-      
+  const textInputHandler = (e) => {
+    setCompetitorNetWorthInput({
+      ...competitorNetWorthInput,
+      accValue: e.target.value,
+    });
+
+    if (
+      !e.target.value === "" ||
+      !e.target.value === null ||
+      !/^[1-9]{1}[0-9]{0,10}[\.][0-9]{2}$/.test(e.target.value)
+    ) {
       setHasError({ ...hasError, accValue: true });
     } else {
       setHasError({ ...hasError, accValue: false });
     }
-  }
-  
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -211,35 +224,39 @@ useEffect(()=>{
       datatosend.compNo !== null &&
       datatosend.accValue !== null &&
       datatosend.accountYear !== null
-    )
-    {
-    axios.post(`${baseUrl}/api/competitornetworth`, datatosend).then((resp) => {
-      if (resp.data.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "Competitor Networth",
-          text: resp.data.message,
-          timer: 2000,
-        }).then(function () {
-          setLoading(false);
-          setIsBtnClicked(false);
-          setCompetitorNetWorthInput({...competitorNetWorthInput, accValue: "", accountYear: null});
-          getNetWorthList();
+    ) {
+      axios
+        .post(`${baseUrl}/api/competitornetworth`, datatosend)
+        .then((resp) => {
+          if (resp.data.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Competitor Networth",
+              text: resp.data.message,
+              timer: 2000,
+            }).then(function () {
+              setLoading(false);
+              setIsBtnClicked(false);
+              setCompetitorNetWorthInput({
+                ...competitorNetWorthInput,
+                accValue: "",
+                accountYear: null,
+              });
+              getNetWorthList();
+            });
+          } else if (resp.data.status === 404) {
+            Swal.fire({
+              icon: "error",
+              title: "Competitor Networth",
+              text: resp.data.message,
+              confirmButtonColor: "#5156ed",
+            }).then(function () {
+              setLoading(false);
+              setIsBtnClicked(false);
+            });
+          }
         });
-      } else if (resp.data.status === 404) {
-        Swal.fire({
-          icon: "error",
-          title: "Competitor Networth",
-          text: resp.data.message,
-          confirmButtonColor: "#5156ed",
-        }).then(function () {
-          setLoading(false);
-          setIsBtnClicked(false);
-        });
-      }
-    });
-  
-  }
+    }
   };
 
   const updateHandler = (e) => {
@@ -260,49 +277,54 @@ useEffect(()=>{
       datatosend.accValue !== null &&
       datatosend.accountYear !== null &&
       competitorNetWorthInput.accYearId
-    )
-    {
-    axios.put(`${baseUrl}/api/competitornetworth/${competitorNetWorthInput.accYearId}`, datatosend).then((resp) => {
-      if (resp.data.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "Competitor Networth",
-          text: resp.data.message,
-          timer: 2000,
-        }).then(function () {
-          setCompetitorNetWorthInput({...competitorNetWorthInput,accYearId:null, accValue: "", accountYear: null});
-          getNetWorthList();
-          setIsBtnClicked(false);
-          setLoading(false);
+    ) {
+      axios
+        .put(
+          `${baseUrl}/api/competitornetworth/${competitorNetWorthInput.accYearId}`,
+          datatosend
+        )
+        .then((resp) => {
+          if (resp.data.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Competitor Networth",
+              text: resp.data.message,
+              timer: 2000,
+            }).then(function () {
+              setCompetitorNetWorthInput({
+                ...competitorNetWorthInput,
+                accYearId: null,
+                accValue: "",
+                accountYear: null,
+              });
+              getNetWorthList();
+              setIsBtnClicked(false);
+              setLoading(false);
+            });
+          } else if (resp.data.status === 404) {
+            Swal.fire({
+              icon: "error",
+              title: "Competitor Networth",
+              text: resp.data.errors,
+              confirmButtonColor: "#5156ed",
+            }).then(function () {
+              setLoading(false);
+              setIsBtnClicked(false);
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Competitor Networth",
+              text: "Something went wrong!",
+              confirmButtonColor: "#5156ed",
+            }).then(function () {
+              setLoading(false);
+              setIsBtnClicked(false);
+            });
+          }
         });
-      } else if (resp.data.status === 404) {
-        Swal.fire({
-          icon: "error",
-          title: "Competitor Networth",
-          text: resp.data.errors,
-          confirmButtonColor: "#5156ed",
-        }).then(function () {
-          setLoading(false);
-          setIsBtnClicked(false);
-        });
-      }
-      else{
-        Swal.fire({
-          icon: "error",
-          title: "Competitor Networth",
-          text: "Something went wrong!",
-          confirmButtonColor: "#5156ed",
-        }).then(function () {
-          setLoading(false);
-          setIsBtnClicked(false);
-        });
-      }
-     
-    });
-  }
+    }
   };
-
-  
 
   return (
     <div className="card-body ">
@@ -317,7 +339,7 @@ useEffect(()=>{
                 </label>
               </div>
               <div className="col-lg-8">
-              <Select
+                <Select
                   name="accountYear"
                   id="accountYear"
                   isSearchable="true"
@@ -326,7 +348,7 @@ useEffect(()=>{
                   onChange={selectInputHandler}
                   value={competitorNetWorthInput.accountYear}
                 ></Select>
-                
+
                 {hasError.accountYear && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
@@ -343,21 +365,22 @@ useEffect(()=>{
             <div className="row align-items-center">
               <div className="col-lg-4 text-dark font-weight-bold pt-1">
                 <label htmlFor="accValue">
-                  Value in Rupees ( &#8377; )<span className="text-danger">&nbsp;*</span>
+                  Value in Rupees ( &#8377; )
+                  <span className="text-danger">&nbsp;*</span>
                   <p className="text-info">( upto : 99,999,999,999.99 )</p>
                 </label>
               </div>
               <div className="col-lg-6">
-              <input
+                <input
                   type="text"
                   className="form-control text-right"
                   id="accValue"
                   placeholder="Enter Value...."
                   name="accValue"
                   value={competitorNetWorthInput.accValue}
-                  onChange={textInputHandler}                  
+                  onChange={textInputHandler}
                 />
-                
+
                 {hasError.accValue && (
                   <div className="pt-1">
                     <span className="text-danger font-weight-bold">
@@ -373,7 +396,15 @@ useEffect(()=>{
           <div className="inputgroup col-lg-5 mb-4"></div>
           <div className="inputgroup col-lg-2 mb-4 align-items-center">
             <div className="row">
-              <button className="btn btn-primary"  disabled={!formIsValid || isBtnClicked === true} onClick={!competitorNetWorthInput.accYearId ? submitHandler : updateHandler}>
+              <button
+                className="btn btn-primary"
+                disabled={!formIsValid || isBtnClicked === true}
+                onClick={
+                  !competitorNetWorthInput.accYearId
+                    ? submitHandler
+                    : updateHandler
+                }
+              >
                 {!competitorNetWorthInput.accYearId
                   ? loading === true
                     ? "Adding...."
@@ -388,7 +419,11 @@ useEffect(()=>{
           <div className="inputgroup col-lg-5 mb-4"></div>
         </div>
       </form>
-      <CompetitorDetailsCompanyNetWorthList netWorthList={netWorthList} onEdit={onEdit} onDelete={onDelete}/>
+      <CompetitorDetailsCompanyNetWorthList
+        netWorthList={netWorthList}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
     </div>
   );
 };

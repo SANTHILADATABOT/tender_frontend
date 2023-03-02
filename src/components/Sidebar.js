@@ -53,7 +53,7 @@ function Sidebar() {
         <Link className="nav-link" to="/tender">
           {/*<i className="fas fa-fw fa-tachometer-alt" />*/}
           <i className="fa fa-laptop"></i>
-          <span>Dashboard</span>
+          <span className="font-weight-bold ml-1">Dashboard</span>
         </Link>
       </motion.li>
       {/* $$$$ */}
@@ -183,6 +183,7 @@ function Sidebar() {
             >
               Tender Type Master
             </NavLink>
+            
           </div>
         </div>
       </motion.li>
@@ -248,8 +249,44 @@ function Sidebar() {
         </div>
       </motion.li>
 
-      <motion.div className="text-center d-none d-md-inline"
-      initial={{y:500, rotate: 360}} animate={{y:0, rotate:0}} transition={{delay: .4}}>
+
+       {/* Divider */}
+       <hr className="sidebar-divider my-0" />
+      {/* Nav Item - Pages Collapse Menu */}
+      <li className="nav-item">
+        <Link
+          className="nav-link collapsed"
+          to="#"
+          data-toggle="collapse"
+          data-target="#collapseLibraryMenu"
+          aria-expanded="true"
+          aria-controls="collapseLibraryMenu"
+          id="libraryMenu"
+        >
+          {/*<i className="fas fa-fw fa-cog" />*/}
+          <i className="fa fa-book"></i>
+          <span className="font-weight-bold ml-1">Library</span>
+        </Link>
+        <div
+          id="collapseLibraryMenu"
+          className="collapse"
+          aria-labelledby="headingTwo"
+          data-parent="#accordionSidebar"
+        >
+          <div className="bg-white py-2 collapse-inner rounded">
+            <NavLink
+              className={`collapse-item ${({ isActive }) =>
+                isActive ? "active" : undefined}`}
+              to={`/${pathName}/library/communicationfiles`}
+              onClick={() => hideSidebarElement("libraryMenu")}
+            >
+              Communication Files
+            </NavLink>           
+          </div>
+        </div>
+      </li>
+
+      <motion.div className="text-center d-none d-md-inline">
         <button className="rounded-circle border-0" id="sidebarToggle"></button>
       </motion.div>
     </ul>

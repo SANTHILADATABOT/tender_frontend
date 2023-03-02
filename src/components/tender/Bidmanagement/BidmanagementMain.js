@@ -9,7 +9,7 @@ const BidmanagementMain = () => {
 
     const[bidManageMainId, setBidManagementMainId] = useState(0)
     const[tendercreationid, setTenderCreationId] =  useState(null)
-
+    const [istenderParticipated, setTenderParticipated] = useState(false)
     const { id, tenderid } = useParams();
     const { server1: baseUrl } = useBaseUrl();
     const navigate = useNavigate();
@@ -45,6 +45,23 @@ const BidmanagementMain = () => {
         })
       }
     },[])
+
+
+    const getTenderParticipationStatus = () => {
+      axios.get(`${baseUrl}/api/bidcreation/tenderparticipation/${id}`).then((resp) => {
+          if (resp.data.status === 200) {
+              if(resp.data.BidCreationTenderParticipation.tenderparticipation){
+                  if(resp.data.BidCreationTenderParticipation.tenderparticipation === 'participating'){
+                      setTenderParticipated(true)
+                  }
+              }
+          }
+      })
+  }
+
+    useEffect(() => {
+      getTenderParticipationStatus()
+    }, [bidManageMainId])
 
     
     const toastSuccess = (text) => {
@@ -135,7 +152,7 @@ const BidmanagementMain = () => {
                           role="tabpanel"
                           aria-labelledby="home-tab"
                         >
-                          <Outlet context={[toastSuccess, toastError, setBidManagementMainId, bidManageMainId ]}/>
+                          <Outlet context={[toastSuccess, toastError, setBidManagementMainId, bidManageMainId, istenderParticipated, setTenderParticipated ]}/>
                         </div>
                         
                       </div>

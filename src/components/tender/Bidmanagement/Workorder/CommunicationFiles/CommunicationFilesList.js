@@ -18,51 +18,54 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 var table;
 const CommunicationFilesList = (props) => {
-  
- var dataSet = []
 
- useEffect(() => {
-   table =  $('#communicationfiles').DataTable({
-        data: dataSet,
-        columns: [
-            { data: 'sl_no' },
-            { data: 'date' },
-            // { data: 'remark' },
-            { data: 'comfile' },
-            { data: 'buttons' },
-        ],
+  var dataSet = []
+
+  useEffect(() => {
+    table = $('#communicationfiles').DataTable({
+      data: dataSet,
+      columns: [
+        { data: 'sl_no' },
+        { data: 'date' },
+        { data: 'from' },
+        { data: 'to' },
+
+        // { data: 'remark' },
+        { data: 'refrenceno' },
+        { data: 'buttons' },
+      ],
     })
 
-      $('#communicationfiles tbody').on('click', 'tr .fa-edit', function () {
-        let rowdata =table.row($(this).closest('tr')).data();
-        props.onEdit(rowdata)
-        
-      });
+    $('#communicationfiles tbody').on('click', 'tr .fa-edit', function () {
+      let rowdata = table.row($(this).closest('tr')).data();
+      props.onEdit(rowdata)
 
-      $('#communicationfiles tbody').on('click', 'tr .fa-trash', function () {
-        let rowdata =table.row($(this).closest('tr')).data();
-        props.onDelete(rowdata)
-      });
+    });
 
-      $('#communicationfiles tbody').on('click', 'tr #commImg', function () {
-        let rowdata =table.row($(this).closest('tr')).data();
-        props.onPreview(rowdata)
-        
-      });
+    $('#communicationfiles tbody').on('click', 'tr .fa-trash', function () {
+      let rowdata = table.row($(this).closest('tr')).data();
+      props.onDelete(rowdata)
+    });
 
- }, [])
+    $('#communicationfiles tbody').on('click', 'tr #commImg', function () {
+      let rowdata = table.row($(this).closest('tr')).data();
+      props.onPreview(rowdata)
 
- useEffect(() => {
-    if(props.commFilesSubList){
-        table.clear().rows.add(props.commFilesSubList).draw();
+    });
+
+  }, [])
+
+  useEffect(() => {
+    if (props.commFilesSubList) {
+      table.clear().rows.add(props.commFilesSubList).draw();
     }
- }, [props.commFilesSubList])
- 
+  }, [props.commFilesSubList])
+
 
   return (
     <Fragment>
       <div className="col-lg-12">
-        </div>
+      </div>
       <div className="table-responsive">
         <table
           className="table   text-center"
@@ -74,12 +77,14 @@ const CommunicationFilesList = (props) => {
             <tr>
               <th scope="col">#</th>
               <th scope="col">Date</th>
-              <th scope="col">Document</th>
+              <th scope="col">From</th>
+              <th scope="col">To</th>
+              <th scope="col">Refrence No</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white">
-                
+
           </tbody>
         </table>
       </div>

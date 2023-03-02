@@ -7,6 +7,7 @@ import axios from "axios";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import FinancialEvalution from "./FinancialEvalution/FinancialEvalution";
+import AwardContract from "./AwardContract/AwardContract";
 import StatusModal from "./StatusModal";
 
 const TenderStatus = () => {
@@ -19,12 +20,17 @@ const TenderStatus = () => {
     let tokenId = localStorage.getItem("token");
     const { id } = useParams();
     const [seed, setSeed] = useState(1);
+    const [isAwarded, setIsAwarded] = useState(true);
     const [tenderStatus, settenderStatus] = useState(null)
     const [FetchLoading, setFetchLoading] = useState(false)
 
     useEffect(() => {
-        getBidders();
-    }, []);
+      if(bidManageMainId)
+      {
+        getTenderAwardedBidder();
+      }
+        
+    }, [bidManageMainId]);
 
     useEffect(() => {
       if(id) {
@@ -37,25 +43,31 @@ const TenderStatus = () => {
       setFetchLoading(true)
       axios.get(`${baseUrl}/api/bigmanagement/tenderstatus/status/${id}`).then((resp) => {
         if(resp.data.status === 200){
-          console.log(resp.data.BidManagementTenderOrBidStaus)
+          // console.log(resp.data.BidManagementTenderOrBidStaus)
           settenderStatus(resp.data.BidManagementTenderOrBidStaus.status);
+        
         }
         setFetchLoading(false)
       })
     }
 
 
-    const getBidders = () =>
+    const getTenderAwardedBidder = () =>
     {
-      axios.get(`${baseUrl}/api/tenderstatus/getbidder/${bidManageMainId}`).then((response)=>{
-        
-        if(response.data.status===200)
-        {
-          setStatus(response.data.bidders.tenderstatus);
+      axios.get(`${baseUrl}/api/tenderstatus/awardcontract/${bidManageMainId}`).then((response)=>{
+        if(response.data.status===200 && response?.data?.result?.bidid == id && response.data.competitorId)
+        {          
+            // console.log("If",response.data.result);
+            setIsAwarded(true);
+          
+        }
+        else{
+          setIsAwarded(false);
+          // console.log("Else",response.data.result);
         }
         });  
     }
-
+    
   const updateTenderStatus = () =>{
         setLoading(true);
         let data = {
@@ -104,6 +116,7 @@ const reloadFunction = () => {
     setSeed(Math.random());
 }
 
+
   return (
     <Fragment>
     <div className="formContent">
@@ -135,7 +148,7 @@ const reloadFunction = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="bidders">
           <div className="card-header">
-            <Bidders key={seed} reloadFunction={reloadFunction}/>
+            <Bidders key={seed} reloadFunction={reloadFunction} tenderStatus={tenderStatus}/>
           </div>
         </div>
       </div>
@@ -156,7 +169,7 @@ const reloadFunction = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="technicalEvaluation">
           <div className="card-header">
-            <TechnicalEvalution key={seed} reloadFunction={reloadFunction}/>
+            <TechnicalEvalution key={seed} reloadFunction={reloadFunction} tenderStatus={tenderStatus} />
           </div>
         </div>
       </div>
@@ -176,11 +189,31 @@ const reloadFunction = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="financialevaluation">
           <div className="card-header">
-            <FinancialEvalution key={seed} reloadFunction={reloadFunction}/>
+            <FinancialEvalution key={seed} reloadFunction={reloadFunction} tenderStatus={tenderStatus} />
           </div>
         </div>
       </div>
 
+
+         {/* Award of Contract Form */}
+      <div className="card shadow mb-2  ">
+        <a
+          href="#awardcontract"
+          className="d-block card-header py-3 bg-white "
+          data-toggle="collapse"
+          role="button"
+          aria-expanded="true"
+          aria-controls="awardcontract"
+        >
+          <h6 className="m-0 font-weight-bold text-dark">AWARD OF CONTRACT</h6>
+        </a>
+        {/* Card Content - Collapse */}
+        <div className="collapse" id="awardcontract">
+          <div className="card-header">
+            <AwardContract key={seed} reloadFunction={reloadFunction} tenderStatus={tenderStatus} />
+          </div>
+        </div>
+      </div>
 
       <div className="row mt-5">
         <div className="col-lg-6">
@@ -189,7 +222,7 @@ const reloadFunction = () => {
           {status === "Completed" ? "Tender Completed" 
           : status === "Cancelled" ? "Tender Cancelled" : "If Tender Cancelled Click Here"}
           </label> */}
-
+{!isAwarded &&
           <button className={`btn 
             ${tenderStatus === 'Cancel' && 'btn-danger'}
             ${tenderStatus==='Retender' && 'btn-warning'}
@@ -206,9 +239,7 @@ const reloadFunction = () => {
             {tenderStatus==='Cancel' && 'Cancelled'}
             {tenderStatus==='Retender' && 'Retender'}
             {(!tenderStatus && !FetchLoading) && 'Cancel/Retender'}
-
-
-          </button>
+          </button> }
         </div>
 
         <div className="col-lg-6"> 

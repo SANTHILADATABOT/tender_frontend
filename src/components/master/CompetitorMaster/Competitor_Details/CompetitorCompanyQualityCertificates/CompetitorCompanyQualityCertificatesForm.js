@@ -1,17 +1,21 @@
 import { usePageTitle } from "../../../../hooks/usePageTitle";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef} from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
 import CompetitorCompanyQualityCertificatesList from "./CompetitorCompanyQualityCertificatesList";
 import { useImageStoragePath } from "../../../../hooks/useImageStoragePath";
 import "./UploadDoc.css";
+import Docsupload from "./Docsupload";
+import { ImageConfig } from "../../../../hooks/Config";
+import PreLoader from "../../../../UI/PreLoader";
 
-const CompetitorCompanyQualityCertificatesForm = () => {
+const CompetitorCompanyQualityCertificatesForm = (props) => {
   const { compid } = useParams();
+
   usePageTitle("Competitor Creation");
   const initialValue = {
     qcId: null,
@@ -20,6 +24,7 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     remark: "",
     fileName: "",
   };
+
   
   const [competitorQCInput, setCompetitorQCInput] = useState(initialValue);
   const [formIsValid, setFormIsValid] = useState(false);
@@ -37,15 +42,25 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { qcFile: filePath } = useImageStoragePath();
-  const [isPdfFile, setIsPdfFile ] = useState(false);
-  // const { pdf: maxPdfSize } = useAllowedUploadFileSize();
-  // const navigate = useNavigate();
-
+  const [fileName, setFileName] = useState("");
+  const [FetchLoading, setFetchLoading] = useState(true);
+  
   useEffect(() => {
-    getCompNo();
-    getQCList();
+    if (compid) {
+      // getCompNo();
+      getQCList();
+    }
   }, []);
 
+  useEffect(() => {
+    if (props.compNo) {
+      setCompetitorQCInput({
+        ...competitorQCInput,
+        compNo: props.compNo,
+      });
+    }
+  }, [props.compNo]);
+  
   const onDragEnter = () => {
     wrapperRef.current.classList.add("dragover");
     setdragover(true);
@@ -59,17 +74,43 @@ const CompetitorCompanyQualityCertificatesForm = () => {
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const onFileDrop = (e) => {
+    e.preventDefault();
     const newFile = e.target.files[0];
-    if (newFile) {
-      var splited = newFile.name.split(".");
-      if(splited[1]==="pdf")
-      {setIsPdfFile(true);}
-      else{setIsPdfFile(false);}
 
+    if (newFile && newFile.size > maxImageSize) {
+      Swal.fire({
+        title: "File Size",
+        text: "File size too Large...!",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        // setFile(null);
+      });
+    } else if (newFile && !doctype.includes(newFile.type)) {
+      let len = newFile.name.split(".").length;
+      if (newFile.type === "" && newFile.name.split(".")[len - 1] === "rar") {
+        setFile(newFile);
+        setFileName("");
+      } else {
+        Swal.fire({
+          title: "File Type",
+          text: "Invalid File type",
+          icon: "error",
+          confirmButtonColor: "#2fba5f",
+        })
+      }
+    } else {
+      if(e.target.files[0].type==="text/plain")
+      {
+        Swal.fire({
+          title: "File Type",
+          text: "Invalid File type",
+          icon: "error",
+          confirmButtonColor: "#2fba5f",
+        })
+      }
+      else{
       setFile(newFile);
-      setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
-      if (previewForEdit) {
-        setPreviewForEdit("");
       }
     }
   };
@@ -83,41 +124,18 @@ const CompetitorCompanyQualityCertificatesForm = () => {
     },
   };
 
-  useEffect(() => {
-    if (file && file.size > maxImageSize) {
-      Swal.fire({
-        title: "File Size",
-        text: "Maximum Allowed File size is 1MB",
-        icon: "error",
-        confirmButtonColor: "#2fba5f",
-      }).then(() => {
-        setFile("");
-        setPreviewObjURL("");
-      });
-    } else if (file && !doctype.includes(file.type)) {
-      Swal.fire({
-        title: "File Type",
-        text: "Allowed File Type are JPG/JPEG/PNG/PDF ",
-        icon: "error",
-        confirmButtonColor: "#2fba5f",
-      }).then(() => {
-        setFile("");
-        setPreviewObjURL("");
-      });
-    }
-  }, [file]);
-  const getCompNo = async () => {
-    await axios
-      .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
-      .then((resp) => {
-        if (resp.data.status === 200) {
-          setCompetitorQCInput({
-            ...competitorQCInput,
-            compNo: resp.data.compNo,
-          });
-        }
-      });
-  };
+  // const getCompNo = async () => {
+  //   await axios
+  //     .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
+  //     .then((resp) => {
+  //       if (resp.data.status === 200) {
+  //         setCompetitorQCInput({
+  //           ...competitorQCInput,
+  //           compNo: resp.data.compNo,
+  //         });
+  //       }
+  //     });
+  // };
 
   //check Form is Valid or not
   useEffect(() => {
@@ -138,77 +156,99 @@ const CompetitorCompanyQualityCertificatesForm = () => {
         let list = [...resp.data.qc];
         let listarr = list.map((item, index) => ({
           ...item,
-
           filepath:
-            item.filetype === "pdf"
-              ? `<embed src="${filePath}` +
+            item.filepath !== "" &&
+            (item.filepath.split(".")[1] === "jpg" ||
+              item.filepath.split(".")[1] === "png" ||
+              item.filepath.split(".")[1] === "jpeg" ||
+              item.filepath.split(".")[1] === "webp")
+              ? `<img src="${filePath}` +
                 item.filepath +
-                `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" title="Pdf"/><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="qcImg" style="cursor:pointer" title="PDF"></img>`
-              : `<img src="${filePath}` +
-                item.filepath +
-                `" class="rounded-circle pointer" width="75" height="75" alt="image" id="qcImg" style="cursor:pointer" title="Image"></img>`,
+                `" class="rounded-circle pointer" width="40" height="40" style="cursor:pointer" />`
+              : `<img src="${
+                  item.filepath.split(".")[1] === "rar" ||
+                  item.filepath.split(".")[1] === "vnd.rar" ||
+                  item.filepath.split(".")[1] === "x-rar-compressed" ||
+                  item.filepath.split(".")[1] === "x-rar"
+                    ? ImageConfig["x-rar"]
+                    : item.filepath.split(".")[1] === "pdf"
+                    ? ImageConfig["pdf"]
+                    : item.filepath.split(".")[1] === "doc" ||
+                      item.filepath.split(".")[1] === "docx" ||
+                      item.filepath.split(".")[1] === "msword" ||
+                      item.filepath.split(".")[1] ===
+                        "vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    ? ImageConfig["doc"]
+                    : item.filepath.split(".")[1] === "zip" ||
+                      item.filepath.split(".")[1] === "multipart/x-zip" ||
+                      item.filepath.split(".")[1] === "x-zip" ||
+                      item.filepath.split(".")[1] === "x-zip-compressed"
+                    ? ImageConfig["zip"]
+                    : item.filepath.split(".")[1] === "xls" ||
+                      item.filepath.split(".")[1] === "xlsx" ||
+                      item.filepath.split(".")[1] === "vnd.ms-excel" ||
+                      item.filepath.split(".")[1] ===
+                        "vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    ? ImageConfig["vnd.ms-excel"]
+                    : item.filepath.split(".")[1] === "csv"
+                    ? ImageConfig["csv"]
+                    : ImageConfig["default"]
+                }" class="rounded-circle pointer" width="40" height="40" alt="" style="cursor:pointer"></img>`,
 
           buttons: `<i class="fa fa-edit text-primary mx-2 h6" style="cursor:pointer" title="Edit"></i> <i class="fa fa-trash text-danger h6  mx-2" style="cursor:pointer"  title="Delete"></i>`,
           sl_no: index + 1,
         }));
         setQCList(listarr);
+      }).then(()=>{
+        setFetchLoading(false);
       });
   };
 
-  const getImageUrl = (s) => {
-    //console.log("filepath" + filePath);
-    // let pat = "/" + filePath + "[a-zA-Z0-9]*.(?:png|jpeg|jpg|pdf)/";
-    // let pattern = new RegExp(pat, "gi");
-    //var pattern1 = /${filepath}[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)/;
-    ///((?:https|http):\/\/.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:8000\/[a-zA-z0-9\/]*\.(?:png|jpeg|jpg|pdf))/;
-    // var url_splited = s.split('""');
-    // console.log("url_splited", url_splited);
-    var pattern = /[a-zA-Z0-9]*\.(?:png|jpeg|jpg|pdf)/;
-
-    var result = s.match(pattern);
-    var img_url = filePath + result; //filePath is a state value, which indicates server storage location
-    // console.log("img Url  ", img_url);
-
-    if (!(img_url === null || !img_url === undefined)) {
-      setPreviewForEdit(img_url);
-    } else {
-      setPreviewForEdit("");
-    }
-  };
-
   const onEdit = (data) => {
-    setFile("");
-    var imgUrl = getImageUrl(data.filepath);
-
     setFormIsValid(true);
     setCompetitorQCInput({
       qcId: data.id,
       compNo: data.compNo,
-      cerName: data.cerName,
-      remark: data.remark,
+      cerName: data.cerName ? data.cerName : "",
+      remark: data.remark ? data.remark : "",
     });
-    var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
-    var img_url = data.filepath.match(pattern);
-    var splited = img_url[0].split(".");
-    if(splited[1]==="pdf")
-    {
-      setIsPdfFile(true);
-    }
-    else{
-      setIsPdfFile(false);
+
+    if (data.filepath) {
+      axios
+        .get(`${baseUrl}/api/competitorqcertificate/${data.id}`)
+        .then((resp) => {
+          if (resp.status === 200) {
+            if (resp.data.qc[0].filepath) {
+              setFileName(resp.data.qc[0].filepath);
+              axios({
+                url: `${baseUrl}/api/download/competitorqcertificate/${data.id}`,
+                method: "GET",
+                responseType: "blob", // important
+                headers: {
+                  //to stop cacheing this response at browsers. otherwise wrongly displayed cached files
+                  "Cache-Control": "no-cache",
+                  Pragma: "no-cache",
+                  Expires: "0",
+                  Accept: doctype,
+                },
+              }).then((response) => {
+                if (response.status === 200) {
+                  setFile(response);
+                } else if (response.status === 204) {
+                  setFile("");
+                  setFileName("");
+                } else {
+                  alert("Unable to Process Now!");
+                }
+              });
+            }
+          }
+        });
     }
   };
-
   const onPreview = (data) => {
-    var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
-    var img_url = data.filepath.match(pattern);
-    if(img_url[0])
-    {
-    var splited = img_url[0].split(".");
-    if(splited[1]==="pdf")
-    {setIsPdfFile(true);}
-    else{setIsPdfFile(false);}
-    window.open(filePath + img_url, "_blank");
+    if (file !== "" && file.data.type.split("/")[0] === "image") {
+      return window.open(data.filepath), "_blank";
     }
   };
 
@@ -409,7 +449,6 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                 setIsBtnClicked(false);
               });
             }
-            console.log("competitorQCInput", competitorQCInput);
           });
       }
       //When Image is changed/reuploaded on update
@@ -504,13 +543,10 @@ const CompetitorCompanyQualityCertificatesForm = () => {
       });
     }
   };
-  const removeImgHandler = (e) => {
-    setFile("");
-    setPreviewObjURL("");
-    setPreviewForEdit("");
-  };
+ 
 
   return (
+    <PreLoader loading={FetchLoading}>
     <div className="card-body ">
       <form>
         <div className="row align-items-center">
@@ -605,115 +641,14 @@ const CompetitorCompanyQualityCertificatesForm = () => {
                 <label htmlFor="remark">Preview</label>
               </div>
               <div className="col-lg-8">
-                {/* <img src={previewObjURL} /> */}
                 {file && (
-                  <div className="card border-left-info shadow py-2 w-100 my-4">
-                    <div className="card-body">
-                      <div className="row no-gutters align-items-center">
-                        <div className="col-md-9">
-                          <div className="font-weight-bold text-info text-uppercase mb-1">
-                            {competitorQCInput.cerName}
-                          </div>
-
-                          <div className="row no-gutters align-items-center ">
-                            <div className="col-auto">
-                              <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                <p className="text-truncate">{file.name}</p>
-                                <p>({file.size / 1000} KB)</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewObjURL && (
-                            <img
-                              className="rounded-circle pointer"
-                              id="previewImg"
-                              // src={previewObjURL}
-                              src={!isPdfFile ? previewObjURL : "assets/icons/pdf_logo.png"}
-                              alt="No Image"
-                              width="75px"
-                              height="75px"
-                              onClick={() =>
-                                window.open(previewObjURL, "_blank")
-                              }
-                              title="Click for Preview"
-                            />
-                          )}
-                          &nbsp;&nbsp;&nbsp;
-                          {previewObjURL !== null && (
-                            <span
-                              className="fa fa-close text-danger h4 closebtn"
-                              onClick={removeImgHandler}
-                            >
-                              &nbsp;
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <Docsupload
+                    file={file}
+                    setFile={setFile}
+                    fileName={fileName}
+                    setFileName={setFileName}
+                  />
                 )}
-                {/* for edit */}
-
-                {file === "" && previewForEdit !== "" && (
-                  <div className="card border-left-info shadow py-2 w-100 my-4">
-                    <div className="card-body">
-                      <div className="row no-gutters align-items-center">
-                        <div className="col-md-9">
-                          <div className="font-weight-bold text-info text-uppercase mb-1">
-                            {competitorQCInput.cerName}
-                          </div>
-
-                          {/* <div className="row no-gutters align-items-center ">
-                                <div className="col-auto">
-                                    <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                        <p className="text-truncate">
-                                            {file.name}
-                                        </p>
-                                        <p>({file.size/1000} KB)</p>
-                                    </div>
-                                </div>
-                            </div> */}
-                        </div>
-                        <div className="col-md-3 d-flex align-items-center justify-content-center">
-                          {previewForEdit !== "" && (
-                            <img
-                              className="rounded-circle pointer"
-                              id="previewImg"
-                              // src={previewForEdit}
-                              src={!isPdfFile ? previewForEdit :"assets/icons/pdf_logo.png"}
-                              alt="No Image"
-                              width="75px"
-                              height="75px"
-                              onClick={() =>
-                                window.open(previewForEdit, "_blank")
-                              }
-                              title="Click for Preview"
-                            />
-                          )}
-                          &nbsp;&nbsp;&nbsp;
-                          {previewForEdit !== "" && (
-                            <span
-                              className="fa fa-close text-danger h4 closebtn"
-                              onClick={removeImgHandler}
-                            >
-                              &nbsp;
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* {hasError.remark && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
-                    </span>
-                  </div>
-                )} */}
               </div>
             </div>
           </div>
@@ -730,10 +665,10 @@ const CompetitorCompanyQualityCertificatesForm = () => {
               >
                 {!competitorQCInput.qcId
                   ? loading === true
-                    ? "Adding...."
+                    ?  <span className="spinner-border spinner-border-sm mr-2"></span>+ progress + '% Uploaded'
                     : "Add"
                   : loading === true
-                  ? "Updating...."
+                  ? progress + '% Updating'
                   : "Update"}
               </button>
             </div>
@@ -746,8 +681,10 @@ const CompetitorCompanyQualityCertificatesForm = () => {
         onEdit={onEdit}
         onDelete={onDelete}
         onPreview={onPreview}
+
       />
     </div>
+    </PreLoader>
   );
 };
 export default CompetitorCompanyQualityCertificatesForm;

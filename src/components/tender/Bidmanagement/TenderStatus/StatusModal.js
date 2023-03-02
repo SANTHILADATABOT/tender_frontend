@@ -10,15 +10,15 @@ import styles from "./TenderStatus_StatusModal.module.css";
 import ReadyToUpload from "./ReadyToupload";
 import PreLoader from "../../../UI/PreLoader";
 import Swal from "sweetalert2";
-
+import { useAllowedUploadFileSize } from "../../../hooks/useAllowedUploadFileSize";
+import { useAllowedMIMEDocType } from "../../../hooks/useAllowedMIMEDocType";
 
 const statusOptions = [
-  { value: 'Retender', label: 'Retender' },
-  { value: 'Cancel', label: 'Cancel' },
+  { value: "Retender", label: "Retender" },
+  { value: "Cancel", label: "Cancel" },
 ];
 
 const StatusModal = (props) => {
-
   const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
   const wrapperRef = useRef(null);
@@ -29,9 +29,10 @@ const StatusModal = (props) => {
   const [progress, setProgressCompleted] = useState(0);
   const [FetchLoading, setFetchLoading] = useState(false);
   const { id } = useParams();
-  const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] = useOutletContext();
-
-
+  const [toastSuccess, toastError, setBidManagementMainId, bidManageMainId] =
+    useOutletContext();
+  const { img: maxImageSize } = useAllowedUploadFileSize();
+  const { MIMEtype: doctype } = useAllowedMIMEDocType();
 
   const {
     value: statusValue,
@@ -41,40 +42,76 @@ const StatusModal = (props) => {
     inputBlurHandler: statusBlurHandler,
     setInputValue: setstatus,
     reset: resetstatus,
-  } = useInputValidation(isNotNull)
+  } = useInputValidation(isNotNull);
 
   useEffect(() => {
-    if(id){
-        fetchLatestData()
+    if (id) {
+      fetchLatestData();
     }
-  }, [])
+  }, []);
 
   const onDragEnter = () => {
-    wrapperRef.current.classList.add(styles['dragover'])
-    setdragover(true)
+    wrapperRef.current.classList.add(styles["dragover"]);
+    setdragover(true);
   };
 
   const onDragLeave = () => {
-    wrapperRef.current.classList.remove(styles['dragover'])
-    setdragover(false)
+    wrapperRef.current.classList.remove(styles["dragover"]);
+    setdragover(false);
   };
 
-  const onDrop = () => wrapperRef.current.classList.remove(styles['dragover']);
+  const onDrop = () => wrapperRef.current.classList.remove(styles["dragover"]);
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
 
-    let filetypes = newFile.type
+    // let filetypes = newFile.type
 
-    console.log(filetypes)
+    // console.log(filetypes)
 
-    if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetypes === "application/x-zip-compressed" || filetypes.split('/')[0] === "image") {
-      setFile(newFile);
+    // if (filetypes === "application/pdf" || filetypes === "application/msword" || filetypes === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetypes === "application/x-zip-compressed" || filetypes.split('/')[0] === "image") {
+    //   setFile(newFile);
+    // } else {
+    //   alert("File format not supported. Upload pdf, doc, docx and images only")
+    // }
+
+    let len = newFile?.name?.split(".").length;
+    if (newFile && newFile.size > maxImageSize) {
+      Swal.fire({
+        title: "File Size",
+        text: "File size is too Large",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile(null);
+      });
+    } else if (newFile && !doctype.includes(newFile.type)) {
+      if (newFile?.name?.split(".")[len - 1] !== "rar") {
+        Swal.fire({
+          title: "File Type",
+          text: "Invalid File Type",
+          icon: "error",
+          confirmButtonColor: "#2fba5f",
+        }).then(() => {
+          setFile(null);
+        });
+      } else {
+        setFile(newFile);
+      }
+    } else if (newFile?.name?.split(".")[len - 1] === "txt") {
+      Swal.fire({
+        title: "File Type",
+        text: "Invalid File Type",
+        icon: "error",
+        confirmButtonColor: "#2fba5f",
+      }).then(() => {
+        setFile(null);
+        // setPreviewObjURL("");
+      });
     } else {
-      alert("File format not supported. Upload pdf, doc, docx and images only")
+      setFile(newFile);
     }
-
-  }
+  };
 
   let formIsValid = false;
 
@@ -84,96 +121,117 @@ const StatusModal = (props) => {
 
   var config = {
     onUploadProgress: function (progressEvent) {
-      var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-      setProgressCompleted(percentCompleted)
-    }
-  }
+      var percentCompleted = Math.round(
+        (progressEvent.loaded * 100) / progressEvent.total
+      );
+      setProgressCompleted(percentCompleted);
+    },
+  };
 
   const fetchLatestData = () => {
-    setFetchLoading(true)
+    setFetchLoading(true);
 
-    axios.get(`${baseUrl}/api/bigmanagement/tenderstatus/status/${id}`).then((resp) => {
-      if (resp.data.status === 200) {
-        setFormId(resp.data.BidManagementTenderOrBidStaus.id);
-        setstatus(statusOptions.find(x => x.value === resp.data.BidManagementTenderOrBidStaus.status))
-        
-        if(resp.data.file){
-          axios({
-            url: `${baseUrl}/api/download/BidManagementTenderOrBidStausDocs/${resp.data.BidManagementTenderOrBidStaus.id}`,
-            method: 'GET',
-            responseType: 'blob', // important
-        }).then((response) => {
-            if (response.status === 200) {
-                response.data.name = resp.data.BidManagementTenderOrBidStaus.file_original_name
-                setFile(response.data)
-            }
-            setFetchLoading(false)
-        });
-        }else{
-          setFetchLoading(false)
+    axios
+      .get(`${baseUrl}/api/bigmanagement/tenderstatus/status/${id}`)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          setFormId(resp.data.BidManagementTenderOrBidStaus.id);
+          setstatus(
+            statusOptions.find(
+              (x) => x.value === resp.data.BidManagementTenderOrBidStaus.status
+            )
+          );
+
+          if (resp.data.file) {
+            axios({
+              url: `${baseUrl}/api/download/BidManagementTenderOrBidStausDocs/${resp.data.BidManagementTenderOrBidStaus.id}`,
+              method: "GET",
+              responseType: "blob", // important
+            }).then((response) => {
+              if (response.status === 200) {
+                response.data.name =
+                  resp.data.BidManagementTenderOrBidStaus.file_original_name;
+                setFile(response.data);
+              }
+              setFetchLoading(false);
+            });
+          } else {
+            setFetchLoading(false);
+          }
+        } else {
+          setFetchLoading(false);
         }
-      }else{
-
-        setFetchLoading(false)
-      }
-
-    })
-  }
+      });
+  };
 
   const postData = (data) => {
-    axios.post(`${baseUrl}/api/bigmanagement/tenderstatus/status`, data, config).then((resp) => {
-      if (resp.data.status === 200) {
-        let modalCloseBtn = document.querySelector('#tenderStatusModal .close');
-        modalCloseBtn.click();
-        toastSuccess(resp.data.message);
-        setFormId(resp.data.id);
-        fetchLatestData()
-        props.checkTenderStatus()
-        // resetall()
-        // navigate("/tender/bidmanagement/list/main/bidsubmission/" + id);
-        //   myRef.current.scrollIntoView({ behavior: 'smooth' })    
-        // window.history.replaceState({}, "Bid Creation", "/tender/bidmanagement/list/main/bidsubmission/" + id);
-      } else if (resp.data.status === 400) {
-        toastError(resp.data.message)
-      } else {
-        toastError("Unable to upload the document")
-      }
-      setdatasending(false)
-    }).catch((err) => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Something went wrong!',
+    axios
+      .post(`${baseUrl}/api/bigmanagement/tenderstatus/status`, data, config)
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          let modalCloseBtn = document.querySelector(
+            "#tenderStatusModal .close"
+          );
+          modalCloseBtn.click();
+          toastSuccess(resp.data.message);
+          setFormId(resp.data.id);
+          fetchLatestData();
+          props.checkTenderStatus();
+          // resetall()
+          // navigate("/tender/bidmanagement/list/main/bidsubmission/" + id);
+          //   myRef.current.scrollIntoView({ behavior: 'smooth' })
+          // window.history.replaceState({}, "Bid Creation", "/tender/bidmanagement/list/main/bidsubmission/" + id);
+        } else if (resp.data.status === 400) {
+          toastError(resp.data.message);
+        } else {
+          toastError("Unable to upload the document");
+        }
+        setdatasending(false);
       })
-      setdatasending(false)
-    });
-  }
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+        setdatasending(false);
+      });
+  };
 
   const putData = (data, formid) => {
-    axios.post(`${baseUrl}/api/bigmanagement/tenderstatus/status/${formid}?_method=PUT`, data, config).then((resp) => {
-      if (resp.data.status === 200) {
-        toastSuccess(resp.data.message)
-        props.checkTenderStatus()
-        let modalCloseBtn = document.querySelector('#tenderStatusModal .close');
-        modalCloseBtn.click();
+    axios
+      .post(
+        `${baseUrl}/api/bigmanagement/tenderstatus/status/${formid}?_method=PUT`,
+        data,
+        config
+      )
+      .then((resp) => {
+        if (resp.data.status === 200) {
+          toastSuccess(resp.data.message);
+          props.checkTenderStatus();
+          let modalCloseBtn = document.querySelector(
+            "#tenderStatusModal .close"
+          );
+          modalCloseBtn.click();
 
-        fetchLatestData() 
-      } else if (resp.data.status === 400) {
-        toastError(resp.data.message) 
-      }else {
-        toastError("Unable to update")
-      }
-      setdatasending(false)
-    }).catch((err) => {
-     console.log(err)
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Something went wrong!',
+          fetchLatestData();
+        } else if (resp.data.status === 400) {
+          toastError(resp.data.message);
+        } else {
+          toastError("Unable to update");
+        }
+        setdatasending(false);
       })
-      setdatasending(false)
-    });
-  }
+      .catch((err) => {
+        console.log(err);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+        setdatasending(false);
+      });
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -185,7 +243,7 @@ const StatusModal = (props) => {
       return;
     }
 
-    console.log("Submitted!");
+    // console.log("Submitted!");
 
     const formdata = new FormData();
 
@@ -203,7 +261,7 @@ const StatusModal = (props) => {
 
     for (var key in data) {
       if (data[key] === null) {
-        formdata.append(key, '');
+        formdata.append(key, "");
         continue;
       }
 
@@ -213,7 +271,7 @@ const StatusModal = (props) => {
     if (formId === 0) {
       postData(formdata);
     } else if (formId > 0) {
-      putData(formdata, formId)
+      putData(formdata, formId);
     }
     // optional: redirect the user
   };
@@ -261,37 +319,68 @@ const StatusModal = (props) => {
                     </div>
                   </div>
                 </div>
-                {file === null && <div className="inputgroup col-lg-12 mb-4 p-0">
-                  <div className="row col-lg-12 pr-0">
-                    <div className="col-lg-4 text-dark font-weight-bold">
-                      <label htmlFor="customername">Document Upload :</label>
-                    </div>
-                    <div className="col-lg-8 pr-0">
-                      <div className={`border-primary d-flex flex-column align-items-center justify-content-center   bg-gray-200 ${styles.height_of_dropbox} ${styles.boderradius__dropbox} ${styles.dashed} ${styles.drop_file_input} `}
-                        ref={wrapperRef}
-                        onDragEnter={onDragEnter}
-                        onDragLeave={onDragLeave}
-                        onDrop={onDrop}
-                      >
-                        <p className="display-4 mb-0"><i className='fas fa-cloud-upload-alt text-primary '></i></p>
-                        {!dragover && <p className="mt-0">Drag & Drop an document or Click</p>}
-                        {dragover && <p className="mt-0">Drop the document</p>}
-                        <input type="file" value="" className="h-100 w-100 position-absolute top-50 start-50 pointer" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/*,  application/x-zip-compressed" onChange={onFileDrop} />
+                {file === null && (
+                  <div className="inputgroup col-lg-12 mb-4 p-0">
+                    <div className="row col-lg-12 pr-0">
+                      <div className="col-lg-4 text-dark font-weight-bold">
+                        <label htmlFor="customername">Document Upload :</label>
+                      </div>
+                      <div className="col-lg-8 pr-0">
+                        <div
+                          className={`border-primary d-flex flex-column align-items-center justify-content-center   bg-gray-200 ${styles.height_of_dropbox} ${styles.boderradius__dropbox} ${styles.dashed} ${styles.drop_file_input} `}
+                          ref={wrapperRef}
+                          onDragEnter={onDragEnter}
+                          onDragLeave={onDragLeave}
+                          onDrop={onDrop}
+                        >
+                          <p className="display-4 mb-0">
+                            <i className="fas fa-cloud-upload-alt text-primary "></i>
+                          </p>
+                          {!dragover && (
+                            <p className="mt-0">
+                              Drag & Drop an document or Click
+                            </p>
+                          )}
+                          {dragover && (
+                            <p className="mt-0">Drop the document</p>
+                          )}
+                          <input
+                            type="file"
+                            value=""
+                            className="h-100 w-100 position-absolute top-50 start-50 pointer"
+                            accept={{doctype}+'.rar'}
+                            // accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/*,  application/x-zip-compressed"
+                            onChange={onFileDrop}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>}
-                {(file !== null) && <div className="inputgroup col-lg-12 mb-4 pr-0">
-                  <div className="row col-lg-12 pr-0">
-                    <div className="col-lg-4 text-dark font-weight-bold  p-0">
-                      {(file.lastModified) && <label htmlFor="customername">(Ready To Upload)</label>}
-                      {(!file.lastModified) && <label htmlFor="customername">(Uploaded Doc/File)</label>}
-                    </div>
-                    <div className="col-lg-8 pr-0 ">
-                      <ReadyToUpload file={file} clearFile={() => setFile(null)} />
+                )}
+                {file !== null && (
+                  <div className="inputgroup col-lg-12 mb-4 pr-0">
+                    <div className="row col-lg-12 pr-0">
+                      <div className="col-lg-4 text-dark font-weight-bold  p-0">
+                        {file.lastModified && (
+                          <label htmlFor="customername">
+                            (Ready To Upload)
+                          </label>
+                        )}
+                        {!file.lastModified && (
+                          <label htmlFor="customername">
+                            (Uploaded Doc/File)
+                          </label>
+                        )}
+                      </div>
+                      <div className="col-lg-8 pr-0 ">
+                        <ReadyToUpload
+                          file={file}
+                          clearFile={() => setFile(null)}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>}
+                )}
               </div>
             </form>
           </div>
@@ -305,7 +394,7 @@ const StatusModal = (props) => {
           >
             Cancel
           </button>
-          {(formId === 0) && (
+          {formId === 0 && (
             <button
               className={
                 !formIsValid
@@ -322,7 +411,7 @@ const StatusModal = (props) => {
               {!isdatasending && "Submit"}
             </button>
           )}
-          {(formId > 0) && (
+          {formId > 0 && (
             <button
               className={
                 !formIsValid
@@ -343,6 +432,6 @@ const StatusModal = (props) => {
       </ModalCard>
     </Fragment>
   );
-}
+};
 
 export default StatusModal;

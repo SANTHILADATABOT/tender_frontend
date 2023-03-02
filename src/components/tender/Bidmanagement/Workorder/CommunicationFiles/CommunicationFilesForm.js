@@ -2,7 +2,7 @@ import { usePageTitle } from "../../../../hooks/usePageTitle";
 import { useAllowedUploadFileSize } from "../../../../hooks/useAllowedUploadFileSize";
 import { useAllowedMIMEDocType } from "../../../../hooks/useAllowedMIMEDocType";
 import { useState, useEffect, useRef, Fragment } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useBaseUrl } from "../../../../hooks/useBaseUrl";
 import Swal from "sweetalert2";
@@ -14,10 +14,11 @@ import Select from "react-select";
 
 //Medium Options
 const options = [
-  { value: "By Postal", label: "By Postal" },
   { value: "Courier", label: "Courier" },
-  { value: "Parcel Service", label: "Parcel Service" },
-  { value: "In hand Delivery", label: "In hand Delivery" },
+  { value: "Mail", label: "Mail" },
+  { value: "Physical Handover", label: "Physical Handover" },
+  { value: "Registered Post", label: "Registered Post"},  
+  { value: "Whatsapp", label: "Whatsapp" },
 ];
 
 const CommunicationFilesForm = () => {
@@ -51,12 +52,14 @@ const CommunicationFilesForm = () => {
   const { img: maxImageSize } = useAllowedUploadFileSize();
   const { MIMEtype: doctype } = useAllowedMIMEDocType();
   const { commnunicationfile: filePath } = useImageStoragePath();
-  const [isPdfFile, setIsPdfFile ] = useState(false);
-  
+  const [isPdfFile, setIsPdfFile] = useState(false);
+  const [ImgaeList, setImgList] = useState([]);
+  const [num, setNum] = useState(0);
   //  const navigate = useNavigate();
   const [hasError, setHasError] = useState(initialValue);
   useEffect(() => {
     getCompFilesList();
+    setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
   }, []);
 
   const onDragEnter = () => {
@@ -70,23 +73,197 @@ const CommunicationFilesForm = () => {
   };
 
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
+  const del_image = (e, id) => {
+    e.preventDefault();
+    axios
+      .get(`${baseUrl}/api/workorder/creation/communicationfiledelete/${id}`)
+      .then((res) => {
+        if (res.data.status === 200) {
+          imageList();
+        }
+      });
+  };
+  const openInNewTab = (url, id) => {
+    onmouseover = window.open(
+      "http://192.168.1.29:8000/uploads/BidManagement/WorkOrder/CommunicationFiles/" +
+        id,
+      "",
+      "height=550,width=800,scrollbars=yes,left=320,top=120,toolbar=no,location=no,directories=no,status=no,menubar=no"
+    );
+    return false;
+  };
+
+  let FILELIST = [];
+
+  const imageList = (e) => {
+    let sub_id = document.getElementById("randno").value;
+    const datatosend = {
+      sub_id: sub_id,
+    };
+    axios
+      .post(
+        `${baseUrl}/api/workorder/creation/communicationfileUploadlist/`,
+        datatosend
+      )
+      .then((res) => {
+        if (res.data.status == 200) {
+          setImgList(res.data.list);
+          // window.location.href = "/admin/bill-upload/"+sub_id;
+        }
+      });
+  };
+  var imageurl = "";
+  // console.log("iMGlIST :", ImgaeList);
+
+  FILELIST = ImgaeList.map((item, index) => {
+    if (item.filetype == "pdf") {
+      imageurl = "assets/icons/pdf_logo.png";
+    } else if (item.filetype == "docx" || item.filetype == "doc") {
+      imageurl = "assets/icons/doc-icon.png";
+    } else if (
+      item.filetype == "jpeg" ||
+      item.filetype == "jpg" ||
+      item.filetype == "png" ||
+      item.filetype == "img"
+    ) {
+      imageurl =
+        "http://192.168.1.29:8000/uploads/BidManagement/WorkOrder/CommunicationFiles/" +
+        item.comfile;
+    } else {
+      imageurl = "assets/icons/excelicon.png";
+    }
+
+    return (
+      <div className="col-lg-2 mb-2 card border-left-info ml-4">
+        <div className=" text-center card-body row" key={+index + 1}>
+          <div className="col-lg-10">
+          <Link onClick={(url) => openInNewTab(url, item.comfile)}>
+            <img
+              src={imageurl}
+              alt=""
+              className="imageprev rounded-circle pointer"
+              width="85"
+              height="85"
+            />
+          </Link></div>
+          <div 
+            className="pointer fa fa-close text-danger h4 closebtn col-lg-2 mt-4"
+            key={+index + 1}
+            onClick={(e) => del_image(e, item.id)}
+          ></div>
+        </div>
+        </div>
+    );
+  });
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
 
   const onFileDrop = (e) => {
-    const newFile = e.target.files[0];
-    if(e.target.files[0]){
-    var splited = newFile.name.split(".");
-    if(splited[1]==="pdf")
-    {setIsPdfFile(true);}
-    else{setIsPdfFile(false);}
+    // console.log("e.target.files",e.target.files);
+
+    imageList();
+
+    let file = e.target.files[0];
+    //  let file=e.target.files[0]
+    let sub_id = document.getElementById("randno").value;
+    // let formData = new FormData();
+    // formData.append('file', file);
+    // console.log("Image FIles",formData);
+    // console.log("Image FIles1",file);
+    if (input.date == "") {
+      Swal.fire({
+        icon: "error",
+        title: "Communication Files",
+        text: "Date Is Empty",
+        confirmButtonColor: "#5156ed",
+      }).then(function () {
+        setLoading(false);
+        setIsBtnClicked(false);
+      });
+      return false;
     }
-    if (newFile) {
-     
-      setFile(newFile);
-      setPreviewObjURL(URL.createObjectURL(e.target.files[0]));
-      if (previewForEdit) {
-        setPreviewForEdit("");
+
+    //  let file=e.target.files[0]
+    let tokenId = localStorage.getItem("token");
+    if (
+      input.date !== "" ||
+      id !== "" ||
+      input.refrence_no !== "" ||
+      input.from !== "" ||
+      input.to !== "" ||
+      input.subject !== "" ||
+      input.medium !== "" ||
+      input.med_refrence_no !== "" ||
+      tokenId !== ""
+    ) {
+      const datatosend = {
+        date: input.date,
+        refrenceno: input.refrence_no,
+        from: input.from,
+        to: input.to,
+        subject: input.subject,
+        medium: input.medium,
+        medrefrenceno: input.med_refrence_no,
+
+        sub_id: sub_id,
+        tokenid: tokenId,
+        bidid: id,
+        file: file,
+        tokenId: tokenId,
+      };
+      const formdata = new FormData();
+
+      for (var key in datatosend) {
+        formdata.append(key, datatosend[key]);
       }
+      // let formData = new FormData();
+      // formData.append('file', file);
+      axios
+        .post(
+          `${baseUrl}/api/workorder/creation/communicationfileUpload/`,
+          formdata
+        )
+        .then((res) => {
+          if (res.data.status == 200) {
+            // window.location.href = "/admin/bill-upload/"+sub_id;
+            imageList();
+          }
+        });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Communication Files",
+        text: "Fill the form after that to upload files",
+        confirmButtonColor: "#5156ed",
+      }).then(function () {
+        setLoading(false);
+        setIsBtnClicked(false);
+      });
     }
+
+    //   console.log("setFileArray before",setFileArray);
+
+    //     if(e.target.files[0]){
+
+    //         setFileArray.push([...setFileArray,e.target.files[0]]);
+    //     // setArray(oldArray => [...oldArray,e.target.files[0]]);
+
+    //     }
+
+    //     console.log("files len",setFileArray.length);
+    //     console.log("setFileArray after",setFileArray);
+
+    // let perv=[];
+    //     for (let i = 0; i < e.target.files.length; i++) {
+    //       perv.push(URL.createObjectURL(e.target.files[i]));
+    //     }
+
+    //     setSelectedFiles(e.target.files);
+    //     setImagePreviews((previousImages) => previousImages.concat(perv));
+
+    //     // setProgressInfos({ val: [images] });
+
+    //     setMessage([]);
   };
 
   var config = {
@@ -124,7 +301,7 @@ const CommunicationFilesForm = () => {
 
   //check Form is Valid or not
   useEffect(() => {
-    if (input.date !== "" && (file !== "") | (previewForEdit !== "")) {
+    if (input.date !== "") {
       setFormIsValid(true);
     } else {
       setFormIsValid(false);
@@ -142,8 +319,7 @@ const CommunicationFilesForm = () => {
           comfile:
             item.filetype === "pdf"
               ? `<embed src="${filePath}` +
-                item.comfile
-                +
+                item.comfile +
                 `" class="rounded-circle pointer" width="0" height="0" style="cursor:pointer" title="Pdf"/><img src="assets/icons/pdf_logo.png" class="rounded-circle pointer" width="75" height="75" alt="PDF" id="commImg" style="cursor:pointer" title="PDF"></img>`
               : `<img src="${filePath}` +
                 item.comfile +
@@ -171,10 +347,11 @@ const CommunicationFilesForm = () => {
 
   const onEdit = (data) => {
     setFile("");
-    
+   
+    setInput(initialValue);
     var imgUrl = getImageUrl(data.comfile);
     setFormIsValid(true);
-    setInput({
+    setTimeout(() => { setInput({
       ...input,
       commId: data.id,
       date: data.date,
@@ -184,17 +361,21 @@ const CommunicationFilesForm = () => {
       subject: data.subject,
       med_refrence_no: data.med_refrenceno,
     });
-    
-    var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
-    var img_url = data.comfile.match(pattern);
-    var splited = img_url[0].split(".");
-    if(splited[1]==="pdf")
-    {
-      setIsPdfFile(true);
-    }
-    else{
-      setIsPdfFile(false);
-    }
+  }, 500);
+    setNum(data.randomno);
+    setTimeout(() => {
+      imageList();
+    }, 1000);
+
+    // var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
+    // var img_url = data.comfile.match(pattern);
+    // var splited = img_url[0].split(".");
+    // if (splited[1] === "pdf") {
+    //   setIsPdfFile(true);
+    // }
+    // else {
+    //   setIsPdfFile(false);
+    // }
 
     setInput((prev) => {
       return {
@@ -205,21 +386,20 @@ const CommunicationFilesForm = () => {
   };
 
   const onPreview = (data) => {
-    
     var pattern = /[a-zA-z0-9]*\.(?:png|jpeg|jpg|pdf)/;
     var img_url = data.comfile.match(pattern);
-    if(img_url[0])
-    {
-    var splited = img_url[0].split(".");
-    if(splited[1]==="pdf")
-    {setIsPdfFile(true);}
-    else{setIsPdfFile(false);}
-    window.open(filePath + img_url, "_blank");
+    if (img_url[0]) {
+      var splited = img_url[0].split(".");
+      if (splited[1] === "pdf") {
+        setIsPdfFile(true);
+      } else {
+        setIsPdfFile(false);
+      }
+      window.open(filePath + img_url, "_blank");
     }
   };
 
   const onDelete = (data) => {
-    console.log("Data", data);
     Swal.fire({
       text: `Are You sure, to delete ?`,
       icon: "warning",
@@ -231,8 +411,10 @@ const CommunicationFilesForm = () => {
     }).then((willDelete) => {
       if (willDelete.isConfirmed) {
         axios
-          .delete(`${baseUrl}/api/workorder/creation/communicationfiles/${data.id}`)
-          .then((resp) => { 
+          .delete(
+            `${baseUrl}/api/workorder/creation/communicationfiles/${data.id}`
+          )
+          .then((resp) => {
             if (resp.data.status === 200) {
               Swal.fire({
                 //success msg
@@ -273,11 +455,11 @@ const CommunicationFilesForm = () => {
       ...input,
       [e.target.name]: e.target.value,
     });
-    if (e.target.value === "" || e.target.value === null) {
-      setHasError({ ...hasError, [e.target.name]: true });
-    } else {
-      setHasError({ ...hasError, [e.target.name]: false });
-    }
+    // if (e.target.value === "" || e.target.value === null) {
+    //   setHasError({ ...hasError, [e.target.name]: true });
+    // } else {
+    //   setHasError({ ...hasError, [e.target.name]: false });
+    // }
   };
 
   const selectInputHandler = (value, action) => {
@@ -285,13 +467,12 @@ const CommunicationFilesForm = () => {
       ...input,
       [action.name]: value,
     });
-    if (value === "" || value === null) {
-      setHasError({ ...hasError, [action.name]: true });
-    } else {
-      setHasError({ ...hasError, [action.name]: false });
-    }
+    // if (value === "" || value === null) {
+    //   setHasError({ ...hasError, [action.name]: true });
+    // } else {
+    //   setHasError({ ...hasError, [action.name]: false });
+    // }
   };
-  
 
   const resetForm = () => {
     setLoading(false);
@@ -309,16 +490,15 @@ const CommunicationFilesForm = () => {
 
     let tokenId = localStorage.getItem("token");
     if (
-      input.date !== "" &&
-      id !== "" &&
-      input.refrence_no !== "" &&
-      input.from !== "" &&
-      input.to !== "" &&
-      input.subject !== "" &&
-      input.medium.value !== "" &&
-      input.med_refrence_no !== "" &&
-      tokenId !== "" &&
-      file !== ""
+      input.date !== "" ||
+      id !== "" ||
+      input.refrence_no !== "" ||
+      input.from !== "" ||
+      input.to !== "" ||
+      input.subject !== "" ||
+      input.medium !== "" ||
+      input.med_refrence_no !== "" ||
+      tokenId !== ""
     ) {
       const datatosend = {
         date: input.date,
@@ -326,12 +506,13 @@ const CommunicationFilesForm = () => {
         from: input.from,
         to: input.to,
         subject: input.subject,
-        medium: input.medium.value,
+        medium: input.medium,
         medrefrenceno: input.med_refrence_no,
         tokenid: tokenId,
         bidid: id,
         file: file,
         tokenId: tokenId,
+        random: document.getElementById("randno").value,
       };
 
       const formdata = new FormData();
@@ -354,8 +535,15 @@ const CommunicationFilesForm = () => {
               timer: 2000,
             }).then(function () {
               resetForm();
-             
+              setLoading(false);
+              setIsBtnClicked(false);
             });
+
+            //1998
+            setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
+            setTimeout(() => {
+              imageList();
+            }, 1000);
           } else if (resp.data.status === 404) {
             Swal.fire({
               icon: "error",
@@ -380,34 +568,33 @@ const CommunicationFilesForm = () => {
       });
     }
   };
-  
   const updateHandler = (e) => {
     e.preventDefault();
     setLoading(true);
     setIsBtnClicked(true);
     let tokenId = localStorage.getItem("token");
-   
+
     if (
-      input.date !== "" &&
-      id !== "" &&
-      input.refrence_no !== "" &&
-      input.from !== "" &&
-      input.to !== "" &&
-      input.subject !== "" &&
-      input.medium.value !== "" &&
-      input.med_refrence_no !== "" &&
+      input.date !== "" ||
+      id !== "" ||
+      input.refrence_no !== "" ||
+      input.from !== "" ||
+      input.to !== "" ||
+      input.subject !== "" ||
+      input.medium !== "" ||
+      input.med_refrence_no !== "" ||
       tokenId !== ""
     ) {
       //When Image is not changed on update
       if (previewForEdit !== "" && file === "") {
         const datatosend = {
           date: input.date,
-          refrenceno: input.refrence_no,
-          from: input.from,
-          to: input.to,
-          subject: input.subject,
-          medium: input.medium.value,
-          med_refrenceno: input.med_refrence_no,
+          refrenceno: input.refrence_no ? input.refrence_no.value :"",
+          from: input.from ? input.from :"",
+          to: input.to ? input.to :"",
+          subject: input.subject ? input.subject :"",
+          medium: input.medium ? input.medium :"",
+          med_refrenceno: input.med_refrence_no ? input.med_refrence_no :"",
           tokenid: tokenId,
           bidid: id,
         };
@@ -428,6 +615,11 @@ const CommunicationFilesForm = () => {
                 resetForm();
                 setPreviewForEdit("");
               });
+
+              setNum("wrk-" + Math.floor(100000 + Math.random() * 900000));
+              setTimeout(() => {
+                imageList();
+              }, 1000);
             } else if (resp.data.status === 404) {
               Swal.fire({
                 icon: "error",
@@ -454,14 +646,13 @@ const CommunicationFilesForm = () => {
       //When Image is changed/reuploaded on update
       else if (previewForEdit === "" && file !== "") {
         const datatosend = {
-
           date: input.date,
-          refrenceno: input.refrence_no,
-          from: input.from,
-          to: input.to,
-          subject: input.subject,
-          medium: input.medium.value,
-          med_refrenceno: input.med_refrence_no,
+          refrenceno: input.refrence_no ? input.refrence_no.value :"",
+          from: input.from ? input.from :"",
+          to: input.to ? input.to :"",
+          subject: input.subject ? input.subject :"",
+          medium: input.medium ? input.medium :"",
+          med_refrenceno: input.med_refrence_no ? input.med_refrence_no :"",
           tokenid: tokenId,
           bidid: id,
           file: file,
@@ -472,7 +663,7 @@ const CommunicationFilesForm = () => {
         for (var key in datatosend) {
           formdata.append(key, datatosend[key]);
         }
-        console.log("Input", input);
+
         axios
           .post(
             `${baseUrl}/api/workorder/creation/communicationfiles/${input.commId}`,
@@ -536,12 +727,13 @@ const CommunicationFilesForm = () => {
     }
   };
   const removeImgHandler = (e) => {
-    setFile("");
-    setPreviewObjURL("");
-    setPreviewForEdit("");
+    // setFile("");
+    // setPreviewObjURL("");
+    // setImages("");
+    const s = imagePreviews.filter((img) => img !== e);
+    setImagePreviews(s);
   };
-
-
+  
   return (
     <Fragment>
       <CollapseCard id={"CommunicationFiles"} title={"Communication Files"}>
@@ -772,6 +964,7 @@ const CommunicationFilesForm = () => {
               <div className="row align-items-center">
                 <div className="col-lg-4 text-dark font-weight-bold pt-1">
                   <label htmlFor="cerName"> File Upload</label>
+                  <input type="hidden" id="randno" name="randno" value={num} />
                 </div>
                 <div className="col-lg-8">
                   <div
@@ -798,126 +991,9 @@ const CommunicationFilesForm = () => {
                 </div>
               </div>
             </div>
-
-            <div className="inputgroup col-lg-6 mb-4 ">
-              <div className="row align-items-center">
-                <div className="col-lg-4 text-dark font-weight-bold pt-1">
-                  <label htmlFor="remark" className="ml-3">
-                    Preview
-                  </label>
-                </div>
-                <div className="col-lg-8">
-                  {/* <img src={previewObjURL} /> */}
-                  {file && (
-                    <div className="card border-left-info shadow py-2 w-100 my-4">
-                      <div className="card-body">
-                        <div className="row no-gutters align-items-center">
-                          <div className="col-md-9">
-                            <div className="font-weight-bold text-info text-uppercase mb-1">
-                              {input.date}
-                            </div>
-
-                            <div className="row no-gutters align-items-center ">
-                              <div className="col-auto">
-                                <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                  <p className="text-truncate">{file.name}</p>
-                                  <p>({file.size / 1000} KB)</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3 d-flex align-items-center justify-content-center">
-                            {previewObjURL && (
-                              <img
-                                className="rounded-circle pointer"
-                                id="previewImg"
-                                src={!isPdfFile ? previewObjURL : "assets/icons/pdf_logo.png"}
-                                alt="No Image"
-                                width="75px"
-                                height="75px"
-                                onClick={() =>
-                                  window.open(previewObjURL, "_blank")
-                                }
-                                title="Click for Preview"
-                              />
-                            )}
-                            &nbsp;&nbsp;&nbsp;
-                            {previewObjURL !== null && (
-                              <span
-                                className="fa fa-close text-danger h4 closebtn"
-                                onClick={removeImgHandler}
-                              >
-                                &nbsp;
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {/* for edit */}
-
-                  {file === "" && previewForEdit !== "" && (
-                    <div className="card border-left-info shadow py-2 w-100 my-4">
-                      <div className="card-body">
-                        <div className="row no-gutters align-items-center">
-                          <div className="col-md-9">
-                            <div className="font-weight-bold text-info text-uppercase mb-1">
-                              {/* {competitorQCInput.cerName} */}
-                            </div>
-
-                            {/* <div className="row no-gutters align-items-center ">
-                                <div className="col-auto">
-                                    <div className="h6 mb-0 mr-3 font-weight-bold text-gray-800 ">
-                                        <p className="text-truncate">
-                                            {file.name}
-                                        </p>
-                                        <p>({file.size/1000} KB)</p>
-                                    </div>
-                                </div>
-                            </div> */}
-                          </div>
-                          <div className="col-md-3 d-flex align-items-center justify-content-center">
-                            {previewForEdit !== "" && (
-                              <img
-                                className="rounded-circle pointer"
-                                id="previewImg"
-                                src={!isPdfFile ? previewForEdit :"assets/icons/pdf_logo.png"}
-                                alt="No Image"
-                                width="75px"
-                                height="75px"
-                                onClick={() =>
-                                  window.open(previewForEdit, "_blank")
-                                }
-                                title="Click for Preview"
-                              />
-                            )}
-                            &nbsp;&nbsp;&nbsp;
-                            {previewForEdit !== "" && (
-                              <span
-                                className="fa fa-close text-danger h4 closebtn"
-                                onClick={removeImgHandler}
-                              >
-                                &nbsp;
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* {hasError.remark && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Enter Valid Amount..!
-                    </span>
-                  </div>
-                )} */}
-                </div>
-              </div>
-            </div>
           </div>
+
+          {imagePreviews && <div className="row">{FILELIST}</div>}
           <div className="row text-center">
             <div className="col-12">
               <button

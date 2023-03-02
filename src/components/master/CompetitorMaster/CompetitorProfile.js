@@ -5,7 +5,8 @@ import { useEffect } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
-import { useNavigate, useParams } from "react-router-dom";
+import { useOutletContext, useNavigate, useParams } from "react-router-dom";
+import PreLoader from "../../UI/PreLoader";
 
 const registrationTypeList = [
   { value: 0, label: "Registered" },
@@ -14,23 +15,22 @@ const registrationTypeList = [
   { value: 3, label: "Proprietor" },
   { value: 4, label: "Private Limited Company" },
   { value: 5, label: "Public Limited Company" },
-  { value: 6, label: "Limited Liability Partnership"},
-  { value: 7, label: "One Person Company"},
+  { value: 6, label: "Limited Liability Partnership" },
+  { value: 7, label: "One Person Company" },
   { value: 8, label: "Sole Proprietorship" },
-  
 ];
 const companyTypeList = [
   { value: "0", label: "Work Contract Services" },
   { value: "1", label: "Factory / Manufacturing" },
   { value: "2", label: "Service Provider or Other" },
   { value: "3", label: "Retail Business" },
-  { value: "4", label: "Engineering Service and Consulting"},
+  { value: "4", label: "Engineering Service and Consulting" },
 ];
 
 const CompetitorProfile = () => {
   const { id } = useParams();
   usePageTitle("Competitor Creation");
-
+  const [competitorId, setCompetitorId] = useOutletContext();
   const { server1: baseUrl } = useBaseUrl();
   const navigate = useNavigate();
   const [hasError, setHasError] = useState({
@@ -110,15 +110,19 @@ const CompetitorProfile = () => {
     companyType: "",
     manpower: "",
   });
-  const [isChanged, setIsChanged]=useState({
+  const [isChanged, setIsChanged] = useState({
     country: false,
     state: false,
     district: false,
     city: false,
   });
-  
+  const [fetchLoading, setFetchingLoading] = useState(true);
+
   useEffect(() => {
-    if (id) {editCompetitor();};
+    if (id) {
+      editCompetitor();
+      setCompetitorId(id);
+    }
     getCountryList();
   }, []);
 
@@ -128,132 +132,200 @@ const CompetitorProfile = () => {
     });
   };
 
-//set Country on Edit
-  useEffect(()=>{
-    if(id && fetchingData.country !=="" && countryList.length >0 && isChanged.country===false)
-    {
-    setCompetitorFormInput({ ...competitorFormInput, country: countryList.find((x)=>x.value === fetchingData.country)
-    })}
-  },[countryList, fetchingData]);
+  //Generate set Customer No for new Entry
+  useEffect(() => {
+    if (competitorFormInput.state) {
+      generateNewCompNo();
+    }
+  }, [competitorFormInput.state]);
 
+  const generateNewCompNo = () => {
+    let stateCode,
+      newCompNo = "";
+
+    axios
+      .get(
+        `${baseUrl}/api/customercreation/getstatecode/${competitorFormInput.state.value}`
+      )
+      .then((resp) => {
+        if (resp.status === 200) {
+          stateCode = resp.data.state_code;
+        }
+      })
+      .then(() => {
+        axios
+          .get(
+            `${baseUrl}/api/competitorprofile/getlastcompno/${competitorFormInput.state.value}`
+          )
+          .then((resp1) => {
+            if (resp1.status === 200) {
+              if (resp1.data.lastcompno) {
+                let lastCompNo = resp1.data.lastcompno.match(/[0-9]{4,5}/)[0];
+                newCompNo = lastCompNo
+                  ? lastCompNo < 9
+                    ? "000" + (Number(lastCompNo) + 1).toString()
+                    : lastCompNo < 99
+                    ? "00" + (Number(lastCompNo) + 1).toString()
+                    : lastCompNo < 999
+                    ? "0" + (Number(lastCompNo) + 1).toString()
+                    : (Number(lastCompNo) + 1).toString()
+                  : "0001";
+              } else {
+                newCompNo = "0001";
+              }
+            }
+          })
+          .then(() => {
+            let NewCompNO = stateCode + "CMP" + newCompNo;
+            setCompetitorFormInput((prev) => {
+              return { ...prev, compNo: NewCompNO };
+            });
+          });
+      });
+    }
+
+  //set Country on Edit
+  useEffect(() => {
+    if (
+      id &&
+      fetchingData.country !== "" &&
+      countryList.length > 0 &&
+      isChanged.country === false
+    ) {
+      setCompetitorFormInput({
+        ...competitorFormInput,
+        country: countryList.find((x) => x.value === fetchingData.country),
+      });
+    }
+  }, [countryList, fetchingData]);
 
   //Get State  for New or modification
-  useEffect(()=>{
-    
-    if(competitorFormInput.country!==null && isChanged.country === true){
+  useEffect(() => {
+    if (competitorFormInput.country !== null && isChanged.country === true) {
       setCompetitorFormInput((prev) => {
-        return { ...prev, state:null, district: null, city: null };
-          });  
+        return { ...prev, state: null, district: null, city: null };
+      });
       getStateList();
-    }
-    else if(competitorFormInput.country!==null && isChanged.country === false){
-        getStateList();
-      }
-    else if(competitorFormInput.country===null){
+    } else if (
+      competitorFormInput.country !== null &&
+      isChanged.country === false
+    ) {
+      getStateList();
+    } else if (competitorFormInput.country === null) {
       setStateList([]);
       setCompetitorFormInput((prev) => {
-        return { ...prev, state:null, district: null, city: null };
-          });  
+        return { ...prev, state: null, district: null, city: null };
+      });
     }
-  },[competitorFormInput.country]);
-
+  }, [competitorFormInput.country]);
 
   //set State on Edit
-  useEffect(()=>{
+  useEffect(() => {
+    if (
+      fetchingData.state !== "" &&
+      isChanged.country === false &&
+      competitorFormInput.country !== null &&
+      stateList.length > 0
+    ) {
+      setCompetitorFormInput((prev) => {
+        return {
+          ...prev,
+          state: stateList.find((x) => x.value === fetchingData.state),
+          district: null,
+          city: null,
+        };
+      });
+    } else {
+      setCompetitorFormInput((prev) => {
+        return { ...prev, district: null, city: null };
+      });
+      setDistrictList([]);
+    }
+  }, [stateList]);
 
-    if(fetchingData.state!=="" && isChanged.country===false && competitorFormInput.country!==null && stateList.length>0)
-    {    
-      setCompetitorFormInput((prev) => {
-        return { ...prev,state: stateList.find((x) => x.value === fetchingData.state), district: null, city: null };
-          }); 
-    }
-    else{
-      setCompetitorFormInput((prev) => {
-        return { ...prev, district: null, city: null };
-          }); 
-      setDistrictList([]); 
-    }
-    
-  },[stateList]);
-  
-   //set District for New or modification Branch
-   useEffect(()=>{
-    if(competitorFormInput.state!==null && isChanged.state===false)  
-    {  getDistrictList();
-     
-    }
-    else if(competitorFormInput.state!==null && isChanged.state===true)  
-    {  getDistrictList();
+  //set District for New or modification Branch
+  useEffect(() => {
+    if (competitorFormInput.state !== null && isChanged.state === false) {
+      getDistrictList();
+    } else if (competitorFormInput.state !== null && isChanged.state === true) {
+      getDistrictList();
       setCompetitorFormInput((prev) => {
         return { ...prev, district: null, city: null };
-        });  
-    }
-    else if(competitorFormInput.state===null){
+      });
+    } else if (competitorFormInput.state === null) {
       setCompetitorFormInput((prev) => {
         return { ...prev, district: null, city: null };
-        });
-          setDistrictList([]);
+      });
+      setDistrictList([]);
     }
-  },[competitorFormInput.state]);
-  
+  }, [competitorFormInput.state]);
+
   //set District on Edit
-  useEffect(()=>{
-    
-    if( fetchingData.district!=="" && isChanged.state===false && competitorFormInput.state!==null && districtList.length > 0) 
-    {
+  useEffect(() => {
+    if (
+      fetchingData.district !== "" &&
+      isChanged.state === false &&
+      competitorFormInput.state !== null &&
+      districtList.length > 0
+    ) {
       setCompetitorFormInput((prev) => {
-        return { ...prev,district: districtList.find((x) => x.value === fetchingData.district), city: null };
-          }); 
-    }
-    else{
+        return {
+          ...prev,
+          district: districtList.find((x) => x.value === fetchingData.district),
+          city: null,
+        };
+      });
+    } else {
       setCompetitorFormInput((prev) => {
-        return { ...prev,  city: null };
-          }); 
-      setCityList([]); 
+        return { ...prev, city: null };
+      });
+      setCityList([]);
     }
-  },[districtList]);
-  
-   //set City for New or modification Branch
-   useEffect(()=>{  
-    if(competitorFormInput.district!==null && isChanged.district===false){
-      getCityList(); 
-    }
-    else if(competitorFormInput.district!==null && isChanged.district===true){
+  }, [districtList]);
+
+  //set City for New or modification Branch
+  useEffect(() => {
+    if (competitorFormInput.district !== null && isChanged.district === false) {
+      getCityList();
+    } else if (
+      competitorFormInput.district !== null &&
+      isChanged.district === true
+    ) {
       getCityList();
       setCompetitorFormInput((prev) => {
         return { ...prev, city: null };
-          });  
-      }
-    else if(competitorFormInput.district===null){
+      });
+    } else if (competitorFormInput.district === null) {
       setCityList([]);
       setCompetitorFormInput((prev) => {
         return { ...prev, city: null };
-          });  
+      });
     }
-  },[competitorFormInput.district]);
+  }, [competitorFormInput.district]);
 
- 
-  useEffect(()=>{
-    if(id && cityList.length>0 && isChanged.city===false)
-    {
-      setCompetitorFormInput({...competitorFormInput, city: cityList.find((x)=>x.value === fetchingData.city) });
+  useEffect(() => {
+    if (id && cityList.length > 0 && isChanged.city === false) {
+      setCompetitorFormInput({
+        ...competitorFormInput,
+        city: cityList.find((x) => x.value === fetchingData.city),
+      });
+      setFetchingLoading(false);
     }
-  },[cityList]);
+  }, [cityList]);
 
-  
   const getStateList = async () => {
     if (competitorFormInput.country !== null) {
       await axios
         .get(`${baseUrl}/api/state/list/${competitorFormInput.country.value}`)
         .then((resp) => {
-          setStateList(resp.data.stateList);     
+          setStateList(resp.data.stateList);
         });
     }
   };
   const getDistrictList = async () => {
-    if (competitorFormInput.country !== null &&
+    if (
+      competitorFormInput.country !== null &&
       competitorFormInput.state !== null
-      
     ) {
       await axios
         .get(
@@ -280,42 +352,55 @@ const CompetitorProfile = () => {
     }
   };
 
-  
+  useEffect(() => {
+    if (id && fetchingData.registrationType !== "") {
+      setCompetitorFormInput((prev) => {
+        return {
+          ...prev,
+          registrationType: registrationTypeList.find(
+            (x) => x.value === parseInt(fetchingData.registrationType)
+          ),
+        };
+      });
+    }
+  }, [fetchingData]);
+  useEffect(() => {
+    if (id && fetchingData.companyType !== "") {
+      setCompetitorFormInput((prev) => {
+        return {
+          ...prev,
+          companyType: companyTypeList.find(
+            (x) => x.value === fetchingData.companyType
+          ),
+        };
+      });
+    }
+  }, [fetchingData]);
 
-  
-useEffect(()=>{  
-  if(id && fetchingData.registrationType!=='')
-  {
-    setCompetitorFormInput((prev)=> { return {...prev, registrationType: registrationTypeList.find((x)=> x.value === parseInt(fetchingData.registrationType))}});
-  }
-},[fetchingData]);
-useEffect(()=>{  
-  if(id && fetchingData.companyType!=='')
-  {
-    setCompetitorFormInput((prev) => { return {...prev, companyType: companyTypeList.find((x)=> x.value === fetchingData.companyType)}});
-
-  }
-},[fetchingData]);
-
-useEffect(()=>{  
-  if(!isNaN(id))
-  {
-      setCompetitorFormInput((prev) => { return {...prev,    
-        compNo:fetchingData.compNo,
-        compName: fetchingData.compName,
-        registerationYear: fetchingData.registerationYear,
-        address: fetchingData.address,
-        pincode: fetchingData.pincode,
-        panNo: fetchingData.panNo,
-        mobile: fetchingData.mobile,
-        email: fetchingData.email,
-        gstNo: fetchingData.gstNo,
-        directors: fetchingData.directors,
-        manpower: fetchingData.manpower}});
-  }
-},[fetchingData])
- const editCompetitor=()=>{
-      axios.get(`${baseUrl}/api/competitorprofile/${id}`).then((resp) => {
+  useEffect(() => {
+    if (!isNaN(id)) {
+      setCompetitorFormInput((prev) => {
+        return {
+          ...prev,
+          compNo: fetchingData.compNo,
+          compName: fetchingData.compName,
+          registerationYear: fetchingData.registerationYear,
+          address: fetchingData.address,
+          pincode: fetchingData.pincode,
+          panNo: fetchingData.panNo,
+          mobile: fetchingData.mobile,
+          email: fetchingData.email,
+          gstNo: fetchingData.gstNo,
+          directors: fetchingData.directors,
+          manpower: fetchingData.manpower,
+        };
+      });
+    } else {
+      setFetchingLoading(false);
+    }
+  }, [fetchingData]);
+  const editCompetitor = () => {
+    axios.get(`${baseUrl}/api/competitorprofile/${id}`).then((resp) => {
       setFetchingData({
         compNo: resp.data.competitor.compNo,
         compName: resp.data.competitor.compName,
@@ -334,10 +419,9 @@ useEffect(()=>{
         registrationType: resp.data.competitor.registrationType,
         companyType: resp.data.competitor.companyType,
         manpower: resp.data.competitor.manpower,
-        
       });
-      document.getElementById('dis').setAttribute('value', '2');
-      document.getElementById('dis').setAttribute('defaultValue', '');
+      document.getElementById("dis").setAttribute("value", "2");
+      document.getElementById("dis").setAttribute("defaultValue", "");
       setHasError({
         compNo: false,
         compName: false,
@@ -358,12 +442,10 @@ useEffect(()=>{
         manpower: false,
       });
       setFormIsValid(true);
-      
     });
- }
-  
-useEffect(()=>{  
-  
+  };
+
+  useEffect(() => {
     if (
       hasError.compName !== null &&
       hasError.compName !== true &&
@@ -402,21 +484,17 @@ useEffect(()=>{
       JSON.stringify(competitorFormInput) !== JSON.stringify(intialValues)
     ) {
       setFormIsValid(true);
-     
     } else {
       setFormIsValid(false);
     }
-  },[hasError])
-
+  }, [hasError]);
 
   //Set Text Input Values
   const textInputHandler = (e) => {
-   
     setCompetitorFormInput({
       ...competitorFormInput,
       [e.target.name]: e.target.value,
     });
-
 
     switch (e.target.name) {
       case "pincode":
@@ -428,7 +506,11 @@ useEffect(()=>{
         break;
 
       case "registerationYear":
-        if (e.target.value > today.getFullYear() | e.target.value < 1900 | isNaN(e.target.value)) {
+        if (
+          (e.target.value > today.getFullYear()) |
+          (e.target.value < 1900) |
+          isNaN(e.target.value)
+        ) {
           setHasError({ ...hasError, registerationYear: true });
         } else {
           setHasError({ ...hasError, registerationYear: false });
@@ -438,9 +520,7 @@ useEffect(()=>{
         if (
           e.target.value.trim() === "" ||
           e.target.value === null ||
-          !/^[6-9]{1}[0-9]{9}$/.test(
-            e.target.value
-          )
+          !/^[6-9]{1}[0-9]{9}$/.test(e.target.value)
         ) {
           setHasError({ ...hasError, mobile: true });
         } else {
@@ -502,18 +582,6 @@ useEffect(()=>{
           setHasError({ ...hasError, [e.target.name]: false });
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
   };
 
   //Set select Input Values
@@ -521,26 +589,45 @@ useEffect(()=>{
     // if(id){
     //   setIsChanged({isChanged, [action.name]:true});
     // }
-    switch(action.name){
-      case "country": 
-      setIsChanged({country:true,state:true,district:true,city:true});
-      break;
-      case "state": 
-      setIsChanged({country:false,state:true,district:true,city:true});
-      break;
-      case "district": 
-      setIsChanged({country:false,state:false,district:true,city:true});
-      break;
-      case "city": 
-      setIsChanged({country:false,state:false,district:false,city:true});
-      break;
+    switch (action.name) {
+      case "country":
+        setIsChanged({
+          country: true,
+          state: true,
+          district: true,
+          city: true,
+        });
+        break;
+      case "state":
+        setIsChanged({
+          country: false,
+          state: true,
+          district: true,
+          city: true,
+        });
+        break;
+      case "district":
+        setIsChanged({
+          country: false,
+          state: false,
+          district: true,
+          city: true,
+        });
+        break;
+      case "city":
+        setIsChanged({
+          country: false,
+          state: false,
+          district: false,
+          city: true,
+        });
+        break;
     }
     setCompetitorFormInput({ ...competitorFormInput, [action.name]: value });
     if (value === "" || value === null) {
       setHasError({ ...hasError, [action.name]: true });
     } else {
       setHasError({ ...hasError, [action.name]: false });
-      
     }
   };
 
@@ -555,7 +642,11 @@ useEffect(()=>{
         break;
 
       case "registerationYear":
-        if (e.target.value > today.getFullYear() | e.target.value < 1900 | isNaN(e.target.value)) {
+        if (
+          (e.target.value > today.getFullYear()) |
+          (e.target.value < 1900) |
+          isNaN(e.target.value)
+        ) {
           setHasError({ ...hasError, registerationYear: true });
         } else {
           setHasError({ ...hasError, registerationYear: false });
@@ -565,9 +656,7 @@ useEffect(()=>{
         if (
           e.target.value.trim() === "" ||
           e.target.value === null ||
-          !/^[6-9]{1}[0-9]{9}$/.test(
-            e.target.value
-          )
+          !/^[6-9]{1}[0-9]{9}$/.test(e.target.value)
         ) {
           setHasError({ ...hasError, mobile: true });
         } else {
@@ -635,7 +724,7 @@ useEffect(()=>{
     e.preventDefault();
     setLoading(true);
     let tokenId = localStorage.getItem("token");
-    var registrationTypeInt=competitorFormInput.registrationType.value+"";
+    var registrationTypeInt = competitorFormInput.registrationType.value + "";
     const data = {
       compNo: competitorFormInput.compNo,
       compName: competitorFormInput.compName,
@@ -664,21 +753,22 @@ useEffect(()=>{
           title: "Competitor",
           text: res.data.message,
           confirmButtonColor: "#5156ed",
-          
         }).then(function () {
           setLoading(false);
-          navigate(`/tender/master/competitorcreation/competitor/details/${res.data.inserted_id}`);
+          navigate(
+            `/tender/master/competitorcreation/competitor/details/${res.data.inserted_id}`
+          );
         });
 
-        document.getElementById('dis').setAttribute('value', '2');
-        document.getElementById('dis').setAttribute('defaultValue', '');
+        document.getElementById("dis").setAttribute("value", "2");
+        document.getElementById("dis").setAttribute("defaultValue", "");
       } else if (res.data.status === 400) {
         Swal.fire({
           icon: "error",
           title: "Competitor",
           text: res.data.message,
           confirmButtonColor: "#5156ed",
-        }).then(function(){
+        }).then(function () {
           setLoading(false);
         });
       }
@@ -709,43 +799,58 @@ useEffect(()=>{
       manpower: competitorFormInput.manpower,
       tokenId: tokenId,
     };
-    
 
-if(data.compName===fetchingData.compName && data.registerationYear===fetchingData.registerationYear && data.registrationType===parseInt(fetchingData.registrationType) && data.country === fetchingData.country && data.state===fetchingData.state && data.district===fetchingData.district && data.city===fetchingData.city && data.address===fetchingData.address && data.pincode===fetchingData.pincode && data.mobile===fetchingData.mobile && data.panNo===fetchingData.panNo && data.email===fetchingData.email && data.gstNo===fetchingData.gstNo && data.directors===fetchingData.directors && data.companyType===fetchingData.companyType && data.manpower===fetchingData.manpower)
-{
- 
-        Swal.fire({
+    if (
+      data.compName === fetchingData.compName &&
+      data.registerationYear === fetchingData.registerationYear &&
+      data.registrationType === parseInt(fetchingData.registrationType) &&
+      data.country === fetchingData.country &&
+      data.state === fetchingData.state &&
+      data.district === fetchingData.district &&
+      data.city === fetchingData.city &&
+      data.address === fetchingData.address &&
+      data.pincode === fetchingData.pincode &&
+      data.mobile === fetchingData.mobile &&
+      data.panNo === fetchingData.panNo &&
+      data.email === fetchingData.email &&
+      data.gstNo === fetchingData.gstNo &&
+      data.directors === fetchingData.directors &&
+      data.companyType === fetchingData.companyType &&
+      data.manpower === fetchingData.manpower
+    ) {
+      Swal.fire({
         icon: "info",
         title: "Competitor",
         text: "Nothing Has Changed to Update...!",
         timer: 2000,
-      }).then(function(){
+      }).then(function () {
         setLoading(false);
       });
-} 
-else{
-    axios.put(`${baseUrl}/api/competitorprofile/${id}`, data).then((res) => {
-      if (res.data.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "Competitor",
-          text: res.data.message,
-          confirmButtonColor: "#5156ed",
-        }).then(function () {
-          setLoading(false);
-          navigate("/tender/master/competitorcreation/competitor/details/${res.data.inserted_id}");
-        });
-      } else if (res.data.status === 404) {
-        Swal.fire({
-          icon: "error",
-          title: "Competitor",
-          text: res.data.message,
-          confirmButtonColor: "#5156ed",
-        });
-      }
-      setLoading(false);
-    });
-  }
+    } else {
+      axios.put(`${baseUrl}/api/competitorprofile/${id}`, data).then((res) => {
+        if (res.data.status === 200) {
+          Swal.fire({
+            icon: "success",
+            title: "Competitor",
+            text: res.data.message,
+            confirmButtonColor: "#5156ed",
+          }).then(function () {
+            setLoading(false);
+            navigate(
+              "/tender/master/competitorcreation/competitor/details/${res.data.inserted_id}"
+            );
+          });
+        } else if (res.data.status === 404) {
+          Swal.fire({
+            icon: "error",
+            title: "Competitor",
+            text: res.data.message,
+            confirmButtonColor: "#5156ed",
+          });
+        }
+        setLoading(false);
+      });
+    }
   };
 
   const cancelHandler = () => {
@@ -754,529 +859,540 @@ else{
 
   return (
     <Fragment>
-      <form onSubmit={submitHandler}>
-        <div className="row align-items-center">
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="no">
-                  Competitor No<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="compNo"
-                  placeholder=""
-                  name="compNo"
-                  value={competitorFormInput.compNo}
-                  onChange={textInputHandler}
-                  // ////onBlur={onBlurSelectHandler}
-                  disabled={false}
-                />
+      <PreLoader loading={fetchLoading}>
+        <form onSubmit={submitHandler}>
+          <div className="row align-items-center">
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="no">
+                    Competitor No<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="compNo"
+                    placeholder=""
+                    name="compNo"
+                    value={competitorFormInput.compNo}
+                    onChange={textInputHandler}
+                    // ////onBlur={onBlurSelectHandler}
+                    disabled={true}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
 
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="customercategory" className="font-weight-bold">
-                  Competitor Name<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-              <input type='hidden' id='dis' name='dis' defaultValue='1'/>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="compName"
-                  placeholder="Enter Competitor Name"
-                  name="compName"
-                  value={competitorFormInput.compName}
-                  onChange={textInputHandler}
-                  ////onBlur={onBlurSelectHandler}
-                />
-                {hasError.compName && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Competitor Name is Invalid..!
-                    </span>
-                  </div>
-                )}
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark">
+                  <label
+                    htmlFor="customercategory"
+                    className="font-weight-bold"
+                  >
+                    Competitor Name<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input type="hidden" id="dis" name="dis" defaultValue="1" />
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="compName"
+                    placeholder="Enter Competitor Name"
+                    name="compName"
+                    value={competitorFormInput.compName}
+                    onChange={textInputHandler}
+                    ////onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.compName && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Competitor Name is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
 
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="regType" className="font-weight-bold">
-                  Registration Type<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <Select
-                  name="registrationType"
-                  id="registrationType"
-                  isSearchable="true"
-                  isClearable="true"
-                  options={registrationTypeList}
-                  value={competitorFormInput.registrationType}
-                  onChange={selectInputHandler}
-                  ////onBlur={onBlurSelectHandler}
-                ></Select>
-                {hasError.registrationType && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Select Registration Type..!
-                    </span>
-                  </div>
-                )}
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="regType" className="font-weight-bold">
+                    Registration Type
+                    <span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <Select
+                    name="registrationType"
+                    id="registrationType"
+                    isSearchable="true"
+                    isClearable="true"
+                    options={registrationTypeList}
+                    value={competitorFormInput.registrationType}
+                    onChange={selectInputHandler}
+                    ////onBlur={onBlurSelectHandler}
+                  ></Select>
+                  {hasError.registrationType && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Select Registration Type..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
 
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="registerationYear">
-                  Registeration Year<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="registerationYear"
-                  placeholder="YYYY"
-                  name="registerationYear"
-                  value={competitorFormInput.registerationYear}
-                  onChange={textInputHandler}
-                  ////onBlur={onBlurSelectHandler}
-                />
-                {hasError.registerationYear && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Registration Year is Invalid..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="country" className="font-weight-bold">
-                  Country<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <Select
-                  name="country"
-                  id="country"
-                  isSearchable="true"
-                  isClearable="true"
-                  options={countryList}
-                  value={competitorFormInput.country}
-                  onChange={selectInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                ></Select>
-                {hasError.country && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Select Competitor Country..!
-                    </span>
-                  </div>
-                )}
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold">
+                  <label htmlFor="registerationYear">
+                    Registeration Year
+                    <span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="registerationYear"
+                    placeholder="YYYY"
+                    name="registerationYear"
+                    value={competitorFormInput.registerationYear}
+                    onChange={textInputHandler}
+                    ////onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.registerationYear && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Registration Year is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="country" className="font-weight-bold">
+                    Country<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <Select
+                    name="country"
+                    id="country"
+                    isSearchable="true"
+                    isClearable="true"
+                    options={countryList}
+                    value={competitorFormInput.country}
+                    onChange={selectInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                  ></Select>
+                  {hasError.country && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Select Competitor Country..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
 
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="state">
-                  State/UT<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <Select
-                  name="state"
-                  id="state"
-                  isSearchable="true"
-                  isClearable="true"
-                  options={stateList}
-                  onChange={selectInputHandler}
-                  // onBlur="{customersubcategoryBlurHandler}"
-                  value={competitorFormInput.state}
-                ></Select>
-                {hasError.state && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Select Competitor State..!
-                    </span>
-                  </div>
-                )}
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold">
+                  <label htmlFor="state">
+                    State/UT<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <Select
+                    name="state"
+                    id="state"
+                    isSearchable="true"
+                    isClearable="true"
+                    options={stateList}
+                    onChange={selectInputHandler}
+                    // onBlur="{customersubcategoryBlurHandler}"
+                    value={competitorFormInput.state}
+                  ></Select>
+                  {hasError.state && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Select Competitor State..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
 
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="district" className="font-weight-bold">
-                  District<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <Select
-                  name="district"
-                  id="district"
-                  isSearchable="true"
-                  isClearable="true"
-                  options={districtList}
-                  onChange={selectInputHandler}
-                  //onBlur={district}
-                  value={competitorFormInput.district}
-                ></Select>
-                {hasError.district && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Select Competitor District..!
-                    </span>
-                  </div>
-                )}
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="district" className="font-weight-bold">
+                    District<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <Select
+                    name="district"
+                    id="district"
+                    isSearchable="true"
+                    isClearable="true"
+                    options={districtList}
+                    onChange={selectInputHandler}
+                    //onBlur={district}
+                    value={competitorFormInput.district}
+                  ></Select>
+                  {hasError.district && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Select Competitor District..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
 
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="city">
-                  City<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <Select
-                  name="city"
-                  id="city"
-                  isSearchable="true"
-                  isClearable="true"
-                  options={cityList}
-                  onChange={selectInputHandler}
-                  //onBlur="{city}"
-                  value={competitorFormInput.city}
-                ></Select>
-                {hasError.city && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Select Competitor City..!
-                    </span>
-                  </div>
-                )}
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold">
+                  <label htmlFor="city">
+                    City<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <Select
+                    name="city"
+                    id="city"
+                    isSearchable="true"
+                    isClearable="true"
+                    options={cityList}
+                    onChange={selectInputHandler}
+                    //onBlur="{city}"
+                    value={competitorFormInput.city}
+                  ></Select>
+                  {hasError.city && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Select Competitor City..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
-          <div className="inputgroup col-lg-5 mb-4 ">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="address">
-                  Address<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <textarea
-                  className="form-control"
-                  rows="3"
-                  id="address"
-                  name="address"
-                  value={competitorFormInput.address}
-                  onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                  placeholder="#Door No, Street,
+            <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-5 mb-4 ">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="address">
+                    Address<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <textarea
+                    className="form-control"
+                    rows="3"
+                    id="address"
+                    name="address"
+                    value={competitorFormInput.address}
+                    onChange={textInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                    placeholder="#Door No, Street,
                    Area,
                    Landmark"
-                />
-                {hasError.address && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Address is Invalid..!
-                    </span>
-                  </div>
-                )}
+                  />
+                  {hasError.address && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Address is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1"></div>
-          <div className="inputgroup col-lg-5 mt-n4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="pincode" className="">
-                  Pincode<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="pincode"
-                  placeholder="Ex: 638001"
-                  name="pincode"
-                  value={competitorFormInput.pincode}
-                  onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                />
-                {hasError.pincode && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Pincode is Invalid..!
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="col-lg-4 text-dark font-weight-bold mt-3 mb-n3">
-                <label htmlFor="panNo">
-                  PAN<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8 mt-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="panNo"
-                  placeholder="Enter Pan No"
-                  name="panNo"
-                  value={competitorFormInput.panNo}
-                  onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                />
-                {hasError.panNo && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      PAN Number is Invalid..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="mobile">
-                  Mobile No<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="mobile"
-                  placeholder="Enter Mobile No"
-                  name="mobile"
-                  value={competitorFormInput.mobile}
-                  onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                />
-                {hasError.mobile && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Mobile Number is Invalid..!
-                    </span>
-                  </div>
-                )}
+            <div className="inputgroup col-lg-1"></div>
+            <div className="inputgroup col-lg-5 mt-n4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold">
+                  <label htmlFor="pincode" className="">
+                    Pincode<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="pincode"
+                    placeholder="Ex: 638001"
+                    name="pincode"
+                    value={competitorFormInput.pincode}
+                    onChange={textInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.pincode && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Pincode is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="col-lg-4 text-dark font-weight-bold mt-3 mb-n3">
+                  <label htmlFor="panNo">
+                    PAN<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8 mt-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="panNo"
+                    placeholder="Enter Pan No"
+                    name="panNo"
+                    value={competitorFormInput.panNo}
+                    onChange={textInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.panNo && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        PAN Number is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="email">
-                  Email ID<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="email"
-                  placeholder="Enter Email Id"
-                  name="email"
-                  value={competitorFormInput.email}
-                  onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                />
-                {hasError.email && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Email ID is Invalid..!
-                    </span>
-                  </div>
-                )}
+            <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="mobile">
+                    Mobile No<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="mobile"
+                    placeholder="Enter Mobile No"
+                    name="mobile"
+                    value={competitorFormInput.mobile}
+                    onChange={textInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.mobile && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Mobile Number is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold">
+                  <label htmlFor="email">
+                    Email ID<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="email"
+                    placeholder="Enter Email Id"
+                    name="email"
+                    value={competitorFormInput.email}
+                    onChange={textInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.email && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Email ID is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
-          <div className="inputgroup col-lg-1 mb-4"></div>
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="gst">
-                  GST No<span className="text-danger">&nbsp;*</span>
-                </label>
+            <div className="inputgroup col-lg-1 mb-4"></div>
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center font-weight-bold">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="gst">
+                    GST No<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="gstNo"
+                    placeholder="Enter GST No"
+                    name="gstNo"
+                    value={competitorFormInput.gstNo}
+                    onChange={textInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.gstNo && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        GST Number is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="gstNo"
-                  placeholder="Enter GST No"
-                  name="gstNo"
-                  value={competitorFormInput.gstNo}
-                  onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                />
-                {hasError.gstNo && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      GST Number is Invalid..!
-                    </span>
-                  </div>
-                )}
+            </div>
+            <div className="inputgroup col-lg-1 mb-4"></div>
+
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold">
+                  <label htmlFor="directors">
+                    Directors<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="directors"
+                    placeholder="Enter Director's Name"
+                    name="directors"
+                    value={competitorFormInput.directors}
+                    onChange={textInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.directors && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Director(s) Name is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="inputgroup col-lg-1 mb-4"></div>
+
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark">
+                  <label htmlFor="companyType" className="font-weight-bold">
+                    Type of Company<span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <Select
+                    name="companyType"
+                    id="companyType"
+                    isSearchable="true"
+                    isClearable="true"
+                    options={companyTypeList}
+                    onChange={selectInputHandler}
+                    //onBlur="{companyTypeBlurHandler}"
+                    value={competitorFormInput.companyType}
+                  ></Select>
+                  {hasError.companyType && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Select Competitor Company Type..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="inputgroup col-lg-4 mb-4"></div>
+
+            <div className="inputgroup col-lg-5 mb-4">
+              <div className="row align-items-center">
+                <div className="col-lg-4 text-dark font-weight-bold">
+                  <label htmlFor="manpower">
+                    Manpower Strength
+                    <span className="text-danger">&nbsp;*</span>
+                  </label>
+                </div>
+                <div className="col-lg-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="manpower"
+                    placeholder="Enter Company Manpower"
+                    name="manpower"
+                    value={competitorFormInput.manpower}
+                    onChange={textInputHandler}
+                    //onBlur={onBlurSelectHandler}
+                  />
+                  {hasError.manpower && (
+                    <div className="pt-1">
+                      <span className="text-danger font-weight-bold">
+                        Manpower Strength is Invalid..!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="inputgroup col-lg-6 mb-4"></div>
+            <div className="inputgroup col-lg-6 mb-4"></div>
+            <div className="inputgroup col-lg-5 mb-4 ml-n3">
+              <div className="row align-items-center">
+                <div className="col-lg-10 text-right ">
+                  <button
+                    className="btn btn-primary"
+                    disabled={!formIsValid}
+                    onClick={!id ? submitHandler : updateHandler}
+                  >
+                    {!id
+                      ? loading === true
+                        ? "Submitting...."
+                        : "Save & Countinue"
+                      : loading === true
+                      ? "Updating...."
+                      : "Update"}
+                  </button>
+                </div>
+                <div className="col-lg-1 text-left">
+                  <button className="btn btn-secondary" onClick={cancelHandler}>
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-          <div className="inputgroup col-lg-1 mb-4"></div>
-
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="directors">
-                  Directors<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="directors"
-                  placeholder="Enter Director's Name"
-                  name="directors"
-                  value={competitorFormInput.directors}
-                  onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                />
-                {hasError.directors && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Director(s) Name is Invalid..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="inputgroup col-lg-1 mb-4"></div>
-
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark">
-                <label htmlFor="companyType" className="font-weight-bold">
-                  Type of Company<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <Select
-                  name="companyType"
-                  id="companyType"
-                  isSearchable="true"
-                  isClearable="true"
-                  options={companyTypeList}
-                  onChange={selectInputHandler}
-                  //onBlur="{companyTypeBlurHandler}"
-                  value={competitorFormInput.companyType}
-                ></Select>
-                {hasError.companyType && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Select Competitor Company Type..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="inputgroup col-lg-4 mb-4"></div>
-
-          <div className="inputgroup col-lg-5 mb-4">
-            <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
-                <label htmlFor="manpower">
-                  Manpower Strength<span className="text-danger">&nbsp;*</span>
-                </label>
-              </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="manpower"
-                  placeholder="Enter Company Manpower"
-                  name="manpower"
-                  value={competitorFormInput.manpower}
-                  onChange={textInputHandler}
-                  //onBlur={onBlurSelectHandler}
-                />
-                {hasError.manpower && (
-                  <div className="pt-1">
-                    <span className="text-danger font-weight-bold">
-                      Manpower Strength is Invalid..!
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="inputgroup col-lg-6 mb-4"></div>
-          <div className="inputgroup col-lg-6 mb-4"></div>
-          <div className="inputgroup col-lg-5 mb-4 ml-n3">
-            <div className="row align-items-center">
-              <div className="col-lg-10 text-right ">
-                <button
-                  className="btn btn-primary"
-                  disabled={!formIsValid}
-                  onClick={!id ? submitHandler : updateHandler}
-                >
-                  { !id ?
-                        loading === true ? "Submitting...." : "Save & Countinue"
-                        : loading === true ? "Updating...." : "Update"
-                }
-                </button>
-              </div>
-              <div className="col-lg-1 text-left">
-                <button className="btn btn-secondary" onClick={cancelHandler}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
+        </form>
+      </PreLoader>
     </Fragment>
   );
 };

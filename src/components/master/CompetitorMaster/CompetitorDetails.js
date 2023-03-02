@@ -1,7 +1,9 @@
 import { usePageTitle } from "../../hooks/usePageTitle";
 import {  useState, useEffect } from "react";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
-import { useNavigate, useParams, NavLink, useOutletContext } from "react-router-dom";
+import axios from "axios";
+import ReactDOM from "react-dom/client";
+import { useParams, NavLink, useOutletContext } from "react-router-dom";
 import CompetitorBranchForm from "./Competitor_Details/CompetitorBranch/CompetitorBranchForm";
 import CompetitorDetailsTurnOverForm from "./Competitor_Details/CompetitorTurnOver/CompetitorDetailsTurnOverForm"; 
 import CompetitorDetailsCompanyNetWorthForm from "./Competitor_Details/CompetitorCompanyNetWorth/CompetitorDetailsCompanyNetWorthForm";
@@ -10,16 +12,33 @@ import CompetitorCompanyStrengthWeaknessForm from "./Competitor_Details/Competit
 import CompetitorCompanyQualityCertificatesForm from "./Competitor_Details/CompetitorCompanyQualityCertificates/CompetitorCompanyQualityCertificatesForm";
 import CompetitorCompanyWorkOrderForm from "./Competitor_Details/CompetitorCompanyWorkOrderList/CompetitorCompanyWorkOrderForm";
 
-const comppath="tender/master/competitorcreation/competitor/details";
 
 const CompetitorDetails = () => {
   usePageTitle("Competitor Creation");
   const { compid } = useParams();
-  const { server1: baseUrl } = useBaseUrl();
-  const setCompetitorId = useOutletContext();
-
-
+    const { server1: baseUrl } = useBaseUrl();
+  const [ competitorId, setCompetitorId] = useOutletContext();
+  const [compNo, setCompNo]= useState(null);
   
+
+useEffect(() => {
+  if (compid) {
+    setCompetitorId(compid);
+    getCompNo();
+  };
+}, []);
+
+const getCompNo = async () => {
+  await axios
+    .get(`${baseUrl}/api/competitorprofile/getcompno/${compid}`)
+    .then((resp) => {
+      if (resp.data.status === 200) {
+        setCompNo(resp.data.compNo);
+      }
+    });
+};
+
+
   return (
 
     <div className="formContent">
@@ -51,7 +70,7 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorBranch">
           <div className="card-header">
-            <CompetitorBranchForm />
+            <CompetitorBranchForm compNo1={compNo}/>
           </div>
         </div>
     </div>
@@ -72,7 +91,7 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorTurnOver">
           <div className="card-header">
-            <CompetitorDetailsTurnOverForm />
+            <CompetitorDetailsTurnOverForm compNo={compNo}/>
           </div>
         </div>
     </div>
@@ -93,7 +112,7 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorNetWorth">
           <div className="card-header">
-            <CompetitorDetailsCompanyNetWorthForm/>
+            <CompetitorDetailsCompanyNetWorthForm compNo={compNo}/>
           </div>
         </div>
     </div>
@@ -114,7 +133,7 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="qualitycertificates">
           <div className="card-header">
-            <CompetitorCompanyQualityCertificatesForm/>
+            <CompetitorCompanyQualityCertificatesForm compNo={compNo}/>
           </div>
         </div>
     </div>
@@ -135,7 +154,7 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorlineofbusiness">
           <div className="card-header">
-            <CompetitorDetailsLineOfBusinessForm/>
+            <CompetitorDetailsLineOfBusinessForm compNo={compNo}/>
           </div>
         </div>
     </div>
@@ -156,7 +175,7 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorworkorder">
           <div className="card-header">
-            <CompetitorCompanyWorkOrderForm/>
+            <CompetitorCompanyWorkOrderForm compNo={compNo}/>
           </div>
         </div>
     </div>
@@ -178,13 +197,14 @@ const CompetitorDetails = () => {
         {/* Card Content - Collapse */}
         <div className="collapse" id="competitorplusminus">
           <div className="card-header">
-            <CompetitorCompanyStrengthWeaknessForm/>
+            <CompetitorCompanyStrengthWeaknessForm compNo={compNo}/>
           </div>
         </div>
     </div>
 
 
 </div>
+
   );
 };
 
