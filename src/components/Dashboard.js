@@ -4,6 +4,8 @@ import AuthContext from "../storeAuth/auth-context";
 import { useBaseUrl } from "./hooks/useBaseUrl";
 import axios from "axios";
 import './logoicon.css';
+import { motion } from "framer-motion";
+
 
 
 function Dashboard() {
@@ -30,14 +32,23 @@ function Dashboard() {
             {/* Page Heading */}
             
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
-              <h1 className="h3 mb-0 text-gray-800">Dashboard</h1>
+              <motion.h1 className="h3 mb-0 text-gray-800" animate={{opacity:1}} initial={{opacity:0}}>Dashboard</motion.h1>
               
             </div>
             
             <div className="row">
               {/* Content Row */}  
               <div className="col-xl-4 col-md-6 mb-4">
-                <div className="card  shadow h-100 py-2 border-left-primary border-3">
+                <motion.div className="card  shadow h-100 py-2 border-left-primary border-3" 
+                  initial={{
+                    x: 1300, opacity: 0
+                  }} 
+                  animate={{
+                    x: 0, opacity:1
+                  }}
+                  transition={{
+                    type: 'tween', stiffness: 10, duration: 0.5
+                  }}>
                   <div className="card-body ">
                     <div className="row no-gutters align-items-center " >
                       <div className="col mr-2">
@@ -55,11 +66,20 @@ function Dashboard() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
               
               <div className="col-xl-4 col-md-6 mb-4">
-                <div className="card border-left-success shadow h-100 py-2  border-3">
+                <motion.div className="card border-left-success shadow h-100 py-2  border-3"
+                   initial={{
+                    x: 1300, opacity: 0
+                    }} 
+                    animate={{
+                      x: 0, opacity:1
+                    }}
+                    transition={{
+                      type: 'tween', stiffness: 10, duration: 0.5, delay: 0.2
+                    }}>
                   <div className="card-body">
                     <div className="row no-gutters align-items-center">
                       <div className="col mr-2">
@@ -77,7 +97,7 @@ function Dashboard() {
                      
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
               
               {/* <div className="col-xl-4 col-md-6 mb-4 ">

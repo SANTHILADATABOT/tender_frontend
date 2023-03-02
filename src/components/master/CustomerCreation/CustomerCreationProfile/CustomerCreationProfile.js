@@ -3,6 +3,7 @@ import $ from 'jquery';
 import Select from "react-select";
 import useInputValidation from "../../../hooks/useInputValidation";
 import { CustSubCatgyOpts } from "../data";
+import { motion } from "framer-motion";
 import {
   getCountryData,
   getSatateData,
@@ -15,7 +16,6 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 // import { isMobileValidation, isPincodeValid, isEmailValid, isPanValid, isgstNoValid, isUrlValid } from "../CommonValidation";
 import { isMobileValidation, isPincodeValid, isEmailValid, isPanValid, isgstNoValid, isUrlValid } from "../CommonValidation_copy";
-
 
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useDispatch } from 'react-redux';
@@ -994,29 +994,35 @@ catch(ex){
 } ;
   }
 
-  
+  // const [isShow, setIsShow] = useState(false);
+  // if (loading == false) {
+  //   setIsShow(true);
+  // }
 
   return (
     <Fragment>
     
       <div className="formContent">
-      {loading && <div className="loading">
+      {loading ? (<div className="loading">
         <img id="loading-image" src="/assets/img/282.gif" alt="Loading..." />
-      </div> }
-      <form onSubmit={submitHandler} >
+      </div> ) :
+       (<form onSubmit={submitHandler} >
         {/* <input type = "number" name = "mainid" id = "mainid"  value = {mainid} readOnly={true}/>
         <input type = "number" name = "formNo" id = "formNo"  value = {formNo} readOnly={true}/>
         <input type = "number" name = "formId" id = "formId"  value = {formId} readOnly={true}/>*/}
         <div className="row align-items-center"> 
-          <div className="inputgroup col-lg-6 mb-4">
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{  type:'spring', stiffness: 180}} >
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-5 ">
                 <label htmlFor="customerno" className="pr-3">Customer No <span className="text-danger">&nbsp;*</span> </label>
                 {isCustNoFetching && 
                 <><span className="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span>
                 <span className="sr-only">Loading...</span></>}
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="text"
                   className="form-control"
@@ -1039,13 +1045,16 @@ catch(ex){
 
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{  type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="customercategory">Customer Category<span className="text-danger">&nbsp;*</span> </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <div className="form-check form-check-inline">
                   <label
                     className="form-check-label"
@@ -1103,13 +1112,16 @@ catch(ex){
                 )} */}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .1, type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="customername">Customer Name<span className="text-danger">&nbsp;*</span> </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="text"
                   className="form-control"
@@ -1129,13 +1141,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .1, type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="smartcity">Smart City<span className="text-danger">&nbsp;*</span> </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <div className="form-check form-check-inline">
                   <label className="form-check-label" htmlFor="smartcityyyes">
                     <input
@@ -1170,15 +1185,18 @@ catch(ex){
                 </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .2, type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="customersubcategory">
                   Customer Sub Category:
                 </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <Select
                   name="customersubcategory"
                   id="customersubcategory"
@@ -1199,13 +1217,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .2, type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="country">Country<span className="text-danger">&nbsp;*</span> </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <Select
                   name="country"
                   id="country"
@@ -1226,13 +1247,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .3, type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="state">State<span className="text-danger">&nbsp;*</span> </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <Select
                   name="state"
                   id="state"
@@ -1255,13 +1279,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .3, type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="distrit">District <span className="text-danger">&nbsp;*</span> </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <Select
                   name="distrit"
                   id="distrit"
@@ -1282,13 +1309,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .4, type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="city">City/Town/Village<span className="text-danger">&nbsp;*</span> </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <Select
                   name="city"
                   id="city"
@@ -1309,13 +1339,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .4, type:'spring', stiffness: 180}} >
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-5 ">
                 <label htmlFor="pincode">Pincode <span className="text-danger">&nbsp;*</span> </label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="number"
                   className="form-control"
@@ -1335,14 +1368,17 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .5, type:'spring', stiffness: 180}} >
             <div className="row font-weight-bold">
-              <div className="col-lg-4 text-dark mt-2">
+              <div className="col-lg-5  mt-2">
                 <label htmlFor="address">Address &nbsp;</label>
                 <p className="text-info font-weight-bold mt-n3"><small><b>({addresslen} Characters Remaining) </b></small></p> 
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <textarea
                   className="form-control"
                   id="address"
@@ -1364,13 +1400,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .5, type:'spring', stiffness: 180}} >
             <div className="row align-items-center font-weight-bold  mb-4">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-5 ">
                 <label htmlFor="phone">Phone &nbsp;</label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="text"
                   className="form-control"
@@ -1391,11 +1430,11 @@ catch(ex){
               </div>
             </div>
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-5 ">
                 <label htmlFor="pan">Pan &nbsp;</label>
                 <p className="text-info font-weight-bold mt-n3"><small><b>(Example: FDTPM0000D)</b></small></p> 
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="text"
                   className="form-control"
@@ -1415,13 +1454,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4" 
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .6, type:'spring', stiffness: 180}} >
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-5 ">
                 <label htmlFor="mobile">Mobile No &nbsp;</label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="text"
                   className="form-control"
@@ -1441,13 +1483,13 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
           {/* <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-6 ">
                 <label htmlFor="currentyrdate">Current Year/Date &nbsp;</label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-6">
                 <input
                   type="date"
                   className="form-control"
@@ -1468,12 +1510,15 @@ catch(ex){
               </div>
             </div>
           </div> */}
-          <div className="inputgroup col-lg-6 mb-4">
+          <motion.div className="inputgroup col-lg-6 mb-4"
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .6, type:'spring', stiffness: 180}} >
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-5 ">
                 <label htmlFor="email">Email &nbsp;</label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="text"
                   className="form-control"
@@ -1493,13 +1538,16 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4"
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .7, type:'spring', stiffness: 180}} >
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-5 ">
                 <label htmlFor="website">Website &nbsp;</label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="text"
                   className="form-control"
@@ -1519,15 +1567,18 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
           <div className="inputgroup col-lg-6 mb-4"></div>
-          <div className="inputgroup col-lg-6 mb-4">
+          <motion.div className="inputgroup col-lg-6 mb-4"
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .8, type:'spring', stiffness: 180}} >
             <div className="row align-items-center">
-              <div className="col-lg-4 text-dark font-weight-bold">
+              <div className="col-lg-5 ">
                 <label htmlFor="gstregistered">GST Registered&nbsp;</label>
                
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <div className="form-check form-check-inline">
                   <label
                     className="form-check-label"
@@ -1561,14 +1612,17 @@ catch(ex){
                 </div>
               </div>
             </div>
-          </div>
-          <div className="inputgroup col-lg-6 mb-4">
+          </motion.div>
+          <motion.div className="inputgroup col-lg-6 mb-4"
+            initial={{y:80, opacity: 0}} 
+            animate={{y:0, opacity: 1}}    
+            transition={{ delay: .8, type:'spring', stiffness: 180}} >
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-5 ">
                 <label htmlFor="gstno">GST No. &nbsp;</label>
                 {!GstNoDisable && <p className="text-info font-weight-bold mt-n3"><small><b>(Ex : 22AAAAA0000A1Z5)</b></small></p> }
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 <input
                   type="text"
                   className="form-control"
@@ -1589,13 +1643,13 @@ catch(ex){
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
           {/* <div className="inputgroup col-lg-6 mb-4">
             <div className="row align-items-center font-weight-bold">
-              <div className="col-lg-4 text-dark">
+              <div className="col-lg-6 ">
                 <label htmlFor="populationyrdata">Population Year/Data :</label>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-6">
                 <input
                   type="text"
                   className="form-control"
@@ -1617,7 +1671,7 @@ catch(ex){
             </div>
           </div> */}
           
-          <div className="col-lg-12">
+          <motion.div className="col-lg-12" initial={{opacity:0}} whileInView={{opacity:1}}>
             {!id && <button
              className={(!formIsValid) ?  "btn btn-outline-primary float-right rounded-pill" :  "btn btn-primary float-right rounded-pill"} 
               disabled={!formIsValid || isdatasending}
@@ -1641,9 +1695,9 @@ catch(ex){
             >
               Cancel
             </button>
-          </div>
+          </motion.div>
         </div>
-      </form>
+      </form> ) }
       </div>
       
     </Fragment>

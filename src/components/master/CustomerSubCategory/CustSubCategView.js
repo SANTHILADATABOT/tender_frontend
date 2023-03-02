@@ -1,6 +1,8 @@
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import CustSubCategList from "./CustSubCategList";
+
 
 
 const CustSubCategView = () => {
@@ -10,7 +12,8 @@ const CustSubCategView = () => {
         <>
           {/* Page Heading */}
           <div className="container-fluid p-0">
-            <div className="card shadow mb-4">
+            <motion.div className="card shadow mb-4" 
+              initial={{scale: 0,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:'tween'}}>
               <div className="card-body">
                 <div className="row">
                   <div className="col-lg-12">
@@ -33,7 +36,7 @@ const CustSubCategView = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </>
       );

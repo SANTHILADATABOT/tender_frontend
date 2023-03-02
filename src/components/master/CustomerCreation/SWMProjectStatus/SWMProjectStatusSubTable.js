@@ -65,12 +65,12 @@ const SWMProjectStatusSubTable = (props) => {
       </div>
       <div className="table-responsive">
         <table
-          className="table text-center"
+          className="table table-bordered text-center"
           id="dataTable"
           width="100%"
           cellSpacing={0}
         >
-          <thead className="text-center bg-primary text-white align-middle">
+          <thead className="text-center bg-greeny text-white align-middle">
             <tr className="align-middle">
               <th scope="col" className="align-middle">#</th>
               <th scope="col" className="align-middle">Project Type</th>
