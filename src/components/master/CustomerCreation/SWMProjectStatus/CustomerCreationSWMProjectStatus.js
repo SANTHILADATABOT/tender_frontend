@@ -9,7 +9,7 @@ import SWMProjectStatusSubTable from "./SWMProjectStatusSubTable";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { swmprojectstatusActions } from "../store/SWMProjectStatusSlice";
-
+import { motion } from "framer-motion";
 // validations for input value
 const isNotNull = (value) => {
   //$$$$$
@@ -506,14 +506,17 @@ const CustomerCreationSWMProjectStatus = () => {
         </div>}
         <form onSubmit={submitHandler}>
           <div className="row align-items-center">
-            <div className="inputgroup col-lg-6 mb-4">
+            <motion.div className="inputgroup col-lg-6 mb-4"  
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .1, type:'spring', stiffness: 180}} >
               <div className="row align-items-center ">
-                <div className="col-lg-4 text-dark font-weight-bold">
+                <div className="col-lg-5 text-dark font-weight-bold">
                   <label htmlFor="projecttype">
                    Project Type :
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                     <Select
                     name="projecttype"
                     id="projecttype"
@@ -534,16 +537,19 @@ const CustomerCreationSWMProjectStatus = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="inputgroup col-lg-6 mb-4">
+            <motion.div className="inputgroup col-lg-6 mb-4"  
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .1, type:'spring', stiffness: 180}} >
               <div className="row align-items-center ">
-                <div className="col-lg-4 text-dark font-weight-bold">
+                <div className="col-lg-5 text-dark font-weight-bold">
                   <label htmlFor="status">
                    Status :
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                     <Select
                     name="status"
                     id="status"
@@ -563,16 +569,19 @@ const CustomerCreationSWMProjectStatus = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="inputgroup col-lg-6 mb-4">
+            <motion.div className="inputgroup col-lg-6 mb-4"  
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .2, type:'spring', stiffness: 180}} >
               <div className="row align-items-center ">
-                <div className="col-lg-4 text-dark font-weight-bold">
+                <div className="col-lg-5 text-dark font-weight-bold">
                   <label htmlFor="vendorType">
                    Vendor Type :
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                     <Select
                     name="vendorType"
                     id="vendorType"
@@ -592,16 +601,19 @@ const CustomerCreationSWMProjectStatus = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="inputgroup col-lg-6 mb-4">
+            <motion.div className="inputgroup col-lg-6 mb-4"  
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .2, type:'spring', stiffness: 180}} >
               <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+                <div className="col-lg-5 text-dark">
                   <label htmlFor="vendor">
                     Vendor :
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                   <input
                     type="text"
                     className="form-control"
@@ -621,16 +633,19 @@ const CustomerCreationSWMProjectStatus = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="inputgroup col-lg-6 mb-4">
+            <motion.div className="inputgroup col-lg-6 mb-4"  
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .3, type:'spring', stiffness: 180}} >
               <div className="row align-items-center ">
-                <div className="col-lg-4 text-dark font-weight-bold" >
+                <div className="col-lg-5 text-dark font-weight-bold" >
                   <label htmlFor="projectstatus">
                     Project Status :
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                    <Select
                     name="projectstatus"
                     id="projectstatus"
@@ -651,16 +666,19 @@ const CustomerCreationSWMProjectStatus = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="inputgroup col-lg-6 mb-4">
+            <motion.div className="inputgroup col-lg-6 mb-4"  
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .3, type:'spring', stiffness: 180}} >
               <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+                <div className="col-lg-5 text-dark">
                   <label htmlFor="projectvalue">
                     Project Value :
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                   <input
                     type="number"
                     className="form-control"
@@ -680,16 +698,19 @@ const CustomerCreationSWMProjectStatus = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="inputgroup col-lg-6 mb-4">
+            <motion.div className="inputgroup col-lg-6 mb-4"  
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .4, type:'spring', stiffness: 180}} >
               <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+                <div className="col-lg-5 text-dark">
                   <label htmlFor="duration">
                    Duration :
                   </label>
                 </div>
-                <div className="col-lg-8 ">
+                <div className="col-lg-7 ">
                   <div className="col-lg-12 d-flex justify-content-between p-0">
                   <input
                     type="date"
@@ -722,7 +743,7 @@ const CustomerCreationSWMProjectStatus = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
             
             <div className="col-lg-12 d-flex justify-content-center">
               {!isEditbtn && 

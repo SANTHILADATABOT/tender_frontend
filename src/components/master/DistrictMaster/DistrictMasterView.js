@@ -1,7 +1,7 @@
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import DistrictMasterList from "./DistrictMasterList";
-
 
 const DistrictMasterView = () => {
   usePageTitle("District Master Creation");
@@ -10,7 +10,8 @@ const DistrictMasterView = () => {
       {/* Page Heading */}
       <div className="container-fluid p-0">
         <div className="card shadow mb-4">
-          <div className="card-body">
+          <motion.div className="card-body"
+             initial={{scale: 0,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:'tween'}}>
             <div className="row">
               <div className="col-lg-12">
                 <div className="row">
@@ -34,7 +35,7 @@ const DistrictMasterView = () => {
                 <DistrictMasterList/>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </>

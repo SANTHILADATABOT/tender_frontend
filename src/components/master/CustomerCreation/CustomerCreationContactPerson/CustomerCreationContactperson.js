@@ -10,8 +10,7 @@ import CustomerCreationContactSubtable from "./CustomerCreationContactSubtable";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { contactPersonActions } from "../store/ContactPersonSlice";
-
-
+import { motion } from 'framer-motion';
 
 //validation custom functions
 // const isNotEmpty = (value) => value.trim() !== "";
@@ -296,14 +295,17 @@ const CustomerCreationContactPerson = () => {
         </div>}
         <form onSubmit={submitHandler}>
           <div className="row align-items-center">
-            <div className="inputgroup col-lg-6 mb-4">
+            <motion.div className="inputgroup col-lg-6 mb-4"
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .1, type:'spring', stiffness: 180}} >
               <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+                <div className="col-lg-5 text-dark">
                   <label htmlFor="contactpersonname">
                     Contact Person Name :
                   </label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                   <input
                     type="text"
                     className="form-control"
@@ -323,13 +325,16 @@ const CustomerCreationContactPerson = () => {
                   )}
                 </div>
               </div>
-            </div>
-            <div className="inputgroup col-lg-6 mb-4">
+            </motion.div>
+            <motion.div className="inputgroup col-lg-6 mb-4"
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .1, type:'spring', stiffness: 180}} >
               <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+                <div className="col-lg-5 text-dark">
                   <label htmlFor="Designation">Designation :</label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                   <input
                     type="text"
                     className="form-control"
@@ -349,13 +354,16 @@ const CustomerCreationContactPerson = () => {
                   )}
                 </div>
               </div>
-            </div>
-            <div className="inputgroup col-lg-6 mb-4">
+            </motion.div>
+            <motion.div className="inputgroup col-lg-6 mb-4"
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .2, type:'spring', stiffness: 180}} >
               <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+                <div className="col-lg-5 text-dark">
                   <label htmlFor="email">Email :</label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                   <input
                     type="text"
                     className="form-control"
@@ -375,13 +383,16 @@ const CustomerCreationContactPerson = () => {
                   )}
                 </div>
               </div>
-            </div>
-            <div className="inputgroup col-lg-6 mb-4">
+            </motion.div>
+            <motion.div className="inputgroup col-lg-6 mb-4"
+              initial={{y:80, opacity: 0}} 
+              animate={{y:0, opacity: 1}}    
+              transition={{ delay: .2, type:'spring', stiffness: 180}} >
               <div className="row align-items-center font-weight-bold">
-                <div className="col-lg-4 text-dark">
+                <div className="col-lg-5 text-dark">
                   <label htmlFor="mobile">Mobile no :</label>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-7">
                   <input
                     // type="number"
                     type="text"
@@ -403,7 +414,7 @@ const CustomerCreationContactPerson = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
             <div className="col-lg-12 d-flex justify-content-center">
               {!isEditbtn && 
               <button

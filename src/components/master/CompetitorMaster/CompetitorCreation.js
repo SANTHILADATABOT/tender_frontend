@@ -22,6 +22,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
+import { motion } from "framer-motion";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 window.JSZip = jsZip;
 
@@ -57,10 +58,10 @@ const CompetitorCreation = () => {
   useEffect(() => {
     table = $(`#dataTable`).DataTable({
       dom:
-        //   "<'row'<'col-sm-12'l>>" +
-        "<'row'<'col-sm-12   col-md-2 mt-2'l> <'col-sm-12  col-md-4'B> <'col-sm-12 col-md-6 mt-2'f>>" +
-        "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+         //   "<'row'<'col-sm-12'l>>" +
+         "<'row px-3'<'col-sm-12   col-md-6 pl-4'l>  <'col-sm-12 col-md-6 pr-4'f>>" +
+         "<'row'<'col-sm-12'tr>>" +
+         "<'row px-3'<'col-sm-12 col-md-5 pl-4'i><'col-sm-12 col-md-7 pr-4'p>>",
 
       buttons: [
         // {
@@ -164,16 +165,18 @@ const CompetitorCreation = () => {
       <div className="container-fluid p-0">
         <div className="row">
           <div className="col-lg-12">
-            <div className="card shadow mb-4">
+            <motion.div className="card shadow mb-4" initial={{scale: 0,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:'tween'}}>
               <div className="card-body">
-                <div className="competitorListTable">
+              </div>
+              <div>
+                <div className="competitorListTable pb-4">
                   <table
-                    className="table table-bordered text-center"
+                    className="table  text-center"
                     id="dataTable"
                     width="100%"
                     cellSpacing={0}
                   >
-                    <thead className="text-center bg-primary text-white">
+                    <thead className="text-center bg-gray text-greeny">
                       <tr>
                         <th className="w-5">Sl.No</th>
                         <th className="w-15">Competitor No</th>
@@ -187,7 +190,7 @@ const CompetitorCreation = () => {
                   </table>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

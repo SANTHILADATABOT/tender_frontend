@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { motion } from "framer-motion";
 
 function Sidebar() {
   const [active, setActive] = useState("");
@@ -23,42 +24,45 @@ function Sidebar() {
 
   return (
     <ul
-      className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+      className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion SideNav"
       id="accordionSidebar"
     >
       {/* Sidebar - Brand */}
-      <Link
+      <motion.Link
         to="/"
-        className="sidebar-brand d-flex align-items-center justify-content-center"
+        className="sidebar-brand d-flex align-items-center justify-content-center brand"
+        initial={{opacity: 0}}
+        animate={{opacity: 1}} 
       >
         <div className="sidebar-brand-icon">
           <img
             src="assets/icons/logo.png"
             width="70"
             height="70"
-            className="mt-2"
+            className="icon"
             alt="..."
           />
         </div>
         <div className="sidebar-brand-text mx-3">Zigma</div>
-      </Link>
+      </motion.Link>
       {/* Divider */}
       <hr className="sidebar-divider my-0" />
       {/* Nav Item - Dashboard */}
-      <li className="nav-item">
+      <motion.li className="nav-item" 
+        animate={{x:0}} initial={{x:-300}} transition={{type: 'tween'  }}>
         <Link className="nav-link" to="/tender">
           {/*<i className="fas fa-fw fa-tachometer-alt" />*/}
           <i className="fa fa-laptop"></i>
           <span className="font-weight-bold ml-1">Dashboard</span>
         </Link>
-      </li>
-{/* $$$$ */}
-     
+      </motion.li>
+      {/* $$$$ */}
 
       {/* Divider */}
       <hr className="sidebar-divider my-0" />
       {/* Nav Item - Dashboard */}
-      <li className="nav-item ">
+      <motion.li className="nav-item "
+        animate={{x:0}} initial={{x:-300}} transition={{type: 'tween', delay: 0.1 }}>
         <Link
           className="nav-link collapsed"
           to="#"
@@ -70,7 +74,7 @@ function Sidebar() {
         >
           {/*<i className="fas fa-fw fa-cog" />*/}
           <i className="fa fa-graduation-cap"></i>
-          <span className="font-weight-bold ml-1">Master</span>
+          <span>Master</span>
         </Link>
         <div
           id="collapseMasterMenu"
@@ -182,12 +186,13 @@ function Sidebar() {
             
           </div>
         </div>
-      </li>
+      </motion.li>
 
-       {/* Divider */}
-       <hr className="sidebar-divider my-0" />
+      {/* Divider */}
+      <hr className="sidebar-divider my-0" />
       {/* Nav Item - Pages Collapse Menu */}
-      <li className="nav-item">
+      <motion.li className="nav-item"
+        animate={{x:0}} initial={{x:-300}} transition={{type: 'tween', delay: 0.2 }}>
         <Link
           className="nav-link collapsed"
           to="#"
@@ -199,7 +204,7 @@ function Sidebar() {
         >
           {/*<i className="fas fa-fw fa-cog" />*/}
           <i className="fa fa-gavel"></i>
-          <span className="font-weight-bold ml-1">Tenders</span>
+          <span>Tenders</span>
         </Link>
         <div
           id="collapseTenderMenu"
@@ -240,10 +245,9 @@ function Sidebar() {
             >
               Legacy Statement
             </NavLink>
-            
           </div>
         </div>
-      </li>
+      </motion.li>
 
 
        {/* Divider */}
@@ -282,9 +286,9 @@ function Sidebar() {
         </div>
       </li>
 
-      <div className="text-center d-none d-md-inline">
+      <motion.div className="text-center d-none d-md-inline">
         <button className="rounded-circle border-0" id="sidebarToggle"></button>
-      </div>
+      </motion.div>
     </ul>
   );
 }
