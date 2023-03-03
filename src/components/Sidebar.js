@@ -28,11 +28,11 @@ function Sidebar() {
       id="accordionSidebar"
     >
       {/* Sidebar - Brand */}
-      <motion.Link
-        to="/"
+      <motion.span
+      initial={{opacity: 0}}
+      animate={{opacity: 1}} 
+        // to="/"
         className="sidebar-brand d-flex align-items-center justify-content-center brand"
-        initial={{opacity: 0}}
-        animate={{opacity: 1}} 
       >
         <div className="sidebar-brand-icon">
           <img
@@ -44,7 +44,7 @@ function Sidebar() {
           />
         </div>
         <div className="sidebar-brand-text mx-3">Zigma</div>
-      </motion.Link>
+      </motion.span>
       {/* Divider */}
       <hr className="sidebar-divider my-0" />
       {/* Nav Item - Dashboard */}

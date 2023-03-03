@@ -572,6 +572,18 @@ body {
     top: 0px!important;
     right: 0px!important;
 }
+.triangle-info {
+    width: 0;
+    height: 0;
+    border-top: 80px solid transparent;
+    border-right: 80px solid rgb(78, 183, 243);
+    border-bottom: 80px solid transparent;
+    border-left: -20px solid transparent;
+    rotate: 0deg!important;
+    position: relative;
+    top: 0px!important;
+    right: 0px!important;
+}
 @media screen and (max-width: 768px) {
     .triangle-fresh {
         rotate: 135deg!important;
@@ -580,6 +592,12 @@ body {
         right: -32px!important;
     }
     .triangle-live {
+        rotate: 135deg!important;
+        position: relative;
+        top: -80px!important;
+        right: -32px!important;
+    }
+    .triangle-info {
         rotate: 135deg!important;
         position: relative;
         top: -80px!important;

@@ -111,7 +111,17 @@ function Dashboard() {
 
 
               <div className="col-xl-4 col-md-6 mb-4">
-                <div className="card border-left-info shadow h-100 py-2  border-3">
+                <motion.div className="card border-left-info shadow h-100 py-2 triangle-awarded border-3"
+                   initial={{
+                    x: 1300, opacity: 0
+                    }} 
+                    animate={{
+                      x: 0, opacity:1
+                    }}
+                    transition={{
+                      type: 'tween', stiffness: 10, duration: 0.5, delay: 0.3
+                    }}>
+                  
                   <div className="card-body">
                     <div className="row no-gutters align-items-center">
                       <div className="col mr-2">
@@ -129,7 +139,7 @@ function Dashboard() {
                      
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
               {/* <div className="col-xl-4 col-md-6 mb-4 ">
                 <div className="card border-left-info shadow h-100 py-2  border-3">

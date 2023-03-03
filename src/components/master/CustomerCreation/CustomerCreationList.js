@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { useEffect, useState } from "react";
-import RotateLoader from "react-spinners/RotateLoader";
+// import RotateLoader from "react-spinners/RotateLoader";
 import "./CustomerCreationList.css";
 //For DataTable
 import "jquery/dist/jquery.min.js";
