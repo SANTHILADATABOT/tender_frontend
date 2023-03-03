@@ -141,27 +141,7 @@ function Dashboard() {
                   </div>
                 </motion.div>
               </div>
-              {/* <div className="col-xl-4 col-md-6 mb-4 ">
-                <div className="card border-left-info shadow h-100 py-2  border-3">
-                  <div className="card-body">
-                    <div className="row no-gutters align-items-center">
-                      <div className="col pl-3 ">
-                        <div className="text-xl font-weight-bold text-info text-uppercase mb-2">
-                          Awarded Tenders
-                        </div>
-                          <div className="h2 mb-0 font-weight-bold text-gray-800 ">
-                          5
-                        </div>
-                      </div>
-                      <div className="col-auto">
-                      <div className="triangle-awarded"></div>
-                        //  <i className="fas fa-dollar-sign fa-2x text-gray-300" /> 
-                        {/* <img src="assets/icons/tender_awarded1.png" alt="" width="50" height="50" className="mb-1 text-gray-300"/>}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div> */}
+             
             </div>  
             
             </>
