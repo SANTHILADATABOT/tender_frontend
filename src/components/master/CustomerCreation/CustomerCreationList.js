@@ -52,7 +52,7 @@ const CustomerCreationList = () => {
 
     $("#dataTable tbody").on("click", "tr .fa-edit", function () {
       let rowdata = table.row($(this).closest("tr")).data();
-      navigate(`${location.pathname}/main/profile/${rowdata.id}`);
+      navigate(`${location.pathname}/main/profile/${rowdata.id}`, { state: { data: {byclicking :'new' } }});
       // props.onEdit(rowdata)
     });
 
